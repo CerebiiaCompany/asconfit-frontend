@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { notificacionService, Notificacion } from '../services/notificacionService';
 
 export interface Notification {
     id: string;
@@ -9,75 +10,110 @@ export interface Notification {
     type?: 'info' | 'warning' | 'success' | 'error';
 }
 
-// Notificaciones de prueba (en producción vendrían de una API)
-const initialNotifications: Notification[] = [
-    {
-        id: '1',
-        title: 'Nueva auditoría asignada',
-        message: 'Se te ha asignado la auditoría de Empresa ABC para revisión',
-        time: 'Hace 5 minutos',
-        read: false,
-        type: 'info'
-    },
-    {
-        id: '2',
-        title: 'Auditoría completada',
-        message: 'La auditoría de Empresa XYZ ha sido completada exitosamente',
-        time: 'Hace 1 hora',
-        read: false,
-        type: 'success'
-    },
-    {
-        id: '3',
-        title: 'Documento pendiente',
-        message: 'Faltan documentos por cargar en la auditoría de Empresa DEF',
-        time: 'Hace 2 horas',
-        read: true,
-        type: 'warning'
-    },
-    {
-        id: '4',
-        title: 'Error en validación',
-        message: 'Se encontraron errores en la validación de documentos',
-        time: 'Hace 3 horas',
-        read: true,
-        type: 'error'
-    },
-    {
-        id: '5',
-        title: 'Recordatorio',
-        message: 'Tienes 3 auditorías pendientes de revisión esta semana',
-        time: 'Hace 1 día',
-        read: true,
-        type: 'info'
+const getNotificationType = (tipo: string): 'info' | 'warning' | 'success' | 'error' => {
+    switch (tipo) {
+        case 'auditoria_creada':
+        case 'tarea_asignada':
+            return 'info';
+        case 'archivo_subido':
+            return 'success';
+        case 'auditoria_completada':
+            return 'success';
+        case 'documento_pendiente':
+            return 'warning';
+        case 'error':
+            return 'error';
+        default:
+            return 'info';
     }
-];
+};
+
+const getTimeAgo = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Justo ahora';
+    if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
+    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+    return date.toLocaleDateString();
+};
+
+const convertToNotification = (notif: Notificacion): Notification => ({
+    id: notif.id.toString(),
+    title: notif.titulo,
+    message: notif.mensaje,
+    time: getTimeAgo(notif.created_at),
+    read: notif.leida,
+    type: getNotificationType(notif.tipo)
+});
 
 export const useNotifications = () => {
-    const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleMarkAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(notif =>
-                notif.id === id ? { ...notif, read: true } : notif
-            )
-        );
+    const loadNotifications = async () => {
+        try {
+            const data = await notificacionService.getAll();
+            setNotifications(data.map(convertToNotification));
+        } catch (error) {
+            console.error('Error al cargar notificaciones:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleMarkAllAsRead = () => {
-        setNotifications(prev =>
-            prev.map(notif => ({ ...notif, read: true }))
-        );
+    useEffect(() => {
+        loadNotifications();
+
+        // Recargar notificaciones cada 30 segundos
+        const interval = setInterval(loadNotifications, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleMarkAsRead = async (id: string) => {
+        try {
+            await notificacionService.markAsRead(parseInt(id));
+            setNotifications(prev =>
+                prev.map(notif =>
+                    notif.id === id ? { ...notif, read: true } : notif
+                )
+            );
+        } catch (error) {
+            console.error('Error al marcar como leída:', error);
+        }
     };
 
-    const handleClearAll = () => {
-        setNotifications([]);
+    const handleMarkAllAsRead = async () => {
+        try {
+            await notificacionService.markAllAsRead();
+            setNotifications(prev =>
+                prev.map(notif => ({ ...notif, read: true }))
+            );
+        } catch (error) {
+            console.error('Error al marcar todas como leídas:', error);
+        }
+    };
+
+    const handleClearAll = async () => {
+        try {
+            await notificacionService.deleteAll();
+            setNotifications([]);
+        } catch (error) {
+            console.error('Error al limpiar notificaciones:', error);
+        }
     };
 
     return {
         notifications,
+        loading,
         handleMarkAsRead,
         handleMarkAllAsRead,
-        handleClearAll
+        handleClearAll,
+        refreshNotifications: loadNotifications
     };
 };
