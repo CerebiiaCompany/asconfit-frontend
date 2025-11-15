@@ -8,6 +8,14 @@ const getAuthHeader = () => {
 };
 
 export const plantillaService = {
+    async getPlantillas() {
+        const response = await axios.get(
+            `${API_URL}/categoria-plantillas`,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
     async getPlantilla(codigo: string) {
         const response = await axios.get(
             `${API_URL}/categoria-plantillas/${codigo}`,

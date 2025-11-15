@@ -85,10 +85,10 @@ export const useAuditoriaForm = () => {
         }));
     };
 
-    const handleLoadPlantilla = async (categoriaId: string, codigo: string) => {
+    const handleLoadPlantilla = async (categoriaId: string, codigoONombre: string) => {
         try {
             const { plantillaService } = await import('../services/plantillaService');
-            const plantilla = await plantillaService.getPlantilla(codigo);
+            const plantilla = await plantillaService.getPlantilla(codigoONombre);
 
             setCategorias(prev => prev.map(cat => {
                 if (cat.id === categoriaId) {
@@ -109,7 +109,7 @@ export const useAuditoriaForm = () => {
             }));
         } catch (error) {
             console.error('Error al cargar plantilla:', error);
-            alert('Error al cargar la plantilla');
+            // No mostrar alert si la plantilla no existe (puede ser una categoría nueva)
         }
     };
 

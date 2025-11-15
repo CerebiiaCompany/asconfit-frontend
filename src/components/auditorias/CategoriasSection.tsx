@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Categoria, Subtarea } from '../../types/auditoria.types';
 import { SubtareaItem } from './SubtareaItem';
+import { plantillaService } from '../../services/plantillaService';
 
 interface CategoriasSectionProps {
     categorias: Categoria[];
@@ -23,6 +24,20 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
     onSubtareaChange,
     onLoadPlantilla
 }) => {
+    const [plantillasDisponibles, setPlantillasDisponibles] = useState<any[]>([]);
+
+    useEffect(() => {
+        const cargarPlantillas = async () => {
+            try {
+                const plantillas = await plantillaService.getPlantillas();
+                setPlantillasDisponibles(plantillas);
+            } catch (error) {
+                console.error('Error al cargar plantillas:', error);
+            }
+        };
+        cargarPlantillas();
+    }, []);
+
     return (
         <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -44,26 +59,69 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1">
                                 <label className="text-sm text-gray-600 sm:w-24 flex-shrink-0">Categoría</label>
-                                <select
-                                    value={categoria.nombre}
-                                    onChange={(e) => {
-                                        const newValue = e.target.value;
-                                        const previousValue = categoria.nombre;
-                                        onCategoriaChange(categoria.id, newValue);
-                                        // Cargar plantilla automáticamente si se selecciona una categoría diferente
-                                        if (newValue && newValue !== previousValue) {
-                                            onLoadPlantilla(categoria.id, newValue);
-                                        }
-                                    }}
-                                    className="flex-1 sm:max-w-md px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
-                                >
-                                    <option value="">Selecciona la categoría requerida</option>
-                                    <option value="documentos_corporativos">Documentos Corporativos</option>
-                                    <option value="libros_contables">Libros Contables</option>
-                                    <option value="informacion_financiera">Información Financiera</option>
-                                    <option value="impuestos">Impuestos</option>
-                                    <option value="nomina">Nómina</option>
-                                </select>
+                                {(() => {
+                                    // Verificar si la categoría actual es una plantilla existente
+                                    const esPlantillaExistente = plantillasDisponibles.some(
+                                        p => p.codigo === categoria.nombre || p.nombre === categoria.nombre
+                                    );
+                                    const esCategoriaPersonalizada = categoria.nombre && !esPlantillaExistente;
+
+                                    if (esCategoriaPersonalizada) {
+                                        // Mostrar input para categoría personalizada
+                                        return (
+                                            <div className="flex-1 flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={categoria.nombre}
+                                                    onChange={(e) => onCategoriaChange(categoria.id, e.target.value)}
+                                                    className="flex-1 sm:max-w-md px-3 sm:px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base font-medium"
+                                                    placeholder="Nombre de la categoría personalizada"
+                                                />
+                                                <button
+                                                    onClick={() => onCategoriaChange(categoria.id, '')}
+                                                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 underline"
+                                                    title="Cambiar a plantilla"
+                                                >
+                                                    Cambiar
+                                                </button>
+                                            </div>
+                                        );
+                                    }
+
+                                    // Mostrar select para plantillas
+                                    return (
+                                        <select
+                                            value={categoria.nombre}
+                                            onChange={(e) => {
+                                                const newValue = e.target.value;
+                                                const previousValue = categoria.nombre;
+
+                                                if (newValue === 'nueva') {
+                                                    // Permitir escribir nombre personalizado
+                                                    const nombrePersonalizado = prompt('Ingresa el nombre de la nueva categoría:');
+                                                    if (nombrePersonalizado && nombrePersonalizado.trim()) {
+                                                        onCategoriaChange(categoria.id, nombrePersonalizado.trim());
+                                                    }
+                                                } else {
+                                                    onCategoriaChange(categoria.id, newValue);
+                                                    // Cargar plantilla automáticamente si se selecciona una categoría existente
+                                                    if (newValue && newValue !== previousValue && newValue !== 'nueva') {
+                                                        onLoadPlantilla(categoria.id, newValue);
+                                                    }
+                                                }
+                                            }}
+                                            className="flex-1 sm:max-w-md px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+                                        >
+                                            <option value="">Selecciona la categoría requerida</option>
+                                            {plantillasDisponibles.map((plantilla) => (
+                                                <option key={plantilla.id} value={plantilla.codigo}>
+                                                    {plantilla.nombre}
+                                                </option>
+                                            ))}
+                                            <option value="nueva" className="font-semibold text-orange-600">+ Crear nueva categoría</option>
+                                        </select>
+                                    );
+                                })()}
                             </div>
                             <button
                                 onClick={() => onRemoveCategoria(categoria.id)}
