@@ -44,7 +44,43 @@ export const NuevaAuditoria: React.FC = () => {
         handleLoadPlantilla
     } = useAuditoriaForm();
 
+    const validateForm = (): { isValid: boolean; message: string } => {
+        // Validar campos de empresa
+        const camposEmpresaRequeridos = [
+            { campo: 'empresa', nombre: 'Empresa' },
+            { campo: 'nit', nombre: 'NIT' },
+            { campo: 'razonSocial', nombre: 'Razón Social' },
+            { campo: 'direccion', nombre: 'Dirección' },
+            { campo: 'responsable', nombre: 'Responsable o Representante Legal' },
+            { campo: 'actividadEconomica', nombre: 'Actividad Económica' },
+            { campo: 'contacto', nombre: 'Contacto' }
+        ];
+
+        for (const { campo, nombre } of camposEmpresaRequeridos) {
+            if (!formData[campo as keyof typeof formData] || formData[campo as keyof typeof formData].trim() === '') {
+                return {
+                    isValid: false,
+                    message: `El campo "${nombre}" es obligatorio`
+                };
+            }
+        }
+
+        return { isValid: true, message: '' };
+    };
+
     const handleSubmit = async () => {
+        // Validar formulario
+        const validation = validateForm();
+        if (!validation.isValid) {
+            setModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Campos incompletos',
+                message: validation.message
+            });
+            return;
+        }
+
         try {
             const auditoriaData = {
                 formData,
