@@ -49,5 +49,22 @@ export const auditoriaService = {
             { headers: getAuthHeader() }
         );
         return response.data;
+    },
+
+    async uploadFile(subtareaId: number, file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await axios.post(
+            `${API_URL}/auditorias/subtareas/${subtareaId}/upload`,
+            formData,
+            {
+                headers: {
+                    ...getAuthHeader(),
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
+        return response.data;
     }
 };

@@ -25,6 +25,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = true, onClo
             icon: '/search.png',
         },
         {
+            id: 'mis-tareas',
+            path: '/mis-tareas',
+            label: 'Mis Tareas',
+            icon: '/search.png',
+        },
+        {
             id: 'empresas',
             path: '/empresas',
             label: 'Empresas',
@@ -42,6 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = true, onClo
         if (location.pathname === path) return true;
         // Mantener activo "Auditorías" en rutas relacionadas
         if (path === '/auditorias' && location.pathname.startsWith('/auditorias/')) return true;
+        // Mantener activo "Mis Tareas" en rutas relacionadas
+        if (path === '/mis-tareas' && location.pathname.startsWith('/mis-tareas/')) return true;
         return false;
     };
 
