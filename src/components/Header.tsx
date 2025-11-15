@@ -1,25 +1,13 @@
 import React from 'react';
 import { UserDropdown } from './UserDropdown';
 import { NotificationDropdown } from './NotificationDropdown';
-
-interface Notification {
-    id: string;
-    title: string;
-    message: string;
-    time: string;
-    read: boolean;
-    type?: 'info' | 'warning' | 'success' | 'error';
-}
+import { useNotifications } from '../hooks/useNotifications';
 
 interface HeaderProps {
     userName?: string;
     onLogout?: () => void;
     showActions?: boolean;
     onNavigateToSettings?: () => void;
-    notifications?: Notification[];
-    onMarkNotificationAsRead?: (id: string) => void;
-    onMarkAllNotificationsAsRead?: () => void;
-    onClearAllNotifications?: () => void;
     onToggleSidebar?: () => void;
 }
 
@@ -28,12 +16,9 @@ export const Header: React.FC<HeaderProps> = ({
     onLogout,
     showActions = true,
     onNavigateToSettings,
-    notifications,
-    onMarkNotificationAsRead,
-    onMarkAllNotificationsAsRead,
-    onClearAllNotifications,
     onToggleSidebar
 }) => {
+    const { notifications, handleMarkAsRead, handleMarkAllAsRead, handleClearAll } = useNotifications();
 
     return (
         <header className="shadow-lg fixed top-0 right-0 lg:left-32 left-0 z-10" style={{ backgroundColor: '#FF9411' }}>
@@ -92,9 +77,9 @@ export const Header: React.FC<HeaderProps> = ({
                             {/* Notification Dropdown */}
                             <NotificationDropdown
                                 notifications={notifications}
-                                onMarkAsRead={onMarkNotificationAsRead}
-                                onMarkAllAsRead={onMarkAllNotificationsAsRead}
-                                onClearAll={onClearAllNotifications}
+                                onMarkAsRead={handleMarkAsRead}
+                                onMarkAllAsRead={handleMarkAllAsRead}
+                                onClearAll={handleClearAll}
                             />
 
                             {/* User Menu */}
