@@ -46,7 +46,15 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                 <label className="text-sm text-gray-600 sm:w-24 flex-shrink-0">Categoría</label>
                                 <select
                                     value={categoria.nombre}
-                                    onChange={(e) => onCategoriaChange(categoria.id, e.target.value)}
+                                    onChange={(e) => {
+                                        const newValue = e.target.value;
+                                        const previousValue = categoria.nombre;
+                                        onCategoriaChange(categoria.id, newValue);
+                                        // Cargar plantilla automáticamente si se selecciona una categoría diferente
+                                        if (newValue && newValue !== previousValue) {
+                                            onLoadPlantilla(categoria.id, newValue);
+                                        }
+                                    }}
                                     className="flex-1 sm:max-w-md px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
                                 >
                                     <option value="">Selecciona la categoría requerida</option>
@@ -56,15 +64,6 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                     <option value="impuestos">Impuestos</option>
                                     <option value="nomina">Nómina</option>
                                 </select>
-                                {categoria.nombre && categoria.subtareas.length === 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => onLoadPlantilla(categoria.id, categoria.nombre)}
-                                        className="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap"
-                                    >
-                                        Cargar plantilla
-                                    </button>
-                                )}
                             </div>
                             <button
                                 onClick={() => onRemoveCategoria(categoria.id)}
