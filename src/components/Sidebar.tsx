@@ -57,13 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = true, onClo
                 style={{ backgroundColor: '#2D3748' }}
             >
                 {/* Logo Section */}
-                <div className="h-20 flex items-center justify-center border-b border-gray-700" style={{ backgroundColor: '#FF9411' }}>
+                <div className="h-20 flex items-center justify-center border-b border-gray-700 relative" style={{ backgroundColor: '#FF9411' }}>
                     {/* Botón cerrar en móvil */}
                     <button
                         onClick={onClose}
-                        className="lg:hidden absolute top-6 right-3 text-white hover:text-gray-200"
+                        className="lg:hidden p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
