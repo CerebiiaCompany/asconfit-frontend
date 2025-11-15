@@ -3,12 +3,11 @@ import { UserSettingsProps, TabType } from '../types/userSettings.types';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { usePasswordUpdate } from '../hooks/usePasswordUpdate';
 
-export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) => {
+export const UserSettings: React.FC<UserSettingsProps> = ({ initialUser, onBack, onLogout }) => {
     const [activeTab, setActiveTab] = useState<TabType>('profile');
 
     const {
         user,
-        loading,
         name,
         setName,
         email,
@@ -16,7 +15,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
         profileLoading,
         profileMessage,
         handleProfileUpdate
-    } = useUserProfile();
+    } = useUserProfile(initialUser);
 
     const {
         currentPassword,

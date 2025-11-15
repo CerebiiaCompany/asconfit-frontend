@@ -39,7 +39,11 @@ export const Perfil: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <UserSettings onBack={() => navigate('/dashboard')} onLogout={handleLogout} />
+                    <UserSettings
+                        initialUser={user!}
+                        onBack={() => navigate('/dashboard')}
+                        onLogout={handleLogout}
+                    />
                 )}
             </div>
         </div>

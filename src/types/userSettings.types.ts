@@ -1,4 +1,7 @@
+import { User } from '../services/authService';
+
 export interface UserSettingsProps {
+    initialUser: User;
     onBack: () => void;
     onLogout: () => void;
 }
