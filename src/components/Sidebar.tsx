@@ -38,7 +38,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, isOpen = true, onClo
         },
     ];
 
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = (path: string) => {
+        if (location.pathname === path) return true;
+        // Mantener activo "Auditorías" en rutas relacionadas
+        if (path === '/auditorias' && location.pathname.startsWith('/auditorias/')) return true;
+        return false;
+    };
 
     return (
         <>

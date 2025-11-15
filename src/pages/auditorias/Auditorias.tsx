@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
-import { Header } from '../components/Header';
-import { Sidebar } from '../components/Sidebar';
-import { useUser } from '../hooks/useUser';
-import { useAuditorias } from '../hooks/useAuditorias';
-import { AuditoriaStatsCard } from '../components/auditorias/AuditoriaStatsCard';
-import { AuditoriaSearchBar } from '../components/auditorias/AuditoriaSearchBar';
-import { AuditoriaEmptyState } from '../components/auditorias/AuditoriaEmptyState';
+import { authService } from '../../services/authService';
+import { Header } from '../../components/Header';
+import { Sidebar } from '../../components/Sidebar';
+import { useUser } from '../../hooks/useUser';
+import { useAuditorias } from '../../hooks/useAuditorias';
+import { AuditoriaStatsCard } from '../../components/auditorias/AuditoriaStatsCard';
+import { AuditoriaSearchBar } from '../../components/auditorias/AuditoriaSearchBar';
+import { AuditoriaEmptyState } from '../../components/auditorias/AuditoriaEmptyState';
 
 export const Auditorias: React.FC = () => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const Auditorias: React.FC = () => {
     const { stats } = useAuditorias();
 
     const handleNewAuditoria = () => {
-        console.log('Nueva auditoría');
+        navigate('/auditorias/nueva');
     };
 
     const handleLogout = async () => {

@@ -5,7 +5,8 @@ import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 import { Dashboard } from './pages/Dashboard';
 import { Empresas } from './pages/Empresas';
-import { Auditorias } from './pages/Auditorias';
+import { Auditorias } from './pages/auditorias/Auditorias';
+import { NuevaAuditoria } from './pages/auditorias/NuevaAuditoria';
 import { Perfil } from './pages/Perfil';
 import { authService } from './services/authService';
 
@@ -50,6 +51,11 @@ function App() {
           <Route path="/auditorias" element={
             <PrivateRoute>
               <Auditorias />
+            </PrivateRoute>
+          } />
+          <Route path="/auditorias/nueva" element={
+            <PrivateRoute>
+              <NuevaAuditoria />
             </PrivateRoute>
           } />
           <Route path="/perfil" element={
