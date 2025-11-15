@@ -17,39 +17,39 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
     onBack
 }) => {
     return (
-        <div className="bg-white shadow-xl rounded-2xl mb-8 p-6">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+        <div className="bg-white shadow-xl rounded-2xl mb-8 p-4 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-center space-x-3 sm:space-x-4">
                     <button
                         onClick={onBack}
-                        className="text-gray-600 hover:text-gray-900 transition-colors"
+                        className="text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0"
                     >
-                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-800">Nueva Auditoría</h1>
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Nueva Auditoría</h1>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">Empresa</span>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-sm text-gray-600 flex-shrink-0">Empresa</span>
                         <SearchInput
                             value={searchEmpresa}
                             onChange={onSearchEmpresaChange}
                             placeholder="Buscar..."
-                            className="w-64"
+                            className="w-full sm:w-48 lg:w-64"
                         />
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">Visita de:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-sm text-gray-600 flex-shrink-0">Visita de:</span>
                         <SearchInput
                             value={searchConcepto}
                             onChange={onSearchConceptoChange}
                             placeholder="Concepto de visita..."
-                            className="w-64"
+                            className="w-full sm:w-48 lg:w-64"
                         />
                     </div>
-                    <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button className="hidden sm:block p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
                         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                         </svg>

@@ -83,7 +83,7 @@ export const NuevaAuditoria: React.FC = () => {
                     />
 
                     {/* Form Content */}
-                    <div className="bg-white shadow-xl rounded-2xl p-8">
+                    <div className="bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8">
                         <EmpresaSection
                             formData={formData}
                             onInputChange={handleInputChange}
@@ -111,7 +111,7 @@ export const NuevaAuditoria: React.FC = () => {
                         <div className="flex justify-end">
                             <button
                                 onClick={handleSubmit}
-                                className="px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-lg"
+                                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-orange-500 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-lg"
                             >
                                 Guardar auditoría
                             </button>
