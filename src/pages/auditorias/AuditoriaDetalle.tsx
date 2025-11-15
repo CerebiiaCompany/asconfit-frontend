@@ -44,13 +44,11 @@ export const AuditoriaDetalle: React.FC = () => {
 
     const getEstadoBadge = (estado: Auditoria['estado']) => {
         const badges = {
-            borrador: 'bg-gray-100 text-gray-800',
             pendiente: 'bg-red-100 text-red-800',
             en_progreso: 'bg-yellow-100 text-yellow-800',
             completada: 'bg-green-100 text-green-800'
         };
         const labels = {
-            borrador: 'Borrador',
             pendiente: 'Pendiente',
             en_progreso: 'En Progreso',
             completada: 'Completada'

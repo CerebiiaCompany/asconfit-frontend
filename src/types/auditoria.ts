@@ -12,7 +12,7 @@ export interface Auditoria {
     fecha_inicial?: string;
     fecha_corte?: string;
     search_concepto?: string;
-    estado: 'borrador' | 'pendiente' | 'en_progreso' | 'completada';
+    estado: 'pendiente' | 'en_progreso' | 'completada';
     created_at: string;
     updated_at: string;
 }

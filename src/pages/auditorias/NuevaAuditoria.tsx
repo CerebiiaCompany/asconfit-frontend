@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
+import { Modal } from '../../components/Modal';
 import { AuditoriaHeader } from '../../components/auditorias/AuditoriaHeader';
 import { EmpresaSection } from '../../components/auditorias/EmpresaSection';
 import { PTSection } from '../../components/auditorias/PTSection';
@@ -18,6 +19,17 @@ export const NuevaAuditoria: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchEmpresa, setSearchEmpresa] = useState('');
     const [searchConcepto, setSearchConcepto] = useState('');
+    const [modal, setModal] = useState<{
+        isOpen: boolean;
+        type: 'success' | 'error';
+        title: string;
+        message: string;
+    }>({
+        isOpen: false,
+        type: 'success',
+        title: '',
+        message: ''
+    });
 
     const {
         formData,
@@ -41,11 +53,27 @@ export const NuevaAuditoria: React.FC = () => {
             };
 
             await auditoriaService.createAuditoria(auditoriaData);
-            alert('Auditoría guardada exitosamente');
-            navigate('/auditorias');
+            setModal({
+                isOpen: true,
+                type: 'success',
+                title: '¡Éxito!',
+                message: 'Auditoría guardada exitosamente'
+            });
         } catch (error: any) {
             console.error('Error al guardar auditoría:', error);
-            alert(error.response?.data?.message || 'Error al guardar la auditoría');
+            setModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Error',
+                message: error.response?.data?.message || 'Error al guardar la auditoría'
+            });
+        }
+    };
+
+    const handleCloseModal = () => {
+        setModal({ ...modal, isOpen: false });
+        if (modal.type === 'success') {
+            navigate('/auditorias');
         }
     };
 
@@ -140,6 +168,15 @@ export const NuevaAuditoria: React.FC = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Modal */}
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={handleCloseModal}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+            />
         </div>
     );
 };

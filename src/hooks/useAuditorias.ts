@@ -46,7 +46,7 @@ export const useAuditorias = () => {
             total: data.length,
             completadas: data.filter(a => a.estado === 'completada').length,
             en_progreso: data.filter(a => a.estado === 'en_progreso').length,
-            pendientes: data.filter(a => a.estado === 'pendiente' || a.estado === 'borrador').length
+            pendientes: data.filter(a => a.estado === 'pendiente').length
         };
         setStats(newStats);
     };
