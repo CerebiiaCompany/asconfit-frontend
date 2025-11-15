@@ -23,12 +23,12 @@ export const AuditoriaSearchBar: React.FC<AuditoriaSearchBarProps> = ({
                 />
                 <button
                     onClick={onNewAuditoria}
-                    className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 py-2 bg-primary-orange text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2"
                 >
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Nueva Auditoría
+                    Crear Auditoría
                 </button>
             </div>
         </div>

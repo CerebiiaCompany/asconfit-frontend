@@ -23,12 +23,13 @@ export const EmpresaSearchBar: React.FC<EmpresaSearchBarProps> = ({
                 />
                 <button
                     onClick={onNewEmpresa}
-                    className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 py-2 text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2"
+                    style={{ backgroundColor: '#FF9411' }}
                 >
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Nueva Empresa
+                    Crear Empresa
                 </button>
             </div>
         </div>

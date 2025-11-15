@@ -93,7 +93,7 @@ export const Auditorias: React.FC = () => {
                     <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
                         <div className="bg-white px-6 py-8">
                             <h2 className="text-3xl font-bold text-gray-800">
-                                Auditorías 📋
+                                Auditorías
                             </h2>
                             <p className="mt-2 text-gray-600">
                                 Gestiona y revisa las auditorías del sistema

@@ -43,7 +43,7 @@ export const Empresas: React.FC = () => {
                     <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
                         <div className="bg-white px-6 py-8">
                             <h2 className="text-3xl font-bold text-gray-800">
-                                Empresas 🏢
+                                Empresas
                             </h2>
                             <p className="mt-2 text-gray-600">
                                 Administra las empresas registradas en el sistema
