@@ -1,58 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 import { Dashboard } from './pages/Dashboard';
+import { Empresas } from './pages/Empresas';
+import { Auditorias } from './pages/Auditorias';
+import { Perfil } from './pages/Perfil';
 import { authService } from './services/authService';
 
-type AuthView = 'login' | 'register' | 'dashboard';
+// Componente para proteger rutas privadas
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+// Componente para redirigir usuarios autenticados
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return !authService.isAuthenticated() ? <>{children}</> : <Navigate to="/dashboard" replace />;
+};
 
 function App() {
-  const [currentView, setCurrentView] = useState<AuthView>('login');
-
-  useEffect(() => {
-    if (authService.isAuthenticated()) {
-      setCurrentView('dashboard');
-    }
-  }, []);
-
-  const handleLoginSuccess = () => {
-    setCurrentView('dashboard');
-  };
-
-  const handleRegisterSuccess = () => {
-    setCurrentView('dashboard');
-  };
-
-  const handleLogout = () => {
-    setCurrentView('login');
-  };
-
-  const switchToRegister = () => {
-    setCurrentView('register');
-  };
-
-  const switchToLogin = () => {
-    setCurrentView('login');
-  };
-
   return (
     <div className="App">
-      {currentView === 'login' && (
-        <Login
-          onLoginSuccess={handleLoginSuccess}
-          onSwitchToRegister={switchToRegister}
-        />
-      )}
-      {currentView === 'register' && (
-        <Register
-          onRegisterSuccess={handleRegisterSuccess}
-          onSwitchToLogin={switchToLogin}
-        />
-      )}
-      {currentView === 'dashboard' && (
-        <Dashboard onLogout={handleLogout} />
-      )}
+      <BrowserRouter>
+        <Routes>
+          {/* Rutas públicas */}
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
+          <Route path="/register" element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          } />
+
+          {/* Rutas privadas */}
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/empresas" element={
+            <PrivateRoute>
+              <Empresas />
+            </PrivateRoute>
+          } />
+          <Route path="/auditorias" element={
+            <PrivateRoute>
+              <Auditorias />
+            </PrivateRoute>
+          } />
+          <Route path="/perfil" element={
+            <PrivateRoute>
+              <Perfil />
+            </PrivateRoute>
+          } />
+
+          {/* Ruta por defecto */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

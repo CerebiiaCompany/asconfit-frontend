@@ -1,15 +1,31 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
+import { Header } from '../components/Header';
+import { Sidebar } from '../components/Sidebar';
+import { useUser } from '../hooks/useUser';
 import { useAuditorias } from '../hooks/useAuditorias';
 import { AuditoriaStatsCard } from '../components/auditorias/AuditoriaStatsCard';
 import { AuditoriaSearchBar } from '../components/auditorias/AuditoriaSearchBar';
 import { AuditoriaEmptyState } from '../components/auditorias/AuditoriaEmptyState';
 
 export const Auditorias: React.FC = () => {
+    const navigate = useNavigate();
+    const { user, loading: userLoading } = useUser(() => navigate('/login'));
     const [searchTerm, setSearchTerm] = useState('');
     const { stats } = useAuditorias();
 
     const handleNewAuditoria = () => {
         console.log('Nueva auditoría');
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
     };
 
     const statsConfig = [
@@ -64,44 +80,52 @@ export const Auditorias: React.FC = () => {
     ];
 
     return (
-        <main className="ml-32 pt-20 py-6 px-4 sm:px-6 lg:px-8">
-            <div className="px-4 py-6 sm:px-0">
-                {/* Header Card */}
-                <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-8">
-                        <h2 className="text-3xl font-bold text-white">
-                            Auditorías 📋
-                        </h2>
-                        <p className="mt-2 text-blue-100">
-                            Gestiona y revisa las auditorías del sistema
-                        </p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <Header
+                userName={user?.name || 'Usuario'}
+                onLogout={handleLogout}
+                onNavigateToSettings={() => navigate('/perfil')}
+            />
+            <Sidebar onLogout={handleLogout} />
+            <main className="ml-32 pt-20 py-6 px-4 sm:px-6 lg:px-8">
+                <div className="px-4 py-6 sm:px-0">
+                    {/* Header Card */}
+                    <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
+                        <div className="bg-white px-6 py-8">
+                            <h2 className="text-3xl font-bold text-gray-800">
+                                Auditorías 📋
+                            </h2>
+                            <p className="mt-2 text-gray-600">
+                                Gestiona y revisa las auditorías del sistema
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Search and Actions */}
+                    <AuditoriaSearchBar
+                        searchTerm={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        onNewAuditoria={handleNewAuditoria}
+                    />
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        {statsConfig.map((stat, index) => (
+                            <AuditoriaStatsCard key={index} {...stat} />
+                        ))}
+                    </div>
+
+                    {/* Auditorías List */}
+                    <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900">Lista de Auditorías</h3>
+                        </div>
+                        <div className="p-6">
+                            <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
+                        </div>
                     </div>
                 </div>
-
-                {/* Search and Actions */}
-                <AuditoriaSearchBar
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    onNewAuditoria={handleNewAuditoria}
-                />
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                    {statsConfig.map((stat, index) => (
-                        <AuditoriaStatsCard key={index} {...stat} />
-                    ))}
-                </div>
-
-                {/* Auditorías List */}
-                <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900">Lista de Auditorías</h3>
-                    </div>
-                    <div className="p-6">
-                        <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
-                    </div>
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     );
 };

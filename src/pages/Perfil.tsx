@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
+import { UserSettings } from '../components/UserSettings';
 import { useUser } from '../hooks/useUser';
-import { LoadingSpinner } from '../components/dashboard/LoadingSpinner';
-import { HomeView } from '../components/dashboard/HomeView';
 
-export const Dashboard: React.FC = () => {
+export const Perfil: React.FC = () => {
     const navigate = useNavigate();
-    const { user, loading } = useUser(() => navigate('/login'));
+    const { user, loading: userLoading } = useUser(() => navigate('/login'));
 
     const handleLogout = async () => {
         try {
@@ -20,19 +19,17 @@ export const Dashboard: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <LoadingSpinner />;
-    }
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             <Header
-                userName={user?.name}
+                userName={user?.name || 'Usuario'}
                 onLogout={handleLogout}
                 onNavigateToSettings={() => navigate('/perfil')}
             />
             <Sidebar onLogout={handleLogout} />
-            <HomeView user={user} />
+            <div className="ml-32 pt-20">
+                <UserSettings onBack={() => navigate('/dashboard')} onLogout={handleLogout} />
+            </div>
         </div>
     );
 };

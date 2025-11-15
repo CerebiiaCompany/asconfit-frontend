@@ -1,12 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RegisterForm } from './RegisterForm';
 
-interface RegisterProps {
-    onRegisterSuccess: () => void;
-    onSwitchToLogin: () => void;
-}
-
-export const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchToLogin }) => {
+export const Register: React.FC = () => {
+    const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -34,7 +31,7 @@ export const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchT
                             </p>
                         </div>
 
-                        <RegisterForm onRegisterSuccess={onRegisterSuccess} />
+                        <RegisterForm onRegisterSuccess={() => navigate('/dashboard')} />
                     </div>
 
                     <div className="px-8 py-4 bg-gray-50 border-t border-gray-200">
@@ -42,7 +39,7 @@ export const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchT
                             ¿Ya tienes cuenta?{' '}
                             <button
                                 type="button"
-                                onClick={onSwitchToLogin}
+                                onClick={() => navigate('/login')}
                                 className="font-medium hover:underline transition duration-150"
                                 style={{ color: '#FF9411' }}
                             >

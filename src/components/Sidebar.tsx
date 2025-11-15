@@ -1,35 +1,42 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
     onLogout: () => void;
-    activeView: string;
-    onNavigate: (view: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onLogout, activeView, onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const menuItems = [
         {
-            id: 'inicio',
+            id: 'dashboard',
+            path: '/dashboard',
             label: 'Inicio',
             icon: '/dashboard.png',
         },
         {
             id: 'auditorias',
+            path: '/auditorias',
             label: 'Auditorias',
             icon: '/search.png',
         },
         {
             id: 'empresas',
+            path: '/empresas',
             label: 'Empresas',
             icon: '/building.png',
         },
         {
             id: 'perfil',
+            path: '/perfil',
             label: 'Perfil',
             icon: '/profile.png',
         },
     ];
+
+    const isActive = (path: string) => location.pathname === path;
 
     return (
         <aside className="w-32 h-screen flex flex-col fixed left-0 top-0 z-20" style={{ backgroundColor: '#2D3748' }}>
@@ -44,12 +51,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout, activeView, onNaviga
                     {menuItems.map((item) => (
                         <li key={item.id}>
                             <button
-                                onClick={() => onNavigate(item.id)}
-                                className={`w-full flex flex-col items-center justify-center py-4 px-2 transition-colors duration-200 ${activeView === item.id
+                                onClick={() => navigate(item.path)}
+                                className={`w-full flex flex-col items-center justify-center py-4 px-2 transition-colors duration-200 ${isActive(item.path)
                                     ? 'bg-gray-700 border-l-4'
                                     : 'hover:bg-gray-700'
                                     }`}
-                                style={activeView === item.id ? { borderLeftColor: '#FF9411' } : {}}
+                                style={isActive(item.path) ? { borderLeftColor: '#FF9411' } : {}}
                             >
                                 <img
                                     src={item.icon}

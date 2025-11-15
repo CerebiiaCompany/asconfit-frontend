@@ -68,7 +68,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                         <button
                             onClick={() => setActiveTab('profile')}
                             className={`py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-150 ${activeTab === 'profile'
-                                ? 'border-purple-600 text-purple-600'
+                                ? 'border-orange-600 text-orange-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                 }`}
                         >
@@ -82,7 +82,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                         <button
                             onClick={() => setActiveTab('password')}
                             className={`py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-150 ${activeTab === 'password'
-                                ? 'border-purple-600 text-purple-600'
+                                ? 'border-orange-600 text-orange-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                 }`}
                         >
@@ -109,7 +109,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                                     id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition duration-150"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
                                     required
                                 />
                             </div>
@@ -123,7 +123,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition duration-150"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
                                     required
                                 />
                             </div>
@@ -144,7 +144,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                             <button
                                 type="submit"
                                 disabled={profileLoading}
-                                className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             >
                                 {profileLoading ? 'Guardando...' : 'Guardar cambios'}
                             </button>
@@ -165,7 +165,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                                     id="currentPassword"
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition duration-150"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
                                     required
                                 />
                             </div>
@@ -179,7 +179,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                                     id="newPassword"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition duration-150"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
                                     required
                                     minLength={8}
                                 />
@@ -195,7 +195,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                                     id="confirmPassword"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition duration-150"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
                                     required
                                 />
                             </div>
@@ -210,7 +210,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({ onBack, onLogout }) 
                             <button
                                 type="submit"
                                 disabled={passwordLoading}
-                                className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             >
                                 {passwordLoading ? 'Actualizando...' : 'Actualizar contraseña'}
                             </button>
