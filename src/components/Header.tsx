@@ -40,14 +40,14 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="px-4 sm:px-6 lg:pr-8 lg:pl-0">
                 <div className="flex justify-between items-center h-20">
                     {/* Hamburger Menu + Logo */}
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
                         {/* Botón Hamburguesa (solo móvil) */}
                         <button
                             onClick={onToggleSidebar}
-                            className="lg:hidden p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150"
+                            className="lg:hidden p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150 flex-shrink-0"
                         >
                             <svg
-                                className="w-6 h-6 text-white"
+                                className="w-5 h-5 sm:w-6 sm:h-6 text-white"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -65,15 +65,15 @@ export const Header: React.FC<HeaderProps> = ({
                         <img
                             src="/Asconfit.png"
                             alt="Asconfit Logo"
-                            className="h-10 w-auto"
+                            className="h-8 sm:h-10 w-auto"
                         />
                     </div>
 
                     {/* Actions */}
                     {showActions && (
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2 sm:space-x-4">
                             {/* Email Icon */}
-                            <button className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150">
+                            <button className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150 flex-shrink-0">
                                 <svg
                                     className="w-5 h-5 text-white"
                                     fill="none"
