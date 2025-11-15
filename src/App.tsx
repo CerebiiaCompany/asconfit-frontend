@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
-import { Dashboard } from './components/Dashboard';
+import { Dashboard } from './pages/Dashboard';
 import { authService } from './services/authService';
 
 type AuthView = 'login' | 'register' | 'dashboard';

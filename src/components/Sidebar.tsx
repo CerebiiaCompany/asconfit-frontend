@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface SidebarProps {
     onLogout: () => void;
+    activeView: string;
+    onNavigate: (view: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
-    const [activeItem, setActiveItem] = useState('inicio');
+export const Sidebar: React.FC<SidebarProps> = ({ onLogout, activeView, onNavigate }) => {
 
     const menuItems = [
         {
@@ -43,12 +44,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                     {menuItems.map((item) => (
                         <li key={item.id}>
                             <button
-                                onClick={() => setActiveItem(item.id)}
-                                className={`w-full flex flex-col items-center justify-center py-4 px-2 transition-colors duration-200 ${activeItem === item.id
+                                onClick={() => onNavigate(item.id)}
+                                className={`w-full flex flex-col items-center justify-center py-4 px-2 transition-colors duration-200 ${activeView === item.id
                                     ? 'bg-gray-700 border-l-4'
                                     : 'hover:bg-gray-700'
                                     }`}
-                                style={activeItem === item.id ? { borderLeftColor: '#FF9411' } : {}}
+                                style={activeView === item.id ? { borderLeftColor: '#FF9411' } : {}}
                             >
                                 <img
                                     src={item.icon}
