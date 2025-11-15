@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Auditoria, AuditoriaStats } from '../types/auditoria';
+import { auditoriaService } from '../services/auditoriaService';
 
 export const useAuditorias = () => {
     const [auditorias, setAuditorias] = useState<Auditoria[]>([]);
@@ -19,10 +20,15 @@ export const useAuditorias = () => {
     const fetchAuditorias = async () => {
         try {
             setLoading(true);
-            // TODO: Implementar llamada a la API
-            // const response = await api.get('/auditorias');
-            // setAuditorias(response.data);
-            // calculateStats(response.data);
+            setError(null);
+            const response = await auditoriaService.getAuditorias();
+            // Laravel retorna datos paginados con la estructura { data: [...], total, per_page, etc }
+            const auditoriasData = response.data || [];
+            setAuditorias(auditoriasData);
+            calculateStats(auditoriasData);
+        } catch (err) {
+            setError('Error al cargar las auditorías');
+            console.error(err);
             setAuditorias([]);
             setStats({
                 total: 0,
@@ -30,9 +36,6 @@ export const useAuditorias = () => {
                 en_progreso: 0,
                 pendientes: 0
             });
-        } catch (err) {
-            setError('Error al cargar las auditorías');
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -43,7 +46,7 @@ export const useAuditorias = () => {
             total: data.length,
             completadas: data.filter(a => a.estado === 'completada').length,
             en_progreso: data.filter(a => a.estado === 'en_progreso').length,
-            pendientes: data.filter(a => a.estado === 'pendiente').length
+            pendientes: data.filter(a => a.estado === 'pendiente' || a.estado === 'borrador').length
         };
         setStats(newStats);
     };

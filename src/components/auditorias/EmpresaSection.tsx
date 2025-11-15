@@ -12,6 +12,17 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({ formData, onInpu
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Empresa</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <label className="text-sm text-gray-600 sm:w-44 flex-shrink-0">Empresa:</label>
+                    <input
+                        type="text"
+                        name="empresa"
+                        value={formData.empresa}
+                        onChange={onInputChange}
+                        placeholder="Nombre de la empresa"
+                        className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+                    />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <label className="text-sm text-gray-600 sm:w-44 flex-shrink-0">Nit:</label>
                     <input
                         type="text"

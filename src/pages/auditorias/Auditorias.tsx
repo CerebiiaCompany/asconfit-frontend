@@ -8,16 +8,33 @@ import { useAuditorias } from '../../hooks/useAuditorias';
 import { AuditoriaStatsCard } from '../../components/auditorias/AuditoriaStatsCard';
 import { AuditoriaSearchBar } from '../../components/auditorias/AuditoriaSearchBar';
 import { AuditoriaEmptyState } from '../../components/auditorias/AuditoriaEmptyState';
+import { AuditoriaList } from '../../components/auditorias/AuditoriaList';
 
 export const Auditorias: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useUser(() => navigate('/login'));
     const [searchTerm, setSearchTerm] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { stats } = useAuditorias();
+    const { auditorias, stats, loading } = useAuditorias();
+
+    // Filtrar auditorías según el término de búsqueda
+    const filteredAuditorias = auditorias.filter(auditoria => {
+        if (!searchTerm) return true;
+        const term = searchTerm.toLowerCase();
+        return (
+            auditoria.empresa?.toLowerCase().includes(term) ||
+            auditoria.nit?.toLowerCase().includes(term) ||
+            auditoria.razon_social?.toLowerCase().includes(term) ||
+            auditoria.responsable?.toLowerCase().includes(term)
+        );
+    });
 
     const handleNewAuditoria = () => {
         navigate('/auditorias/nueva');
+    };
+
+    const handleViewAuditoria = (id: number) => {
+        navigate(`/auditorias/${id}`);
     };
 
     const handleLogout = async () => {
@@ -127,7 +144,24 @@ export const Auditorias: React.FC = () => {
                             <h3 className="text-lg font-semibold text-gray-900">Lista de Auditorías</h3>
                         </div>
                         <div className="p-6">
-                            <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
+                            {loading ? (
+                                <div className="flex justify-center items-center py-12">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                                </div>
+                            ) : filteredAuditorias.length === 0 ? (
+                                auditorias.length === 0 ? (
+                                    <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <p className="text-gray-500">No se encontraron auditorías que coincidan con la búsqueda</p>
+                                    </div>
+                                )
+                            ) : (
+                                <AuditoriaList
+                                    auditorias={filteredAuditorias}
+                                    onViewAuditoria={handleViewAuditoria}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

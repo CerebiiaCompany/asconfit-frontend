@@ -10,6 +10,7 @@ import { CategoriasSection } from '../../components/auditorias/CategoriasSection
 import { useUser } from '../../hooks/useUser';
 import { useAuditoriaForm } from '../../hooks/useAuditoriaForm';
 import { authService } from '../../services/authService';
+import { auditoriaService } from '../../services/auditoriaService';
 
 export const NuevaAuditoria: React.FC = () => {
     const navigate = useNavigate();
@@ -24,12 +25,28 @@ export const NuevaAuditoria: React.FC = () => {
         handleInputChange,
         handleAddCategoria,
         handleRemoveCategoria,
-        handleCategoriaChange
+        handleCategoriaChange,
+        handleAddSubtarea,
+        handleRemoveSubtarea,
+        handleSubtareaChange,
+        handleLoadPlantilla
     } = useAuditoriaForm();
 
-    const handleSubmit = () => {
-        console.log('Guardar auditoría:', { formData, categorias, searchConcepto });
-        navigate('/auditorias');
+    const handleSubmit = async () => {
+        try {
+            const auditoriaData = {
+                formData,
+                categorias,
+                searchConcepto
+            };
+
+            await auditoriaService.createAuditoria(auditoriaData);
+            alert('Auditoría guardada exitosamente');
+            navigate('/auditorias');
+        } catch (error: any) {
+            console.error('Error al guardar auditoría:', error);
+            alert(error.response?.data?.message || 'Error al guardar la auditoría');
+        }
     };
 
     const handleLogout = async () => {
@@ -105,6 +122,10 @@ export const NuevaAuditoria: React.FC = () => {
                             onAddCategoria={handleAddCategoria}
                             onRemoveCategoria={handleRemoveCategoria}
                             onCategoriaChange={handleCategoriaChange}
+                            onAddSubtarea={handleAddSubtarea}
+                            onRemoveSubtarea={handleRemoveSubtarea}
+                            onSubtareaChange={handleSubtareaChange}
+                            onLoadPlantilla={handleLoadPlantilla}
                         />
 
                         {/* Action Button */}

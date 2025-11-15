@@ -1,12 +1,20 @@
 export interface Auditoria {
     id: number;
-    titulo: string;
-    descripcion: string;
-    estado: 'pendiente' | 'en_progreso' | 'completada';
-    fecha_creacion: string;
-    fecha_actualizacion: string;
-    empresa_id?: number;
-    usuario_id?: number;
+    user_id: number;
+    empresa?: string;
+    nit?: string;
+    razon_social?: string;
+    actividad_economica?: string;
+    direccion?: string;
+    responsable?: string;
+    contacto?: string;
+    pt?: string;
+    fecha_inicial?: string;
+    fecha_corte?: string;
+    search_concepto?: string;
+    estado: 'borrador' | 'pendiente' | 'en_progreso' | 'completada';
+    created_at: string;
+    updated_at: string;
 }
 
 export interface AuditoriaStats {

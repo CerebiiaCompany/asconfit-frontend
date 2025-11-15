@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Empresas } from './pages/Empresas';
 import { Auditorias } from './pages/auditorias/Auditorias';
 import { NuevaAuditoria } from './pages/auditorias/NuevaAuditoria';
+import { AuditoriaDetalle } from './pages/auditorias/AuditoriaDetalle';
 import { Perfil } from './pages/Perfil';
 import { authService } from './services/authService';
 
@@ -56,6 +57,11 @@ function App() {
           <Route path="/auditorias/nueva" element={
             <PrivateRoute>
               <NuevaAuditoria />
+            </PrivateRoute>
+          } />
+          <Route path="/auditorias/:id" element={
+            <PrivateRoute>
+              <AuditoriaDetalle />
             </PrivateRoute>
           } />
           <Route path="/perfil" element={

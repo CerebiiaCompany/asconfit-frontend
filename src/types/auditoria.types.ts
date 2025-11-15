@@ -1,6 +1,19 @@
+export interface Subtarea {
+    id: string;
+    nombre: string;
+    prioridad: string;
+    fechaSolicitud: string;
+    tiempoEntrega: string;
+    observaciones: string;
+    estadoInformacion: string;
+    archivoNombre: string;
+    formatoArchivo: 'pdf' | 'excel' | 'word' | '';
+}
+
 export interface Categoria {
     id: string;
     nombre: string;
+    subtareas: Subtarea[];
 }
 
 export interface AuditoriaFormData {

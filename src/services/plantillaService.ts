@@ -1,0 +1,18 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8000/api';
+
+const getAuthHeader = () => {
+    const token = localStorage.getItem('auth_token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const plantillaService = {
+    async getPlantilla(codigo: string) {
+        const response = await axios.get(
+            `${API_URL}/categoria-plantillas/${codigo}`,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    }
+};
