@@ -1,57 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import { api } from './services/api';
+import { Login } from './components/auth/Login';
+import { Register } from './components/auth/Register';
+import { Dashboard } from './components/Dashboard';
+import { authService } from './services/authService';
 
-interface HealthResponse {
-  status: string;
-  message: string;
-  timestamp: string;
-}
+type AuthView = 'login' | 'register' | 'dashboard';
 
 function App() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<AuthView>('login');
 
   useEffect(() => {
-    const checkHealth = async () => {
-      try {
-        const data = await api.get<HealthResponse>('/health');
-        setHealth(data);
-        setError(null);
-      } catch (err) {
-        setError('Error conectando con la API. Asegúrate de que el backend esté corriendo en http://localhost:8000');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkHealth();
+    if (authService.isAuthenticated()) {
+      setCurrentView('dashboard');
+    }
   }, []);
+
+  const handleLoginSuccess = () => {
+    setCurrentView('dashboard');
+  };
+
+  const handleRegisterSuccess = () => {
+    setCurrentView('dashboard');
+  };
+
+  const handleLogout = () => {
+    setCurrentView('login');
+  };
+
+  const switchToRegister = () => {
+    setCurrentView('register');
+  };
+
+  const switchToLogin = () => {
+    setCurrentView('login');
+  };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Asconfit</h1>
-        <h2>React + TypeScript + Laravel API</h2>
-
-        {loading && <p>Conectando con la API...</p>}
-
-        {error && (
-          <div style={{ color: '#ff6b6b', padding: '20px', background: '#2d2d2d', borderRadius: '8px' }}>
-            <p>{error}</p>
-            <p style={{ fontSize: '14px' }}>Ejecuta: <code>php artisan serve</code> en el backend</p>
-          </div>
-        )}
-
-        {health && (
-          <div style={{ color: '#51cf66', padding: '20px', background: '#2d2d2d', borderRadius: '8px' }}>
-            <p>✓ Estado: {health.status}</p>
-            <p>✓ {health.message}</p>
-            <p style={{ fontSize: '12px' }}>Timestamp: {health.timestamp}</p>
-          </div>
-        )}
-      </header>
+      {currentView === 'login' && (
+        <Login
+          onLoginSuccess={handleLoginSuccess}
+          onSwitchToRegister={switchToRegister}
+        />
+      )}
+      {currentView === 'register' && (
+        <Register
+          onRegisterSuccess={handleRegisterSuccess}
+          onSwitchToLogin={switchToLogin}
+        />
+      )}
+      {currentView === 'dashboard' && (
+        <Dashboard onLogout={handleLogout} />
+      )}
     </div>
   );
 }
