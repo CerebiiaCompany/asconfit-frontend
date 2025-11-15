@@ -20,6 +20,7 @@ interface HeaderProps {
     onMarkNotificationAsRead?: (id: string) => void;
     onMarkAllNotificationsAsRead?: () => void;
     onClearAllNotifications?: () => void;
+    onToggleSidebar?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -30,15 +31,37 @@ export const Header: React.FC<HeaderProps> = ({
     notifications,
     onMarkNotificationAsRead,
     onMarkAllNotificationsAsRead,
-    onClearAllNotifications
+    onClearAllNotifications,
+    onToggleSidebar
 }) => {
 
     return (
-        <header className="shadow-lg fixed top-0 right-0 left-32 z-10" style={{ backgroundColor: '#FF9411' }}>
-            <div className="pr-4 sm:pr-6 lg:pr-8">
+        <header className="shadow-lg fixed top-0 right-0 lg:left-32 left-0 z-10" style={{ backgroundColor: '#FF9411' }}>
+            <div className="px-4 sm:px-6 lg:pr-8 lg:pl-0">
                 <div className="flex justify-between items-center h-20">
-                    {/* Logo */}
-                    <div className="flex items-center">
+                    {/* Hamburger Menu + Logo */}
+                    <div className="flex items-center space-x-3">
+                        {/* Botón Hamburguesa (solo móvil) */}
+                        <button
+                            onClick={onToggleSidebar}
+                            className="lg:hidden p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition duration-150"
+                        >
+                            <svg
+                                className="w-6 h-6 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Logo */}
                         <img
                             src="/Asconfit.png"
                             alt="Asconfit Logo"

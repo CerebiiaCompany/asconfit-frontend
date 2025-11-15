@@ -9,6 +9,7 @@ import { useUser } from '../hooks/useUser';
 export const Perfil: React.FC = () => {
     const navigate = useNavigate();
     const { user, loading: userLoading } = useUser(() => navigate('/login'));
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
     const handleLogout = async () => {
         try {
@@ -25,9 +26,14 @@ export const Perfil: React.FC = () => {
                 userName={user?.name || 'Usuario'}
                 onLogout={handleLogout}
                 onNavigateToSettings={() => navigate('/perfil')}
+                onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
             />
-            <Sidebar onLogout={handleLogout} />
-            <div className="ml-32 pt-20">
+            <Sidebar
+                onLogout={handleLogout}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+            />
+            <div className="lg:ml-32 ml-0 pt-20">
                 {userLoading ? (
                     <div className="flex items-center justify-center min-h-[calc(100vh-5rem)]">
                         <div className="text-center">

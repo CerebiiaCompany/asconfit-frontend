@@ -11,8 +11,9 @@ import { EmpresaEmptyState } from '../components/empresas/EmpresaEmptyState';
 
 export const Empresas: React.FC = () => {
     const navigate = useNavigate();
-    const { user, loading: userLoading } = useUser(() => navigate('/login'));
+    const { user } = useUser(() => navigate('/login'));
     const [searchTerm, setSearchTerm] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { stats, loading } = useEmpresas();
 
     const handleNewEmpresa = () => {
@@ -35,9 +36,14 @@ export const Empresas: React.FC = () => {
                 userName={user?.name || 'Usuario'}
                 onLogout={handleLogout}
                 onNavigateToSettings={() => navigate('/perfil')}
+                onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
             />
-            <Sidebar onLogout={handleLogout} />
-            <main className="ml-32 pt-20 py-6 px-4 sm:px-6 lg:px-8">
+            <Sidebar
+                onLogout={handleLogout}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+            />
+            <main className="lg:ml-32 ml-0 pt-20 py-6 px-4 sm:px-6 lg:px-8">
                 <div className="px-4 py-6 sm:px-0">
                     {/* Header Card */}
                     <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
