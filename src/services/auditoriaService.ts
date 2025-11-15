@@ -66,5 +66,16 @@ export const auditoriaService = {
             }
         );
         return response.data;
+    },
+
+    async downloadFile(subtareaId: number) {
+        const response = await axios.get(
+            `${API_URL}/auditorias/subtareas/${subtareaId}/download`,
+            {
+                headers: getAuthHeader(),
+                responseType: 'blob'
+            }
+        );
+        return response;
     }
 };
