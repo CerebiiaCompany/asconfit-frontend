@@ -20,10 +20,6 @@ export const Dashboard: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <LoadingSpinner />;
-    }
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             <Header
@@ -32,7 +28,7 @@ export const Dashboard: React.FC = () => {
                 onNavigateToSettings={() => navigate('/perfil')}
             />
             <Sidebar onLogout={handleLogout} />
-            <HomeView user={user} />
+            {loading ? <LoadingSpinner /> : <HomeView user={user} />}
         </div>
     );
 };
