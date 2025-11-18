@@ -33,7 +33,7 @@ export const MisTareas: React.FC = () => {
 
     const { auditorias, loading, recargar } = useTareas();
 
-    const { uploadFile, uploading, getAcceptedFileTypes } = useFileUpload({
+    const { uploadFile, uploadingSubtareaId, getAcceptedFileTypes } = useFileUpload({
         onSuccess: (fileName) => {
             setModal({
                 isOpen: true,
@@ -146,7 +146,7 @@ export const MisTareas: React.FC = () => {
                                             tarea={tarea}
                                             onFileUpload={(file) => handleFileUpload(tarea.subtareaId, tarea.formatoArchivo, file)}
                                             acceptedFileTypes={getAcceptedFileTypes(tarea.formatoArchivo)}
-                                            uploading={uploading}
+                                            uploading={uploadingSubtareaId === tarea.subtareaId}
                                         />
                                     ))}
                             </div>
