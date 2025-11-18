@@ -105,79 +105,161 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({ auditoria, onViewC
     };
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6 mb-4">
-            <div className="grid grid-cols-12 gap-4 items-center">
-                {/* Radio button */}
-                <div className="col-span-1 flex items-center justify-center">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+            {/* Mobile Layout */}
+            <div className="lg:hidden">
+                <div className="flex items-start gap-3 mb-3">
+                    {/* Radio button */}
                     <input
                         type="radio"
                         name="auditoria-select"
-                        className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+                        className="w-5 h-5 mt-1 text-orange-500 focus:ring-orange-500"
                     />
-                </div>
 
-                {/* NIT */}
-                <div className="col-span-2">
-                    <div className="text-xs text-gray-500 mb-1">NIT</div>
-                    <div className="text-sm font-medium text-gray-900">
-                        {auditoria.nit || '-'}
-                    </div>
-                </div>
-
-                {/* Razón Social */}
-                <div className="col-span-2">
-                    <div className="text-xs text-gray-500 mb-1">Razón social</div>
-                    <div className="text-sm font-medium text-gray-900">
-                        {auditoria.razon_social || auditoria.empresa || '-'}
-                    </div>
-                </div>
-
-                {/* Visita de */}
-                <div className="col-span-2">
-                    <div className="text-xs text-gray-500 mb-1">Visita de:</div>
-                    <div className="text-sm font-medium text-gray-900">
-                        {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
-                    </div>
-                </div>
-
-                {/* Corte */}
-                <div className="col-span-2">
-                    <div className="text-xs text-gray-500 mb-1">Corte</div>
-                    <div className="text-sm">
-                        {getEstadoBadge(auditoria.estado)}
-                    </div>
-                </div>
-
-                {/* Proceso - Progress indicators */}
-                <div className="col-span-3">
-                    <div className="text-xs text-gray-500 mb-2">Proceso</div>
-                    <div className="flex items-center gap-3">
-                        {progressData.map((item, index) => (
-                            <div key={index} className="flex flex-col items-center">
-                                <div className="flex items-center gap-1 mb-1">
-                                    <span className="text-xs text-gray-600">{item.label}</span>
-                                    <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                                </div>
-                                <span className="text-xs font-medium text-gray-900">
-                                    {item.value.toFixed(1)}%
-                                </span>
+                    <div className="flex-1 space-y-2">
+                        {/* NIT y Razón Social */}
+                        <div>
+                            <div className="text-xs text-gray-500">NIT</div>
+                            <div className="text-sm font-medium text-gray-900">
+                                {auditoria.nit || '-'}
                             </div>
-                        ))}
+                        </div>
+
+                        <div>
+                            <div className="text-xs text-gray-500">Razón social</div>
+                            <div className="text-sm font-medium text-gray-900">
+                                {auditoria.razon_social || auditoria.empresa || '-'}
+                            </div>
+                        </div>
+
+                        {/* Fecha y Estado */}
+                        <div className="flex gap-4">
+                            <div>
+                                <div className="text-xs text-gray-500">Visita de:</div>
+                                <div className="text-sm font-medium text-gray-900">
+                                    {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500">Corte</div>
+                                <div className="text-sm">
+                                    {getEstadoBadge(auditoria.estado)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Proceso - Compact version */}
+                        <div>
+                            <div className="text-xs text-gray-500 mb-2">Proceso</div>
+                            <div className="grid grid-cols-3 gap-2">
+                                {progressData.slice(0, 3).map((item, index) => (
+                                    <div key={index} className="flex items-center gap-1">
+                                        <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
+                                        <span className="text-xs text-gray-600">{item.label}</span>
+                                        <span className="text-xs font-medium">{item.value.toFixed(0)}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                                {progressData.slice(3).map((item, index) => (
+                                    <div key={index} className="flex items-center gap-1">
+                                        <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
+                                        <span className="text-xs text-gray-600">{item.label}</span>
+                                        <span className="text-xs font-medium">{item.value.toFixed(0)}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Button */}
-            <div className="mt-4 flex justify-end">
+                {/* Button */}
                 <button
                     onClick={() => onViewComplete(auditoria.id)}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                 >
                     Ver auditoría completa
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="hidden lg:block">
+                <div className="grid grid-cols-12 gap-4 items-center">
+                    {/* Radio button */}
+                    <div className="col-span-1 flex items-center justify-center">
+                        <input
+                            type="radio"
+                            name="auditoria-select"
+                            className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+                        />
+                    </div>
+
+                    {/* NIT */}
+                    <div className="col-span-2">
+                        <div className="text-xs text-gray-500 mb-1">NIT</div>
+                        <div className="text-sm font-medium text-gray-900">
+                            {auditoria.nit || '-'}
+                        </div>
+                    </div>
+
+                    {/* Razón Social */}
+                    <div className="col-span-2">
+                        <div className="text-xs text-gray-500 mb-1">Razón social</div>
+                        <div className="text-sm font-medium text-gray-900">
+                            {auditoria.razon_social || auditoria.empresa || '-'}
+                        </div>
+                    </div>
+
+                    {/* Visita de */}
+                    <div className="col-span-2">
+                        <div className="text-xs text-gray-500 mb-1">Visita de:</div>
+                        <div className="text-sm font-medium text-gray-900">
+                            {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
+                        </div>
+                    </div>
+
+                    {/* Corte */}
+                    <div className="col-span-2">
+                        <div className="text-xs text-gray-500 mb-1">Corte</div>
+                        <div className="text-sm">
+                            {getEstadoBadge(auditoria.estado)}
+                        </div>
+                    </div>
+
+                    {/* Proceso - Progress indicators */}
+                    <div className="col-span-3">
+                        <div className="text-xs text-gray-500 mb-2">Proceso</div>
+                        <div className="flex items-center gap-3">
+                            {progressData.map((item, index) => (
+                                <div key={index} className="flex flex-col items-center">
+                                    <div className="flex items-center gap-1 mb-1">
+                                        <span className="text-xs text-gray-600">{item.label}</span>
+                                        <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-900">
+                                        {item.value.toFixed(1)}%
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Button */}
+                <div className="mt-4 flex justify-end">
+                    <button
+                        onClick={() => onViewComplete(auditoria.id)}
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                    >
+                        Ver auditoría completa
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     );

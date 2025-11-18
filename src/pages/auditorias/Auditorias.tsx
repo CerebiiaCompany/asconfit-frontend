@@ -59,10 +59,10 @@ export const Auditorias: React.FC = () => {
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
             />
-            <main className="lg:ml-32 ml-0 pt-20 py-6 px-4 sm:px-6 lg:px-8">
-                <div className="px-4 py-6 sm:px-0">
+            <main className="lg:ml-32 ml-0 pt-20 py-4 px-3 sm:px-6 lg:px-8">
+                <div className="sm:px-0">
                     {/* Page Title */}
-                    <h1 className="text-2xl font-semibold text-gray-800 mb-6">Auditorías</h1>
+                    <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Auditorías</h1>
 
                     {/* Filter Bar */}
                     <AuditoriaFilterBar
