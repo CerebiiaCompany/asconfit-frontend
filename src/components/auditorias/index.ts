@@ -18,3 +18,6 @@ export { FormatoBadge } from './FormatoBadge';
 export { SubtareaRow } from './SubtareaRow';
 export { SubtareaTable } from './SubtareaTable';
 export { CategoriaCard } from './CategoriaCard';
+export { AuditoriaCard } from './AuditoriaCard';
+export { AuditoriaFilterBar } from './AuditoriaFilterBar';
+export { AuditoriaCardList } from './AuditoriaCardList';
