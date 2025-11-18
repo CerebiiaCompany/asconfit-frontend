@@ -21,8 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
     const { notifications, handleMarkAsRead, handleMarkAllAsRead, handleClearAll } = useNotifications();
 
     return (
-        <header className="shadow-lg fixed top-0 right-0 lg:left-32 left-0 z-10" style={{ backgroundColor: '#FF9411' }}>
-            <div className="px-4 sm:px-6 lg:pr-8 lg:pl-0">
+        <header className="shadow-lg fixed top-0 right-0 left-0 z-50" style={{ backgroundColor: '#FF9411' }}>
+            <div className="px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
                     {/* Hamburger Menu + Logo */}
                     <div className="flex items-center space-x-2 sm:space-x-3">
