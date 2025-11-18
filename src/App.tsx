@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
+import { RoleBasedRoute } from './components/auth/RoleBasedRoute';
 import { Dashboard } from './pages/Dashboard';
 import { Empresas } from './pages/Empresas';
 import { Auditorias } from './pages/auditorias/Auditorias';
@@ -43,42 +44,58 @@ function App() {
           {/* Rutas privadas */}
           <Route path="/dashboard" element={
             <PrivateRoute>
-              <Dashboard />
+              <RoleBasedRoute>
+                <Dashboard />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/empresas" element={
             <PrivateRoute>
-              <Empresas />
+              <RoleBasedRoute>
+                <Empresas />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/auditorias" element={
             <PrivateRoute>
-              <Auditorias />
+              <RoleBasedRoute>
+                <Auditorias />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/auditorias/nueva" element={
             <PrivateRoute>
-              <NuevaAuditoria />
+              <RoleBasedRoute>
+                <NuevaAuditoria />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/auditorias/:id" element={
             <PrivateRoute>
-              <AuditoriaDetalle />
+              <RoleBasedRoute>
+                <AuditoriaDetalle />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/mis-tareas" element={
             <PrivateRoute>
-              <MisTareas />
+              <RoleBasedRoute>
+                <MisTareas />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/mis-tareas/:id" element={
             <PrivateRoute>
-              <TareaDetalle />
+              <RoleBasedRoute>
+                <TareaDetalle />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
           <Route path="/perfil" element={
             <PrivateRoute>
-              <Perfil />
+              <RoleBasedRoute>
+                <Perfil />
+              </RoleBasedRoute>
             </PrivateRoute>
           } />
 
