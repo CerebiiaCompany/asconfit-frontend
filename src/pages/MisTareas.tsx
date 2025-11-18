@@ -151,6 +151,7 @@ export const MisTareas: React.FC = () => {
             />
             <Sidebar
                 onLogout={handleLogout}
+                userRole={(user?.role?.nombre as any) || 'delegado'}
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
             />

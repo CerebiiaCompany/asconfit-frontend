@@ -1,9 +1,15 @@
 import { api } from './api';
 
+export interface Role {
+    id: number;
+    nombre: string;
+}
+
 export interface User {
     id: number;
     name: string;
     email: string;
+    role: Role;
 }
 
 export interface AuthResponse {
