@@ -5,6 +5,7 @@ import { Sidebar } from '../../components/Sidebar';
 import { Modal } from '../../components/Modal';
 import { AuditoriaHeader } from '../../components/auditorias/AuditoriaHeader';
 import { EmpresaSection } from '../../components/auditorias/EmpresaSection';
+import { DelegadoSection } from '../../components/auditorias/DelegadoSection';
 import { PTSection } from '../../components/auditorias/PTSection';
 import { FechasSection } from '../../components/auditorias/FechasSection';
 import { CategoriasSection } from '../../components/auditorias/CategoriasSection';
@@ -57,12 +58,21 @@ export const NuevaAuditoria: React.FC = () => {
         ];
 
         for (const { campo, nombre } of camposEmpresaRequeridos) {
-            if (!formData[campo as keyof typeof formData] || formData[campo as keyof typeof formData].trim() === '') {
+            const valor = formData[campo as keyof typeof formData];
+            if (!valor || (typeof valor === 'string' && valor.trim() === '')) {
                 return {
                     isValid: false,
                     message: `El campo "${nombre}" es obligatorio`
                 };
             }
+        }
+
+        // Validar que se haya seleccionado un delegado
+        if (!formData.delegadoId) {
+            return {
+                isValid: false,
+                message: 'Debe seleccionar un delegado responsable'
+            };
         }
 
         // Validar que haya al menos una categoría
@@ -245,6 +255,15 @@ export const NuevaAuditoria: React.FC = () => {
                         <EmpresaSection
                             formData={formData}
                             onInputChange={handleInputChange}
+                        />
+
+                        <DelegadoSection
+                            selectedDelegadoId={formData.delegadoId}
+                            onDelegadoChange={(delegadoId) =>
+                                handleInputChange({
+                                    target: { name: 'delegadoId', value: delegadoId }
+                                } as any)
+                            }
                         />
 
                         <PTSection

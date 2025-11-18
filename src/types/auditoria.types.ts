@@ -27,6 +27,7 @@ export interface AuditoriaFormData {
     pt: string;
     fechaInicial: string;
     fechaCorte: string;
+    delegadoId: number | null;
 }
 
 export interface NuevaAuditoriaData {
