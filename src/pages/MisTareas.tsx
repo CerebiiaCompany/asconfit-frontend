@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { Modal } from '../components/Modal';
@@ -23,6 +24,7 @@ interface TareaFlat {
 export const MisTareas: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useUser(() => navigate('/login'));
+    const { setUser } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [tareas, setTareas] = useState<TareaFlat[]>([]);
     const [loading, setLoading] = useState(true);
@@ -135,6 +137,7 @@ export const MisTareas: React.FC = () => {
     const handleLogout = async () => {
         try {
             await authService.logout();
+            setUser(null);
             navigate('/login');
         } catch (error) {
             console.error('Error logging out:', error);

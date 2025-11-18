@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { useUser } from '../hooks/useUser';
@@ -10,11 +11,13 @@ import { HomeView } from '../components/dashboard/HomeView';
 export const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const { user, loading } = useUser(() => navigate('/login'));
+    const { setUser } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
     const handleLogout = async () => {
         try {
             await authService.logout();
+            setUser(null); // Limpiar el contexto
             navigate('/login');
         } catch (error) {
             console.error('Error logging out:', error);

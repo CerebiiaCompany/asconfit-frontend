@@ -1,63 +1,37 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ShieldX, Home } from 'lucide-react';
 
 export const AccessDenied: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            backgroundColor: '#f5f5f5',
-            padding: '20px',
-            textAlign: 'center'
-        }}>
-            <div style={{
-                backgroundColor: 'white',
-                padding: '40px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                maxWidth: '500px'
-            }}>
-                <h1 style={{
-                    fontSize: '48px',
-                    color: '#e74c3c',
-                    marginBottom: '20px'
-                }}>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8 text-center">
+                <div className="mb-6 flex justify-center">
+                    <div className="bg-red-100 rounded-full p-4">
+                        <ShieldX className="w-16 h-16 text-red-600" />
+                    </div>
+                </div>
+
+                <h1 className="text-6xl font-bold text-red-600 mb-4">
                     403
                 </h1>
-                <h2 style={{
-                    fontSize: '24px',
-                    color: '#333',
-                    marginBottom: '20px'
-                }}>
+
+                <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                     Acceso Denegado
                 </h2>
-                <p style={{
-                    fontSize: '16px',
-                    color: '#666',
-                    marginBottom: '30px'
-                }}>
-                    No tienes permisos para acceder a esta página.
+
+                <p className="text-gray-600 mb-8 leading-relaxed">
+                    Lo sentimos, no tienes los permisos necesarios para acceder a esta página.
+                    Si crees que esto es un error, contacta con el administrador del sistema.
                 </p>
+
                 <button
                     onClick={() => navigate('/dashboard')}
-                    style={{
-                        backgroundColor: '#3498db',
-                        color: 'white',
-                        border: 'none',
-                        padding: '12px 24px',
-                        fontSize: '16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2980b9'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3498db'}
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                 >
+                    <Home className="w-5 h-5" />
                     Volver al Inicio
                 </button>
             </div>

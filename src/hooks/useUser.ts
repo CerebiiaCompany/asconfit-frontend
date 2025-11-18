@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
-import { authService, User } from '../services/authService';
+import { useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useUser = (onLogout: () => void) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user, loading } = useAuth();
     const onLogoutRef = useRef(onLogout);
 
     // Actualizar la referencia cuando cambie onLogout
@@ -11,21 +10,12 @@ export const useUser = (onLogout: () => void) => {
         onLogoutRef.current = onLogout;
     }, [onLogout]);
 
+    // Si hay un error de autenticación, ejecutar logout
     useEffect(() => {
-        const loadUser = async () => {
-            try {
-                const userData = await authService.getCurrentUser();
-                setUser(userData);
-            } catch (error) {
-                console.error('Error loading user:', error);
-                onLogoutRef.current();
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadUser();
-    }, []); // Sin dependencias - solo se ejecuta una vez al montar
+        if (!loading && !user) {
+            onLogoutRef.current();
+        }
+    }, [loading, user]);
 
     return { user, loading };
 };

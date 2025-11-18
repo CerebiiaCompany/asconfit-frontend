@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { authService } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 import type { LoginCredentials } from '../types';
 
 interface UseLoginFormProps {
@@ -25,6 +26,7 @@ export const useLoginForm = ({ onSuccess }: UseLoginFormProps): UseLoginFormRetu
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { refreshUser } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
@@ -34,6 +36,8 @@ export const useLoginForm = ({ onSuccess }: UseLoginFormProps): UseLoginFormRetu
         try {
             const credentials: LoginCredentials = { email, password };
             await authService.login(credentials);
+            // Actualizar el contexto con el usuario autenticado
+            await refreshUser();
             onSuccess();
         } catch (err: any) {
             setError(err.message || 'Error al iniciar sesión');
