@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { notificacionService, Notificacion } from '../services/notificacionService';
 
 export interface Notification {
@@ -9,6 +9,17 @@ export interface Notification {
     read: boolean;
     type?: 'info' | 'warning' | 'success' | 'error';
 }
+
+interface NotificationContextType {
+    notifications: Notification[];
+    loading: boolean;
+    handleMarkAsRead: (id: string) => Promise<void>;
+    handleMarkAllAsRead: () => Promise<void>;
+    handleClearAll: () => Promise<void>;
+    refreshNotifications: () => Promise<void>;
+}
+
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 const getNotificationType = (tipo: string): 'info' | 'warning' | 'success' | 'error' => {
     switch (tipo) {
@@ -52,7 +63,7 @@ const convertToNotification = (notif: Notificacion): Notification => ({
     type: getNotificationType(notif.tipo)
 });
 
-export const useNotifications = () => {
+export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -108,12 +119,26 @@ export const useNotifications = () => {
         }
     };
 
-    return {
-        notifications,
-        loading,
-        handleMarkAsRead,
-        handleMarkAllAsRead,
-        handleClearAll,
-        refreshNotifications: loadNotifications
-    };
+    return (
+        <NotificationContext.Provider
+            value={{
+                notifications,
+                loading,
+                handleMarkAsRead,
+                handleMarkAllAsRead,
+                handleClearAll,
+                refreshNotifications: loadNotifications
+            }}
+        >
+            {children}
+        </NotificationContext.Provider>
+    );
+};
+
+export const useNotificationContext = () => {
+    const context = useContext(NotificationContext);
+    if (context === undefined) {
+        throw new Error('useNotificationContext must be used within a NotificationProvider');
+    }
+    return context;
 };

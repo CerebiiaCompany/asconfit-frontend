@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserDropdown } from './UserDropdown';
 import { NotificationDropdown } from './NotificationDropdown';
-import { useNotifications } from '../hooks/useNotifications';
+import { useNotificationContext } from '../contexts/NotificationContext';
 
 interface HeaderProps {
     userName?: string;
@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
     onNavigateToSettings,
     onToggleSidebar
 }) => {
-    const { notifications, handleMarkAsRead, handleMarkAllAsRead, handleClearAll } = useNotifications();
+    const { notifications, handleMarkAsRead, handleMarkAllAsRead, handleClearAll } = useNotificationContext();
 
     return (
         <header className="shadow-lg fixed top-0 right-0 left-0 z-50" style={{ backgroundColor: '#FF9411' }}>

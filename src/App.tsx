@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 import { RoleBasedRoute } from './components/auth/RoleBasedRoute';
@@ -28,85 +29,87 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <BrowserRouter>
-          <Routes>
-            {/* Rutas públicas */}
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
-            <Route path="/register" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
+      <NotificationProvider>
+        <div className="App">
+          <BrowserRouter>
+            <Routes>
+              {/* Rutas públicas */}
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
 
-            {/* Rutas privadas */}
-            <Route path="/dashboard" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <Dashboard />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/empresas" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <Empresas />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/auditorias" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <Auditorias />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/auditorias/nueva" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <NuevaAuditoria />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/auditorias/:id" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <AuditoriaDetalle />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/mis-tareas" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <MisTareas />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/mis-tareas/:id" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <TareaDetalle />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
-            <Route path="/perfil" element={
-              <PrivateRoute>
-                <RoleBasedRoute>
-                  <Perfil />
-                </RoleBasedRoute>
-              </PrivateRoute>
-            } />
+              {/* Rutas privadas */}
+              <Route path="/dashboard" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <Dashboard />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/empresas" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <Empresas />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/auditorias" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <Auditorias />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/auditorias/nueva" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <NuevaAuditoria />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/auditorias/:id" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <AuditoriaDetalle />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/mis-tareas" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <MisTareas />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/mis-tareas/:id" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <TareaDetalle />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/perfil" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <Perfil />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
 
-            {/* Ruta por defecto */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </div>
+              {/* Ruta por defecto */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
