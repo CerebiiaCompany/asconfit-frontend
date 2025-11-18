@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { auditoriaService } from '../../services/auditoriaService';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
+import { Modal } from '../../components/Modal';
 import { useUser } from '../../hooks/useUser';
 
 export const AuditoriaDetalle: React.FC = () => {
@@ -13,6 +14,19 @@ export const AuditoriaDetalle: React.FC = () => {
     const [auditoria, setAuditoria] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [uploadingSubtareaId, setUploadingSubtareaId] = useState<number | null>(null);
+    const [modal, setModal] = useState<{
+        isOpen: boolean;
+        type: 'success' | 'error';
+        title: string;
+        message: string;
+    }>({
+        isOpen: false,
+        type: 'success',
+        title: '',
+        message: ''
+    });
+    const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
     useEffect(() => {
         if (id) {
@@ -32,6 +46,53 @@ export const AuditoriaDetalle: React.FC = () => {
         }
     };
 
+    const getAcceptedFileTypes = (formatoArchivo: string): string => {
+        const formatos: Record<string, string> = {
+            'pdf': '.pdf',
+            'excel': '.xlsx,.xls,.csv,.xlsm,.xlsb,.xltx,.xltm',
+            'word': '.doc,.docx,.docm,.dotx,.dotm,.odt'
+        };
+        return formatos[formatoArchivo] || '*';
+    };
+
+    const handleFileSelect = (subtareaId: number) => {
+        fileInputRefs.current[subtareaId]?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setUploadingSubtareaId(subtareaId);
+            await auditoriaService.uploadFile(subtareaId, file);
+
+            setModal({
+                isOpen: true,
+                type: 'success',
+                title: 'Éxito',
+                message: 'Archivo subido exitosamente'
+            });
+
+            // Recargar la auditoría para mostrar el archivo actualizado
+            await fetchAuditoria();
+        } catch (error: any) {
+            console.error('Error al subir archivo:', error);
+            setModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Error',
+                message: error.response?.data?.message || 'Error al subir el archivo'
+            });
+        } finally {
+            setUploadingSubtareaId(null);
+            // Limpiar el input
+            if (event.target) {
+                event.target.value = '';
+            }
+        }
+    };
+
     const handleOpenFile = async (subtareaId: number, fileName: string) => {
         try {
             const response = await auditoriaService.downloadFile(subtareaId);
@@ -47,7 +108,12 @@ export const AuditoriaDetalle: React.FC = () => {
             }, 100);
         } catch (error) {
             console.error('Error al abrir archivo:', error);
-            alert('Error al abrir el archivo');
+            setModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Error',
+                message: 'Error al abrir el archivo'
+            });
         }
     };
 
@@ -269,30 +335,56 @@ export const AuditoriaDetalle: React.FC = () => {
                                                                     )}
                                                                 </td>
                                                                 <td className="px-3 py-3">
-                                                                    {subtarea.archivo_nombre ? (
+                                                                    <div className="flex items-center gap-2">
+                                                                        {subtarea.archivo_nombre ? (
+                                                                            <button
+                                                                                onClick={() => handleOpenFile(subtarea.id, subtarea.archivo_nombre)}
+                                                                                className="flex items-center gap-1 hover:bg-blue-50 px-2 py-1 rounded transition-colors group"
+                                                                                title="Click para abrir en nueva pestaña"
+                                                                            >
+                                                                                <svg className="h-4 w-4 text-blue-500 group-hover:text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                                </svg>
+                                                                                <span className="text-xs text-blue-600 group-hover:text-blue-700 underline truncate" title={subtarea.archivo_nombre}>
+                                                                                    {subtarea.archivo_nombre.length > 15
+                                                                                        ? subtarea.archivo_nombre.substring(0, 15) + '...'
+                                                                                        : subtarea.archivo_nombre}
+                                                                                </span>
+                                                                            </button>
+                                                                        ) : (
+                                                                            <div className="flex items-center gap-1 text-gray-400">
+                                                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                                </svg>
+                                                                                <span className="text-xs">Sin archivo</span>
+                                                                            </div>
+                                                                        )}
+                                                                        <input
+                                                                            type="file"
+                                                                            ref={(el) => { fileInputRefs.current[subtarea.id] = el; }}
+                                                                            onChange={(e) => handleFileChange(e, subtarea.id)}
+                                                                            accept={getAcceptedFileTypes(subtarea.formato_archivo)}
+                                                                            className="hidden"
+                                                                        />
                                                                         <button
-                                                                            onClick={() => handleOpenFile(subtarea.id, subtarea.archivo_nombre)}
-                                                                            className="flex items-center gap-1 hover:bg-blue-50 px-2 py-1 rounded transition-colors group"
-                                                                            title="Click para abrir en nueva pestaña"
+                                                                            onClick={() => handleFileSelect(subtarea.id)}
+                                                                            disabled={uploadingSubtareaId === subtarea.id}
+                                                                            className="p-1 text-orange-600 hover:bg-orange-50 rounded transition-colors disabled:opacity-50"
+                                                                            title="Subir archivo"
                                                                         >
-                                                                            <svg className="h-4 w-4 text-blue-500 group-hover:text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                                            </svg>
-                                                                            <span className="text-xs text-blue-600 group-hover:text-blue-700 underline truncate" title={subtarea.archivo_nombre}>
-                                                                                {subtarea.archivo_nombre.length > 15
-                                                                                    ? subtarea.archivo_nombre.substring(0, 15) + '...'
-                                                                                    : subtarea.archivo_nombre}
-                                                                            </span>
+                                                                            {uploadingSubtareaId === subtarea.id ? (
+                                                                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                                </svg>
+                                                                            ) : (
+                                                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                                                </svg>
+                                                                            )}
                                                                         </button>
-                                                                    ) : (
-                                                                        <div className="flex items-center gap-1 text-gray-400">
-                                                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                                            </svg>
-                                                                            <span className="text-xs">Sin archivo</span>
-                                                                        </div>
-                                                                    )}
+                                                                    </div>
                                                                 </td>
                                                                 <td className="px-2 py-3 whitespace-nowrap">
                                                                     {subtarea.formato_archivo ? (
@@ -320,6 +412,15 @@ export const AuditoriaDetalle: React.FC = () => {
                     )}
                 </div>
             </main>
+
+            {/* Modal */}
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={() => setModal({ ...modal, isOpen: false })}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+            />
         </div>
     );
 };

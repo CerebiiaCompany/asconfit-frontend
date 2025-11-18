@@ -85,19 +85,41 @@ export const MisTareas: React.FC = () => {
         }
     };
 
+    const getAcceptedFileTypes = (formatoArchivo: string | null): string => {
+        if (!formatoArchivo) return '*';
+
+        const formatos: Record<string, string> = {
+            'pdf': '.pdf',
+            'excel': '.xlsx,.xls,.csv,.xlsm,.xlsb,.xltx,.xltm',
+            'word': '.doc,.docx,.docm,.dotx,.dotm,.odt'
+        };
+        return formatos[formatoArchivo.toLowerCase()] || '*';
+    };
+
+    const getExtensionesPermitidas = (formatoArchivo: string | null): string[] => {
+        if (!formatoArchivo) return [];
+
+        const extensiones: Record<string, string[]> = {
+            'pdf': ['pdf'],
+            'excel': ['xlsx', 'xls', 'csv', 'xlsm', 'xlsb', 'xltx', 'xltm'],
+            'word': ['doc', 'docx', 'docm', 'dotx', 'dotm', 'odt']
+        };
+        return extensiones[formatoArchivo.toLowerCase()] || [];
+    };
+
     const handleFileUpload = async (tarea: TareaFlat, file: File) => {
         try {
             // Validar formato de archivo si está especificado
             if (tarea.formatoArchivo) {
                 const extension = file.name.split('.').pop()?.toLowerCase();
-                const formatosPermitidos = tarea.formatoArchivo.toLowerCase().split(',').map(f => f.trim());
+                const formatosPermitidos = getExtensionesPermitidas(tarea.formatoArchivo);
 
-                if (extension && !formatosPermitidos.includes(extension)) {
+                if (extension && formatosPermitidos.length > 0 && !formatosPermitidos.includes(extension)) {
                     setModal({
                         isOpen: true,
                         type: 'error',
                         title: 'Formato incorrecto',
-                        message: `El archivo debe ser de tipo: ${tarea.formatoArchivo}`
+                        message: `El archivo debe ser de tipo: ${formatosPermitidos.join(', ')}`
                     });
                     return;
                 }
@@ -249,16 +271,21 @@ export const MisTareas: React.FC = () => {
                                                     <input
                                                         type="file"
                                                         className="hidden"
-                                                        accept={tarea.formatoArchivo ? `.${tarea.formatoArchivo.split(',').join(',.')}` : '*'}
+                                                        accept={getAcceptedFileTypes(tarea.formatoArchivo)}
                                                         onChange={(e) => {
                                                             const file = e.target.files?.[0];
                                                             if (file) {
                                                                 handleFileUpload(tarea, file);
                                                             }
+                                                            // Limpiar el input para permitir subir el mismo archivo de nuevo
+                                                            e.target.value = '';
                                                         }}
                                                     />
-                                                    <div className="px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors text-center whitespace-nowrap">
-                                                        📤 Subir archivo
+                                                    <div className="px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors text-center whitespace-nowrap flex items-center gap-2">
+                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                        </svg>
+                                                        Subir archivo
                                                     </div>
                                                 </label>
 
