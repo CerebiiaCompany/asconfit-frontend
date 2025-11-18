@@ -7,6 +7,33 @@ interface AuditoriaCardProps {
 }
 
 export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({ auditoria, onViewComplete }) => {
+    // Formatear fecha
+    const formatDate = (dateString?: string): string => {
+        if (!dateString) return 'Planeación';
+
+        try {
+            // Manejar formato ISO con zona horaria
+            let date: Date;
+            if (dateString.includes('T')) {
+                // Formato ISO: 2025-11-17T00:00:00.000000Z
+                date = new Date(dateString);
+            } else {
+                // Formato simple: 2025-11-17
+                date = new Date(dateString + 'T00:00:00');
+            }
+
+            if (isNaN(date.getTime())) return 'Planeación';
+
+            const day = date.getUTCDate();
+            const monthNames = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const month = monthNames[date.getUTCMonth()];
+
+            return `${day} ${month}`;
+        } catch {
+            return 'Planeación';
+        }
+    };
+
     // Calcular porcentajes de progreso basados en subtareas
     const calculateProgress = () => {
         if (!auditoria.categorias || auditoria.categorias.length === 0) {
@@ -109,12 +136,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({ auditoria, onViewC
                 <div className="col-span-2">
                     <div className="text-xs text-gray-500 mb-1">Visita de:</div>
                     <div className="text-sm font-medium text-gray-900">
-                        {auditoria.fecha_inicial ?
-                            new Date(auditoria.fecha_inicial).toLocaleDateString('es-ES', {
-                                day: '2-digit',
-                                month: 'short'
-                            }).replace('.', '')
-                            : 'Planeación'}
+                        {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
                     </div>
                 </div>
 
