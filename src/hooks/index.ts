@@ -9,3 +9,5 @@ export * from './usePasswordUpdate';
 export * from './useUser';
 export * from './useDashboardNavigation';
 export * from './useEmpresas';
+export * from './useAuditoriaDetalle';
+export * from './useFileUpload';

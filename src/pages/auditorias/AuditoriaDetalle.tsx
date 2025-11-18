@@ -1,20 +1,22 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authService } from '../../services/authService';
-import { auditoriaService } from '../../services/auditoriaService';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { Modal } from '../../components/Modal';
 import { useUser } from '../../hooks/useUser';
+import { useAuditoriaDetalle } from '../../hooks/useAuditoriaDetalle';
+import { useFileUpload } from '../../hooks/useFileUpload';
+import { AuditoriaInfoCard } from '../../components/auditorias/AuditoriaInfoCard';
+import { CategoriaCard } from '../../components/auditorias/CategoriaCard';
+import { EstadoBadge } from '../../components/auditorias/EstadoBadge';
 
 export const AuditoriaDetalle: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { user } = useUser(() => navigate('/login'));
-    const [auditoria, setAuditoria] = useState<any | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [uploadingSubtareaId, setUploadingSubtareaId] = useState<number | null>(null);
     const [modal, setModal] = useState<{
         isOpen: boolean;
         type: 'success' | 'error';
@@ -26,96 +28,33 @@ export const AuditoriaDetalle: React.FC = () => {
         title: '',
         message: ''
     });
-    const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
-    useEffect(() => {
-        if (id) {
-            fetchAuditoria();
-        }
-    }, [id]);
-
-    const fetchAuditoria = async () => {
-        try {
-            setLoading(true);
-            const response = await auditoriaService.getAuditoria(id!);
-            setAuditoria(response);
-        } catch (error) {
-            console.error('Error al cargar la auditoría:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getAcceptedFileTypes = (formatoArchivo: string): string => {
-        const formatos: Record<string, string> = {
-            'pdf': '.pdf',
-            'excel': '.xlsx,.xls,.csv,.xlsm,.xlsb,.xltx,.xltm',
-            'word': '.doc,.docx,.docm,.dotx,.dotm,.odt'
-        };
-        return formatos[formatoArchivo] || '*';
-    };
-
-    const handleFileSelect = (subtareaId: number) => {
-        fileInputRefs.current[subtareaId]?.click();
-    };
-
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        try {
-            setUploadingSubtareaId(subtareaId);
-            await auditoriaService.uploadFile(subtareaId, file);
-
+    const {
+        uploadingSubtareaId,
+        fileInputRefs,
+        getAcceptedFileTypes,
+        handleFileSelect,
+        handleFileChange: uploadFile,
+        handleOpenFile
+    } = useFileUpload({
+        onSuccess: async () => {
             setModal({
                 isOpen: true,
                 type: 'success',
                 title: 'Éxito',
                 message: 'Archivo subido exitosamente'
             });
-
-            // Recargar la auditoría para mostrar el archivo actualizado
-            await fetchAuditoria();
-        } catch (error: any) {
-            console.error('Error al subir archivo:', error);
+            await refetch();
+        },
+        onError: (message) => {
             setModal({
                 isOpen: true,
                 type: 'error',
                 title: 'Error',
-                message: error.response?.data?.message || 'Error al subir el archivo'
-            });
-        } finally {
-            setUploadingSubtareaId(null);
-            // Limpiar el input
-            if (event.target) {
-                event.target.value = '';
-            }
-        }
-    };
-
-    const handleOpenFile = async (subtareaId: number, fileName: string) => {
-        try {
-            const response = await auditoriaService.downloadFile(subtareaId);
-
-            // Crear un blob URL y abrirlo en nueva pestaña
-            const blob = new Blob([response.data], { type: response.headers['content-type'] });
-            const url = window.URL.createObjectURL(blob);
-            window.open(url, '_blank');
-
-            // Limpiar el URL después de un tiempo
-            setTimeout(() => {
-                window.URL.revokeObjectURL(url);
-            }, 100);
-        } catch (error) {
-            console.error('Error al abrir archivo:', error);
-            setModal({
-                isOpen: true,
-                type: 'error',
-                title: 'Error',
-                message: 'Error al abrir el archivo'
+                message
             });
         }
-    };
+    });
 
     const handleLogout = async () => {
         try {
@@ -124,24 +63,6 @@ export const AuditoriaDetalle: React.FC = () => {
         } catch (error) {
             console.error('Error logging out:', error);
         }
-    };
-
-    const getEstadoBadge = (estado: string) => {
-        const badges: Record<string, string> = {
-            pendiente: 'bg-red-100 text-red-800',
-            en_progreso: 'bg-yellow-100 text-yellow-800',
-            completada: 'bg-green-100 text-green-800'
-        };
-        const labels: Record<string, string> = {
-            pendiente: 'Pendiente',
-            en_progreso: 'En Progreso',
-            completada: 'Completada'
-        };
-        return (
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badges[estado] || 'bg-gray-100 text-gray-800'}`}>
-                {labels[estado] || estado}
-            </span>
-        );
     };
 
     if (loading) {
@@ -195,60 +116,11 @@ export const AuditoriaDetalle: React.FC = () => {
                             </svg>
                             Volver a auditorías
                         </button>
-                        {getEstadoBadge(auditoria.estado)}
+                        <EstadoBadge estado={auditoria.estado} />
                     </div>
 
                     {/* Información de la Auditoría */}
-                    <div className="bg-white shadow-xl rounded-2xl overflow-hidden mb-6">
-                        <div className="px-6 py-8">
-                            <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                                Detalle de Auditoría
-                            </h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
-                                    <p className="text-gray-900">{auditoria.empresa || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">NIT</label>
-                                    <p className="text-gray-900">{auditoria.nit || '-'}</p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Razón Social</label>
-                                    <p className="text-gray-900">{auditoria.razon_social || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Actividad Económica</label>
-                                    <p className="text-gray-900">{auditoria.actividad_economica || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-                                    <p className="text-gray-900">{auditoria.direccion || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
-                                    <p className="text-gray-900">{auditoria.responsable || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Contacto</label>
-                                    <p className="text-gray-900">{auditoria.contacto || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">PT</label>
-                                    <p className="text-gray-900">{auditoria.pt || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Inicial</label>
-                                    <p className="text-gray-900">{auditoria.fecha_inicial || '-'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Corte</label>
-                                    <p className="text-gray-900">{auditoria.fecha_corte || '-'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <AuditoriaInfoCard auditoria={auditoria} />
 
                     {/* Categorías y Subtareas */}
                     {auditoria.categorias && auditoria.categorias.length > 0 && (
@@ -256,157 +128,16 @@ export const AuditoriaDetalle: React.FC = () => {
                             <h3 className="text-2xl font-bold text-gray-800">Categorías y Requerimientos</h3>
 
                             {auditoria.categorias.map((categoria: any) => (
-                                <div key={categoria.id} className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
-                                        <h4 className="text-xl font-bold text-white">{categoria.nombre}</h4>
-                                    </div>
-
-                                    <div className="px-6 py-4">
-                                        {categoria.subtareas && categoria.subtareas.length > 0 ? (
-                                            <div className="overflow-hidden">
-                                                <table className="w-full divide-y divide-gray-200">
-                                                    <thead className="bg-gray-50">
-                                                        <tr>
-                                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                                                                Requerimiento
-                                                            </th>
-                                                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                                                                Prioridad
-                                                            </th>
-                                                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                                                                F. Solicitud
-                                                            </th>
-                                                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                                                                T. Entrega
-                                                            </th>
-                                                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                                                                Estado
-                                                            </th>
-                                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                                Archivo
-                                                            </th>
-                                                            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
-                                                                Formato
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="bg-white divide-y divide-gray-200">
-                                                        {categoria.subtareas.map((subtarea: any) => (
-                                                            <tr key={subtarea.id} className="hover:bg-gray-50">
-                                                                <td className="px-3 py-3">
-                                                                    <div className="text-sm text-gray-900 font-medium break-words">
-                                                                        {subtarea.nombre}
-                                                                    </div>
-                                                                    {subtarea.observaciones && (
-                                                                        <div className="text-xs text-gray-500 mt-1 break-words">
-                                                                            {subtarea.observaciones}
-                                                                        </div>
-                                                                    )}
-                                                                </td>
-                                                                <td className="px-2 py-3 whitespace-nowrap">
-                                                                    {subtarea.prioridad ? (
-                                                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${subtarea.prioridad === 'alta' ? 'bg-red-100 text-red-800' :
-                                                                            subtarea.prioridad === 'media' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                'bg-green-100 text-green-800'
-                                                                            }`}>
-                                                                            {subtarea.prioridad.charAt(0).toUpperCase() + subtarea.prioridad.slice(1)}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-sm text-gray-400">-</span>
-                                                                    )}
-                                                                </td>
-                                                                <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-                                                                    {subtarea.fecha_solicitud || '-'}
-                                                                </td>
-                                                                <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-                                                                    {subtarea.tiempo_entrega || '-'}
-                                                                </td>
-                                                                <td className="px-2 py-3 whitespace-nowrap">
-                                                                    {subtarea.estado_informacion ? (
-                                                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${subtarea.estado_informacion === 'aprobado' ? 'bg-green-100 text-green-800' :
-                                                                            subtarea.estado_informacion === 'recibido' ? 'bg-blue-100 text-blue-800' :
-                                                                                subtarea.estado_informacion === 'revision' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                    'bg-gray-100 text-gray-800'
-                                                                            }`}>
-                                                                            {subtarea.estado_informacion.charAt(0).toUpperCase() + subtarea.estado_informacion.slice(1)}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-sm text-gray-400">-</span>
-                                                                    )}
-                                                                </td>
-                                                                <td className="px-3 py-3">
-                                                                    <div className="flex items-center gap-2">
-                                                                        {subtarea.archivo_nombre ? (
-                                                                            <button
-                                                                                onClick={() => handleOpenFile(subtarea.id, subtarea.archivo_nombre)}
-                                                                                className="flex items-center gap-1 hover:bg-blue-50 px-2 py-1 rounded transition-colors group"
-                                                                                title="Click para abrir en nueva pestaña"
-                                                                            >
-                                                                                <svg className="h-4 w-4 text-blue-500 group-hover:text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                                                </svg>
-                                                                                <span className="text-xs text-blue-600 group-hover:text-blue-700 underline truncate" title={subtarea.archivo_nombre}>
-                                                                                    {subtarea.archivo_nombre.length > 15
-                                                                                        ? subtarea.archivo_nombre.substring(0, 15) + '...'
-                                                                                        : subtarea.archivo_nombre}
-                                                                                </span>
-                                                                            </button>
-                                                                        ) : (
-                                                                            <div className="flex items-center gap-1 text-gray-400">
-                                                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                                                </svg>
-                                                                                <span className="text-xs">Sin archivo</span>
-                                                                            </div>
-                                                                        )}
-                                                                        <input
-                                                                            type="file"
-                                                                            ref={(el) => { fileInputRefs.current[subtarea.id] = el; }}
-                                                                            onChange={(e) => handleFileChange(e, subtarea.id)}
-                                                                            accept={getAcceptedFileTypes(subtarea.formato_archivo)}
-                                                                            className="hidden"
-                                                                        />
-                                                                        <button
-                                                                            onClick={() => handleFileSelect(subtarea.id)}
-                                                                            disabled={uploadingSubtareaId === subtarea.id}
-                                                                            className="p-1 text-orange-600 hover:bg-orange-50 rounded transition-colors disabled:opacity-50"
-                                                                            title="Subir archivo"
-                                                                        >
-                                                                            {uploadingSubtareaId === subtarea.id ? (
-                                                                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                                                </svg>
-                                                                            ) : (
-                                                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                                                </svg>
-                                                                            )}
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-2 py-3 whitespace-nowrap">
-                                                                    {subtarea.formato_archivo ? (
-                                                                        <span className="px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-800">
-                                                                            {subtarea.formato_archivo.toUpperCase()}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-sm text-gray-400">-</span>
-                                                                    )}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        ) : (
-                                            <p className="text-center text-gray-500 py-8">
-                                                No hay requerimientos en esta categoría
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
+                                <CategoriaCard
+                                    key={categoria.id}
+                                    categoria={categoria}
+                                    uploadingSubtareaId={uploadingSubtareaId}
+                                    fileInputRefs={fileInputRefs}
+                                    onFileSelect={handleFileSelect}
+                                    onFileChange={uploadFile}
+                                    onOpenFile={handleOpenFile}
+                                    getAcceptedFileTypes={getAcceptedFileTypes}
+                                />
                             ))}
                         </div>
                     )}
