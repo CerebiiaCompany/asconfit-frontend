@@ -54,6 +54,7 @@ export const FileUploadCell: React.FC<FileUploadCellProps> = ({
                 ref={fileInputRef}
                 onChange={(e) => onFileChange(e, subtareaId)}
                 accept={getAcceptedFileTypes(formatoArchivo)}
+                data-formato={formatoArchivo}
                 className="hidden"
             />
             <button

@@ -1,33 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { Modal } from '../components/Modal';
 import { useUser } from '../hooks/useUser';
+import { useTareas } from '../hooks/useTareas';
+import { useFileUpload } from '../hooks/useFileUpload';
 import { authService } from '../services/authService';
-import { auditoriaService } from '../services/auditoriaService';
-
-interface TareaFlat {
-    auditoriaId: number;
-    auditoriaEmpresa: string;
-    auditoriaNit: string;
-    categoriaId: number;
-    categoriaNombre: string;
-    subtareaId: number;
-    subtareaNombre: string;
-    formatoArchivo: string | null;
-    archivoNombre: string | null;
-    observaciones: string | null;
-}
+import { AuditoriaCard } from '../components/tareas/AuditoriaCard';
+import { TareaCard } from '../components/tareas/TareaCard';
+import { EmptyState } from '../components/tareas/EmptyState';
+import { LoadingSpinner } from '../components/tareas/LoadingSpinner';
 
 export const MisTareas: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useUser(() => navigate('/login'));
     const { setUser } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [tareas, setTareas] = useState<TareaFlat[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [auditoriaSeleccionada, setAuditoriaSeleccionada] = useState<number | null>(null);
     const [modal, setModal] = useState<{
         isOpen: boolean;
         type: 'success' | 'error';
@@ -40,116 +31,30 @@ export const MisTareas: React.FC = () => {
         message: ''
     });
 
-    useEffect(() => {
-        cargarTareas();
-    }, []);
+    const { auditorias, loading, recargar } = useTareas();
 
-    const cargarTareas = async () => {
-        try {
-            setLoading(true);
-            const response = await auditoriaService.getAuditorias();
-            const auditorias = response.data || response;
-
-            // Aplanar todas las subtareas de todas las auditorías
-            const tareasFlat: TareaFlat[] = [];
-            auditorias.forEach((auditoria: any) => {
-                auditoria.categorias?.forEach((categoria: any) => {
-                    categoria.subtareas?.forEach((subtarea: any) => {
-                        tareasFlat.push({
-                            auditoriaId: auditoria.id,
-                            auditoriaEmpresa: auditoria.empresa || 'Sin nombre',
-                            auditoriaNit: auditoria.nit || 'Sin NIT',
-                            categoriaId: categoria.id,
-                            categoriaNombre: categoria.nombre,
-                            subtareaId: subtarea.id,
-                            subtareaNombre: subtarea.nombre,
-                            formatoArchivo: subtarea.formato_archivo,
-                            archivoNombre: subtarea.archivo_nombre,
-                            observaciones: subtarea.observaciones
-                        });
-                    });
-                });
-            });
-
-            setTareas(tareasFlat);
-        } catch (error) {
-            console.error('Error al cargar tareas:', error);
-            setModal({
-                isOpen: true,
-                type: 'error',
-                title: 'Error',
-                message: 'No se pudieron cargar las tareas'
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getAcceptedFileTypes = (formatoArchivo: string | null): string => {
-        if (!formatoArchivo) return '*';
-
-        const formatos: Record<string, string> = {
-            'pdf': '.pdf',
-            'excel': '.xlsx,.xls,.csv,.xlsm,.xlsb,.xltx,.xltm',
-            'word': '.doc,.docx,.docm,.dotx,.dotm,.odt'
-        };
-        return formatos[formatoArchivo.toLowerCase()] || '*';
-    };
-
-    const getExtensionesPermitidas = (formatoArchivo: string | null): string[] => {
-        if (!formatoArchivo) return [];
-
-        const extensiones: Record<string, string[]> = {
-            'pdf': ['pdf'],
-            'excel': ['xlsx', 'xls', 'csv', 'xlsm', 'xlsb', 'xltx', 'xltm'],
-            'word': ['doc', 'docx', 'docm', 'dotx', 'dotm', 'odt']
-        };
-        return extensiones[formatoArchivo.toLowerCase()] || [];
-    };
-
-    const handleFileUpload = async (tarea: TareaFlat, file: File) => {
-        try {
-            // Validar formato de archivo si está especificado
-            if (tarea.formatoArchivo) {
-                const extension = file.name.split('.').pop()?.toLowerCase();
-                const formatosPermitidos = getExtensionesPermitidas(tarea.formatoArchivo);
-
-                if (extension && formatosPermitidos.length > 0 && !formatosPermitidos.includes(extension)) {
-                    setModal({
-                        isOpen: true,
-                        type: 'error',
-                        title: 'Formato incorrecto',
-                        message: `El archivo debe ser de tipo: ${formatosPermitidos.join(', ')}`
-                    });
-                    return;
-                }
-            }
-
-            // Subir el archivo al servidor
-            const prevLoading = loading;
-            setLoading(true);
-            await auditoriaService.uploadFile(tarea.subtareaId, file);
-
+    const { uploadFile, uploading, getAcceptedFileTypes } = useFileUpload({
+        onSuccess: (fileName) => {
             setModal({
                 isOpen: true,
                 type: 'success',
                 title: '¡Éxito!',
-                message: `Archivo "${file.name}" subido correctamente`
+                message: `Archivo "${fileName}" subido correctamente`
             });
-
-            // Recargar tareas para actualizar el estado
-            await cargarTareas();
-            setLoading(prevLoading);
-        } catch (error: any) {
-            console.error('Error al subir archivo:', error);
+            recargar();
+        },
+        onError: (message) => {
             setModal({
                 isOpen: true,
                 type: 'error',
                 title: 'Error',
-                message: error.response?.data?.message || 'No se pudo subir el archivo'
+                message
             });
-            setLoading(false);
         }
+    });
+
+    const handleFileUpload = async (subtareaId: number, formatoArchivo: string | null, file: File) => {
+        await uploadFile(subtareaId, file, formatoArchivo);
     };
 
     const handleCloseModal = () => {
@@ -185,122 +90,65 @@ export const MisTareas: React.FC = () => {
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                            Mis Tareas
-                        </h1>
+                        <div className="flex items-center gap-4 mb-2">
+                            {auditoriaSeleccionada !== null && (
+                                <button
+                                    onClick={() => setAuditoriaSeleccionada(null)}
+                                    className="text-orange-500 hover:text-orange-600 transition-colors"
+                                >
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                            )}
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                                {auditoriaSeleccionada === null ? 'Mis Auditorías' : 'Tareas de la Auditoría'}
+                            </h1>
+                        </div>
                         <p className="text-gray-600">
-                            Aquí puedes ver y subir archivos para las auditorías asignadas
+                            {auditoriaSeleccionada === null
+                                ? 'Selecciona una auditoría para ver sus tareas'
+                                : 'Aquí puedes ver y subir archivos para las tareas asignadas'
+                            }
                         </p>
                     </div>
 
-                    {/* Lista de Tareas */}
+                    {/* Lista de Auditorías o Tareas */}
                     <div className="bg-white shadow-xl rounded-2xl p-6">
                         {loading ? (
-                            <div className="text-center py-12">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-                                <p className="mt-4 text-gray-600">Cargando tareas...</p>
-                            </div>
-                        ) : tareas.length === 0 ? (
-                            <div className="text-center py-12">
-                                <svg
-                                    className="mx-auto h-12 w-12 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                    />
-                                </svg>
-                                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                                    No hay tareas disponibles
-                                </h3>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    Las tareas aparecerán aquí cuando se creen auditorías
-                                </p>
-                            </div>
+                            <LoadingSpinner />
+                        ) : auditoriaSeleccionada === null ? (
+                            // Vista de lista de auditorías
+                            auditorias.length === 0 ? (
+                                <EmptyState
+                                    title="No hay auditorías disponibles"
+                                    description="Las auditorías aparecerán aquí cuando se te asignen"
+                                />
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {auditorias.map((auditoria) => (
+                                        <AuditoriaCard
+                                            key={auditoria.auditoriaId}
+                                            auditoria={auditoria}
+                                            onClick={() => setAuditoriaSeleccionada(auditoria.auditoriaId)}
+                                        />
+                                    ))}
+                                </div>
+                            )
                         ) : (
+                            // Vista de tareas de la auditoría seleccionada
                             <div className="space-y-4">
-                                {tareas.map((tarea, index) => (
-                                    <div
-                                        key={`${tarea.subtareaId}-${index}`}
-                                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                                    >
-                                        {/* Información de la auditoría */}
-                                        <div className="mb-3 pb-3 border-b border-gray-200">
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <svg className="h-4 w-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                </svg>
-                                                <span className="font-semibold">{tarea.auditoriaEmpresa}</span>
-                                                <span className="text-gray-400">•</span>
-                                                <span>NIT: {tarea.auditoriaNit}</span>
-                                            </div>
-                                            <div className="mt-1 text-sm text-gray-600">
-                                                <span className="font-medium text-blue-600">{tarea.categoriaNombre}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Información de la subtarea */}
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex-1">
-                                                <h4 className="font-medium text-gray-800 mb-2">
-                                                    {tarea.subtareaNombre}
-                                                </h4>
-                                                <div className="space-y-1">
-                                                    {tarea.formatoArchivo && (
-                                                        <p className="text-sm text-gray-600">
-                                                            <span className="font-medium">Formato requerido:</span>{' '}
-                                                            <span className="text-orange-600 font-semibold">{tarea.formatoArchivo}</span>
-                                                        </p>
-                                                    )}
-                                                    {tarea.observaciones && (
-                                                        <p className="text-sm text-gray-600">
-                                                            <span className="font-medium">Observaciones:</span> {tarea.observaciones}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Botón de subir archivo */}
-                                            <div className="flex flex-col gap-2 items-end">
-                                                <label className="cursor-pointer">
-                                                    <input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept={getAcceptedFileTypes(tarea.formatoArchivo)}
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                handleFileUpload(tarea, file);
-                                                            }
-                                                            // Limpiar el input para permitir subir el mismo archivo de nuevo
-                                                            e.target.value = '';
-                                                        }}
-                                                    />
-                                                    <div className="px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors text-center whitespace-nowrap flex items-center gap-2">
-                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                        </svg>
-                                                        Subir archivo
-                                                    </div>
-                                                </label>
-
-                                                {tarea.archivoNombre && (
-                                                    <div className="flex items-center gap-1 text-xs text-green-600">
-                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <span>Archivo subido</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                {auditorias
+                                    .find(a => a.auditoriaId === auditoriaSeleccionada)
+                                    ?.tareas.map((tarea, index) => (
+                                        <TareaCard
+                                            key={`${tarea.subtareaId}-${index}`}
+                                            tarea={tarea}
+                                            onFileUpload={(file) => handleFileUpload(tarea.subtareaId, tarea.formatoArchivo, file)}
+                                            acceptedFileTypes={getAcceptedFileTypes(tarea.formatoArchivo)}
+                                            uploading={uploading}
+                                        />
+                                    ))}
                             </div>
                         )}
                     </div>
