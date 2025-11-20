@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Categoria, Subtarea } from "../../types/auditoria.types";
+import { Categoria, Subtarea } from "../../../types/auditoria.types";
 import { SubtareaItem } from "./SubtareaItem";
-import { plantillaService } from "../../services/plantillaService";
-import { Modal } from "../Modal";
+import { plantillaService } from "../../../services/plantillaService";
+import { Modal } from "../../Modal";
 
 interface CategoriasSectionProps {
   categorias: Categoria[];

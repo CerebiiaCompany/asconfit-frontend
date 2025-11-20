@@ -1,23 +1,14 @@
-export { AuditoriaEmptyState } from './AuditoriaEmptyState';
-export { AuditoriaHeader } from './AuditoriaHeader';
-export { AuditoriaList } from './AuditoriaList';
-export { AuditoriaSearchBar } from './AuditoriaSearchBar';
-export { AuditoriaStatsCard } from './AuditoriaStatsCard';
-export { CategoriasSection } from './CategoriasSection';
-export { DelegadoSection } from './DelegadoSection';
-export { EmpresaSection } from './EmpresaSection';
-export { FechasSection } from './FechasSection';
-export { PTSection } from './PTSection';
-export { SubtareaItem } from './SubtareaItem';
-export { AuditoriaInfoCard } from './AuditoriaInfoCard';
-export { EstadoInformacionBadge } from './EstadoInformacionBadge';
-export { FileUploadCell } from './FileUploadCell';
-export { EstadoBadge } from './EstadoBadge';
-export { PriorityBadge } from './PriorityBadge';
-export { FormatoBadge } from './FormatoBadge';
-export { SubtareaRow } from './SubtareaRow';
-export { SubtareaTable } from './SubtareaTable';
-export { CategoriaCard } from './CategoriaCard';
-export { AuditoriaCard } from './AuditoriaCard';
-export { AuditoriaFilterBar } from './AuditoriaFilterBar';
-export { AuditoriaCardList } from './AuditoriaCardList';
+// Auditorias (List View)
+export * from "./auditorias";
+
+// Auditorias Nueva (Create/Edit)
+export * from "./auditorias-nueva";
+
+// Auditorias Detalle (Detail View)
+export * from "./auditorias-detalle";
+
+// Shared Badges (used across multiple views)
+export { EstadoBadge } from "./EstadoBadge";
+export { EstadoInformacionBadge } from "./EstadoInformacionBadge";
+export { FormatoBadge } from "./FormatoBadge";
+export { PriorityBadge } from "./PriorityBadge";
