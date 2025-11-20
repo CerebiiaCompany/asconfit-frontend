@@ -22,5 +22,14 @@ export const plantillaService = {
             { headers: getAuthHeader() }
         );
         return response.data;
+    },
+
+    async updatePlantilla(codigo: string, data: any) {
+        const response = await axios.put(
+            `${API_URL}/categoria-plantillas/${codigo}`,
+            data,
+            { headers: getAuthHeader() }
+        );
+        return response.data;
     }
 };
