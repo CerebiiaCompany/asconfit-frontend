@@ -6,6 +6,10 @@
 
 ```bash
 cd C:\Users\USUARIO\Documents\GitHub\asconfit
+
+git clone https://github.com/CerebiiaCompany/asconfit-frontend.git
+
+git clone https://github.com/CerebiiaCompany/asconfit-backend.git
 ```
 
 ### 2. Instalar Dependencias del Frontend
