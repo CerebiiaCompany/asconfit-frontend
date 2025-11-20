@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { auditoriaService } from '../../services/auditoriaService';
 import { Header } from '../../components/Header';
 import { Sidebar } from '../../components/Sidebar';
 import { Modal } from '../../components/Modal';
@@ -17,6 +18,7 @@ export const AuditoriaDetalle: React.FC = () => {
     const { user } = useUser(() => navigate('/login'));
     const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<number | null>(null);
     const [modal, setModal] = useState<{
         isOpen: boolean;
         type: 'success' | 'error';
@@ -55,6 +57,30 @@ export const AuditoriaDetalle: React.FC = () => {
             });
         }
     });
+
+    const handleEstadoChange = async (subtareaId: number, estado: string) => {
+        try {
+            setUpdatingEstadoSubtareaId(subtareaId);
+            await auditoriaService.updateEstadoSubtarea(subtareaId, estado);
+            await refetch();
+            setModal({
+                isOpen: true,
+                type: 'success',
+                title: 'Éxito',
+                message: 'Estado actualizado correctamente'
+            });
+        } catch (error) {
+            console.error('Error al actualizar estado:', error);
+            setModal({
+                isOpen: true,
+                type: 'error',
+                title: 'Error',
+                message: 'No se pudo actualizar el estado'
+            });
+        } finally {
+            setUpdatingEstadoSubtareaId(null);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -137,6 +163,9 @@ export const AuditoriaDetalle: React.FC = () => {
                                     onFileChange={uploadFile}
                                     onOpenFile={handleOpenFile}
                                     getAcceptedFileTypes={getAcceptedFileTypes}
+                                    onEstadoChange={handleEstadoChange}
+                                    updatingEstadoSubtareaId={updatingEstadoSubtareaId}
+                                    userRole={user?.role?.nombre || 'delegado'}
                                 />
                             ))}
                         </div>

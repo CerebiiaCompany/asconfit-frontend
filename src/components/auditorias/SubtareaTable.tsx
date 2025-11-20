@@ -9,6 +9,9 @@ interface SubtareaTableProps {
     onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
+    onEstadoChange: (subtareaId: number, estado: string) => void;
+    updatingEstadoSubtareaId: number | null;
+    userRole: string;
 }
 
 export const SubtareaTable: React.FC<SubtareaTableProps> = ({
@@ -18,7 +21,10 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     onFileSelect,
     onFileChange,
     onOpenFile,
-    getAcceptedFileTypes
+    getAcceptedFileTypes,
+    onEstadoChange,
+    updatingEstadoSubtareaId,
+    userRole
 }) => {
     return (
         <div className="overflow-hidden">
@@ -59,6 +65,9 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             onFileChange={onFileChange}
                             onOpenFile={onOpenFile}
                             getAcceptedFileTypes={getAcceptedFileTypes}
+                            onEstadoChange={onEstadoChange}
+                            isUpdatingEstado={updatingEstadoSubtareaId === subtarea.id}
+                            userRole={userRole}
                         />
                     ))}
                 </tbody>

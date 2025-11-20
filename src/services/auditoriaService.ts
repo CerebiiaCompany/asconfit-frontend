@@ -77,5 +77,14 @@ export const auditoriaService = {
             }
         );
         return response;
+    },
+
+    async updateEstadoSubtarea(subtareaId: number, estado: string) {
+        const response = await axios.put(
+            `${API_URL}/auditorias/subtareas/${subtareaId}/estado`,
+            { estado_informacion: estado },
+            { headers: getAuthHeader() }
+        );
+        return response.data;
     }
 };

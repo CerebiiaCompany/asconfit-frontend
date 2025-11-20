@@ -12,6 +12,9 @@ interface SubtareaRowProps {
     onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
+    onEstadoChange: (subtareaId: number, estado: string) => void;
+    isUpdatingEstado: boolean;
+    userRole: string;
 }
 
 export const SubtareaRow: React.FC<SubtareaRowProps> = ({
@@ -21,8 +24,14 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
     onFileSelect,
     onFileChange,
     onOpenFile,
-    getAcceptedFileTypes
+    getAcceptedFileTypes,
+    onEstadoChange,
+    isUpdatingEstado,
+    userRole
 }) => {
+    const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onEstadoChange(subtarea.id, e.target.value);
+    };
     return (
         <tr className="hover:bg-gray-50">
             <td className="px-3 py-3">
@@ -45,7 +54,21 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
                 {subtarea.tiempo_entrega || '-'}
             </td>
             <td className="px-2 py-3 whitespace-nowrap">
-                <EstadoInformacionBadge estado={subtarea.estado_informacion} />
+                {userRole === 'auditor' ? (
+                    <select
+                        value={subtarea.estado_informacion}
+                        onChange={handleEstadoChange}
+                        disabled={isUpdatingEstado}
+                        className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <option value="pendiente">Pendiente</option>
+                        <option value="recibido">Recibido</option>
+                        <option value="revision">En Revisión</option>
+                        <option value="aprobado">Aprobado</option>
+                    </select>
+                ) : (
+                    <EstadoInformacionBadge estado={subtarea.estado_informacion} />
+                )}
             </td>
             <td className="px-3 py-3">
                 <FileUploadCell

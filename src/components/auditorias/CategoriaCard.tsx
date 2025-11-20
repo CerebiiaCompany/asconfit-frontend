@@ -9,6 +9,9 @@ interface CategoriaCardProps {
     onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
+    onEstadoChange: (subtareaId: number, estado: string) => void;
+    updatingEstadoSubtareaId: number | null;
+    userRole: string;
 }
 
 export const CategoriaCard: React.FC<CategoriaCardProps> = ({
@@ -18,7 +21,10 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     onFileSelect,
     onFileChange,
     onOpenFile,
-    getAcceptedFileTypes
+    getAcceptedFileTypes,
+    onEstadoChange,
+    updatingEstadoSubtareaId,
+    userRole
 }) => {
     return (
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -36,6 +42,9 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                         onFileChange={onFileChange}
                         onOpenFile={onOpenFile}
                         getAcceptedFileTypes={getAcceptedFileTypes}
+                        onEstadoChange={onEstadoChange}
+                        updatingEstadoSubtareaId={updatingEstadoSubtareaId}
+                        userRole={userRole}
                     />
                 ) : (
                     <p className="text-center text-gray-500 py-8">
