@@ -57,7 +57,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         {subtarea.tiempo_entrega || "-"}
       </td>
       <td className="px-2 py-3 whitespace-nowrap">
-        {userRole === "auditor" ? (
+        {userRole === "auditor" || userRole === "admin" ? (
           <select
             value={subtarea.estado_informacion}
             onChange={handleEstadoChange}
