@@ -1,5 +1,9 @@
-export { AuditoriaCard } from './AuditoriaCard';
-export { TareaCard } from './TareaCard';
-export { FileUploadButton } from './FileUploadButton';
-export { EmptyState } from './EmptyState';
-export { LoadingSpinner } from './LoadingSpinner';
+export { AuditoriaCard } from "./AuditoriaCard";
+export { TareaCard } from "./TareaCard";
+export { FileUploadButton } from "./FileUploadButton";
+export { EmptyState } from "./EmptyState";
+export { LoadingSpinner } from "./LoadingSpinner";
+export { BreadcrumbTarea } from "./BreadcrumbTarea";
+export { InfoEmpresa } from "./InfoEmpresa";
+export { SubtareaCard } from "./SubtareaCard";
+export { CategoriaSection } from "./CategoriaSection";
