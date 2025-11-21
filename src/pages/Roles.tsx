@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
@@ -18,7 +18,6 @@ import { Modal } from "../components/Modal";
 export const Roles: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
-  const { setUser } = useAuth();
   const { roles, loading, error, loadRoles, deleteRole } = useRoles();
   const {
     users,
@@ -46,20 +45,25 @@ export const Roles: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleDelete = (id: string) => {
-    openConfirm(
-      "Eliminar Rol",
-      "¿Estás seguro de que deseas eliminar este rol?",
-      async () => {
-        try {
-          await deleteRole(id);
-        } catch (err) {
-          console.error("Delete error:", err);
-        }
-      },
-      "Eliminar"
-    );
-  };
+  const handleDelete = useCallback(
+    (id: string) => {
+      openConfirm(
+        "Eliminar Rol",
+        "¿Estás seguro de que deseas eliminar este rol?",
+        async () => {
+          try {
+            await deleteRole(id);
+            setSuccessMessage("Rol eliminado correctamente");
+            setTimeout(() => setSuccessMessage(null), 3000);
+          } catch (err) {
+            console.error("Delete error:", err);
+          }
+        },
+        "Eliminar"
+      );
+    },
+    [openConfirm, deleteRole]
+  );
 
   const handleFormSubmit = async (success: boolean) => {
     if (success) {
@@ -86,7 +90,7 @@ export const Roles: React.FC = () => {
     );
   };
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await authService.logout();
       navigate("/login");
@@ -94,7 +98,7 @@ export const Roles: React.FC = () => {
       console.error("Error logging out:", error);
       navigate("/login");
     }
-  };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
