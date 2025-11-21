@@ -7,10 +7,10 @@ import { Sidebar } from '../components/Sidebar';
 import { useUser } from '../hooks/useUser';
 import { useRoles } from '../hooks/useRoles';
 import { useRoleForm } from '../hooks/useRoleForm';
-import { Role } from '../types/role';
-import { roleService } from '../services/roleService';
+import { useConfirmModal } from '../hooks/useConfirmModal';
 import { RoleForm } from '../components/Roles/RoleForm';
 import { RoleList } from '../components/Roles/RoleList';
+import { Modal } from '../components/Modal';
 
 export const Roles: React.FC = () => {
     const navigate = useNavigate();
@@ -18,16 +18,23 @@ export const Roles: React.FC = () => {
     const { setUser } = useAuth();
     const { roles, loading, error, loadRoles, deleteRole } = useRoles();
     const { showForm, selectedRole, handleCreateNew, handleEdit, handleFormClose } = useRoleForm();
+    const { isOpen, title, message, openConfirm, closeConfirm, handleConfirm } = useConfirmModal();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este rol?')) {
-            try {
-                await deleteRole(id);
-            } catch (err) {
-                console.error('Delete error:', err);
+    const handleDelete = (id: string) => {
+        setDeleteId(id);
+        openConfirm(
+            'Eliminar Rol',
+            '¿Estás seguro de que deseas eliminar este rol?',
+            async () => {
+                try {
+                    await deleteRole(id);
+                } catch (err) {
+                    console.error('Delete error:', err);
+                }
             }
-        }
+        );
     };
 
     const handleFormSubmit = async (success: boolean) => {
@@ -112,6 +119,17 @@ export const Roles: React.FC = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Confirmation Modal */}
+            <Modal
+                isOpen={isOpen}
+                onClose={closeConfirm}
+                title={title}
+                message={message}
+                type="warning"
+                confirmText="Eliminar"
+                onConfirm={handleConfirm}
+            />
         </div>
     );
 };
