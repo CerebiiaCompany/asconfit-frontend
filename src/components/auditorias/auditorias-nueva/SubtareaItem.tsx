@@ -82,24 +82,6 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
         />
       </div>
 
-      {/* Estado de información */}
-      <div className="mb-4">
-        <label className="block text-sm text-gray-600 mb-2">
-          Estado de información
-        </label>
-        <select
-          value={subtarea.estadoInformacion}
-          onChange={(e) => onChange("estadoInformacion", e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
-        >
-          <option value="">Seleccionar</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="recibido">Recibido</option>
-          <option value="revision">En revisión</option>
-          <option value="aprobado">Aprobado</option>
-        </select>
-      </div>
-
       {/* Formato y Subir Archivo */}
       <div className="mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-end">
         <div className="flex-1">
