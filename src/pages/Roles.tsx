@@ -10,10 +10,12 @@ import { useUsers } from "../hooks/useUsers";
 import { useRoleForm } from "../hooks/useRoleForm";
 import { useConfirmModal } from "../hooks/useConfirmModal";
 import { useTabs } from "../hooks/useTabs";
+import { useToast } from "../hooks/useToast";
 import { RoleForm } from "../components/Roles/RoleForm";
 import { RoleList } from "../components/Roles/RoleList";
 import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
 import { Modal } from "../components/Modal";
+import { ToastContainer } from "../components/Toast/ToastContainer";
 
 export const Roles: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +45,7 @@ export const Roles: React.FC = () => {
   } = useConfirmModal();
   const { activeTab, setActiveTab } = useTabs("users");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -53,16 +55,16 @@ export const Roles: React.FC = () => {
         async () => {
           try {
             await deleteRole(id);
-            setSuccessMessage("Rol eliminado correctamente");
-            setTimeout(() => setSuccessMessage(null), 3000);
+            showSuccess("Rol eliminado correctamente");
           } catch (err) {
             console.error("Delete error:", err);
+            showError("Error al eliminar el rol");
           }
         },
         "Eliminar"
       );
     },
-    [openConfirm, deleteRole]
+    [openConfirm, deleteRole, showSuccess, showError]
   );
 
   const handleFormSubmit = async (success: boolean) => {
@@ -80,10 +82,10 @@ export const Roles: React.FC = () => {
         try {
           await updateUserRole(userId, parseInt(roleId));
           await loadUsers(); // Reload users to refresh the content
-          setSuccessMessage("Rol actualizado correctamente");
-          setTimeout(() => setSuccessMessage(null), 3000);
+          showSuccess("Rol actualizado correctamente");
         } catch (err) {
           console.error("Update error:", err);
+          showError("Error al actualizar el rol");
         }
       },
       "Cambiar"
@@ -127,13 +129,6 @@ export const Roles: React.FC = () => {
               </p>
             </div>
           </div>
-
-          {/* Success Message */}
-          {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
-              {successMessage}
-            </div>
-          )}
 
           {/* Error Message */}
           {error && (
@@ -230,6 +225,9 @@ export const Roles: React.FC = () => {
         confirmText={confirmText}
         onConfirm={handleConfirm}
       />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 };

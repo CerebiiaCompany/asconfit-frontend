@@ -31,9 +31,11 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   // Filter users by name or email
   const filteredUsers = users.filter((user) => {
     const searchLower = searchTerm.toLowerCase();
+    const name = user.name || "";
+    const email = user.email || "";
     return (
-      user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower)
+      name.toLowerCase().includes(searchLower) ||
+      email.toLowerCase().includes(searchLower)
     );
   });
 

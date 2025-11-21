@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
@@ -8,13 +8,14 @@ import { useUser } from "../hooks/useUser";
 import { useUsers } from "../hooks/useUsers";
 import { useRoles } from "../hooks/useRoles";
 import { useConfirmModal } from "../hooks/useConfirmModal";
+import { useToast } from "../hooks/useToast";
 import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
 import { Modal } from "../components/Modal";
+import { ToastContainer } from "../components/Toast/ToastContainer";
 
 export const UserRoles: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
-  const { setUser } = useAuth();
   const {
     users,
     loading: usersLoading,
@@ -25,25 +26,34 @@ export const UserRoles: React.FC = () => {
   const { isOpen, title, message, openConfirm, closeConfirm, handleConfirm } =
     useConfirmModal();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
-  const handleUpdateRole = async (userId: number, roleId: string) => {
-    openConfirm(
-      "Cambiar Rol",
-      "¿Estás seguro de que deseas cambiar el rol de este usuario?",
-      async () => {
-        try {
-          await updateUserRole(userId, parseInt(roleId));
-          setSuccessMessage("Rol actualizado correctamente");
-          setTimeout(() => setSuccessMessage(null), 3000);
-        } catch (err) {
-          console.error("Update error:", err);
+  useEffect(() => {
+    if (usersError) {
+      showError(usersError);
+    }
+  }, [usersError, showError]);
+
+  const handleUpdateRole = useCallback(
+    async (userId: number, roleId: string) => {
+      openConfirm(
+        "Cambiar Rol",
+        "¿Estás seguro de que deseas cambiar el rol de este usuario?",
+        async () => {
+          try {
+            await updateUserRole(userId, parseInt(roleId));
+            showSuccess("Rol actualizado correctamente");
+          } catch (err) {
+            console.error("Update error:", err);
+            showError("Error al actualizar el rol del usuario");
+          }
         }
-      }
-    );
-  };
+      );
+    },
+    [openConfirm, updateUserRole, showSuccess, showError]
+  );
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await authService.logout();
       navigate("/login");
@@ -51,7 +61,7 @@ export const UserRoles: React.FC = () => {
       console.error("Error logging out:", error);
       navigate("/login");
     }
-  };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -80,13 +90,6 @@ export const UserRoles: React.FC = () => {
               </p>
             </div>
           </div>
-
-          {/* Success Message */}
-          {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
-              {successMessage}
-            </div>
-          )}
 
           {/* Error Message */}
           {usersError && (
@@ -124,6 +127,9 @@ export const UserRoles: React.FC = () => {
         confirmText="Cambiar"
         onConfirm={handleConfirm}
       />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 };
