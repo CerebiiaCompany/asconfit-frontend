@@ -8,7 +8,7 @@ import { useUser } from "../hooks/useUser";
 import { useUsers } from "../hooks/useUsers";
 import { useRoles } from "../hooks/useRoles";
 import { useConfirmModal } from "../hooks/useConfirmModal";
-import { UserRoleList } from "../components/Users/UserRoleList";
+import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
 import { Modal } from "../components/Modal";
 
 export const UserRoles: React.FC = () => {
@@ -103,7 +103,7 @@ export const UserRoles: React.FC = () => {
               </h3>
             </div>
             <div className="p-6">
-              <UserRoleList
+              <UserRoleAssignment
                 users={users}
                 roles={roles}
                 loading={usersLoading || rolesLoading}

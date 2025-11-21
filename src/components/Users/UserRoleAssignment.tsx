@@ -3,14 +3,14 @@ import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
 
-interface UserRoleListProps {
+interface UserRoleAssignmentProps {
   users: User[];
   roles: Role[];
   loading: boolean;
   onUpdateRole: (userId: number, roleId: string) => Promise<void>;
 }
 
-export const UserRoleList: React.FC<UserRoleListProps> = ({
+export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   users,
   roles,
   loading,

@@ -12,7 +12,7 @@ import { useConfirmModal } from "../hooks/useConfirmModal";
 import { useTabs } from "../hooks/useTabs";
 import { RoleForm } from "../components/Roles/RoleForm";
 import { RoleList } from "../components/Roles/RoleList";
-import { UserRoleList } from "../components/Users/UserRoleList";
+import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
 import { Modal } from "../components/Modal";
 
 export const Roles: React.FC = () => {
@@ -171,7 +171,7 @@ export const Roles: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
                   Asignar Roles a Usuarios
                 </h3>
-                <UserRoleList
+                <UserRoleAssignment
                   users={users}
                   roles={roles}
                   loading={usersLoading || loading}
