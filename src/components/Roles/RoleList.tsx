@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Role, getRoleName } from '../../types/role';
 import { ALL_MENU_ITEMS } from '../../config/menuConfig';
 
@@ -7,9 +7,12 @@ interface RoleListProps {
     loading: boolean;
     onEdit: (role: Role) => void;
     onDelete: (id: string) => void;
+    deletingId?: string | null;
 }
 
-export const RoleList: React.FC<RoleListProps> = ({ roles, loading, onEdit, onDelete }) => {
+export const RoleList: React.FC<RoleListProps> = ({ roles, loading, onEdit, onDelete, deletingId: externalDeletingId }) => {
+    const [localDeletingId, setLocalDeletingId] = useState<string | null>(null);
+    const deletingId = externalDeletingId ?? localDeletingId;
     if (loading) {
         return (
             <div className="text-center py-12">
@@ -61,15 +64,22 @@ export const RoleList: React.FC<RoleListProps> = ({ roles, loading, onEdit, onDe
                             <td className="px-6 py-4 text-center text-sm">
                                 <button
                                     onClick={() => onEdit(role)}
-                                    className="text-primary-orange hover:opacity-70 font-medium mr-4 transition-opacity"
+                                    className="text-primary-orange hover:opacity-70 font-medium mr-4 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={deletingId !== null}
                                 >
                                     Editar
                                 </button>
                                 <button
-                                    onClick={() => role.id && onDelete(role.id.toString())}
-                                    className="text-red-600 hover:text-red-800 font-medium transition-colors"
+                                    onClick={() => {
+                                        if (role.id) {
+                                            setLocalDeletingId(role.id.toString());
+                                            onDelete(role.id.toString());
+                                        }
+                                    }}
+                                    className="text-red-600 hover:text-red-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={deletingId !== null}
                                 >
-                                    Eliminar
+                                    {deletingId === role.id?.toString() ? 'Eliminando...' : 'Eliminar'}
                                 </button>
                             </td>
                         </tr>

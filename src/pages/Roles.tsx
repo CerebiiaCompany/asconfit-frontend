@@ -9,7 +9,7 @@ import { useUsers } from "../hooks/useUsers";
 import { useRoleForm } from "../hooks/useRoleForm";
 import { useConfirmModal } from "../hooks/useConfirmModal";
 import { useTabs } from "../hooks/useTabs";
-import { useToast } from "../hooks/useToast";
+import { useToast } from "../contexts/ToastContext";
 import { RoleForm } from "../components/Roles/RoleForm";
 import { RoleList } from "../components/Roles/RoleList";
 import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
@@ -44,7 +44,8 @@ export const Roles: React.FC = () => {
   } = useConfirmModal();
   const { activeTab, setActiveTab } = useTabs("users");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { showSuccess, showError } = useToast();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -53,17 +54,20 @@ export const Roles: React.FC = () => {
         "¿Estás seguro de que deseas eliminar este rol?",
         async () => {
           try {
+            setDeletingId(id);
             await deleteRole(id);
-            showSuccess("Rol eliminado correctamente");
+            addToast("Rol eliminado correctamente", "success");
           } catch (err) {
             console.error("Delete error:", err);
-            showError("Error al eliminar el rol");
+            addToast("Error al eliminar el rol", "error");
+          } finally {
+            setDeletingId(null);
           }
         },
         "Eliminar"
       );
     },
-    [openConfirm, deleteRole, showSuccess, showError]
+    [openConfirm, deleteRole, addToast]
   );
 
   const handleFormSubmit = async (success: boolean) => {
@@ -81,10 +85,10 @@ export const Roles: React.FC = () => {
         try {
           await updateUserRole(userId, parseInt(roleId));
           await loadUsers(); // Reload users to refresh the content
-          showSuccess("Rol actualizado correctamente");
+          addToast("Rol actualizado correctamente", "success");
         } catch (err) {
           console.error("Update error:", err);
-          showError("Error al actualizar el rol");
+          addToast("Error al actualizar el rol", "error");
         }
       },
       "Cambiar"
@@ -142,19 +146,21 @@ export const Roles: React.FC = () => {
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("users")}
-                  className={`px-6 py-4 font-medium transition-colors ${activeTab === "users"
-                    ? "text-primary-orange border-b-2 border-primary-orange"
-                    : "text-gray-600 hover:text-gray-900"
-                    }`}
+                  className={`px-6 py-4 font-medium transition-colors ${
+                    activeTab === "users"
+                      ? "text-primary-orange border-b-2 border-primary-orange"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
                 >
                   Asignar Roles a Usuarios
                 </button>
                 <button
                   onClick={() => setActiveTab("roles")}
-                  className={`px-6 py-4 font-medium transition-colors ${activeTab === "roles"
-                    ? "text-primary-orange border-b-2 border-primary-orange"
-                    : "text-gray-600 hover:text-gray-900"
-                    }`}
+                  className={`px-6 py-4 font-medium transition-colors ${
+                    activeTab === "roles"
+                      ? "text-primary-orange border-b-2 border-primary-orange"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
                 >
                   Gestión de Roles
                 </button>
@@ -204,6 +210,7 @@ export const Roles: React.FC = () => {
                     loading={loading}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    deletingId={deletingId}
                   />
                 )}
               </div>
