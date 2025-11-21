@@ -14,6 +14,7 @@ import { AuditoriaDetalle } from './pages/auditorias/AuditoriaDetalle';
 import { MisTareas } from './pages/MisTareas';
 import { TareaDetalle } from './pages/TareaDetalle';
 import { Perfil } from './pages/Perfil';
+import { Roles } from './pages/Roles';
 import { authService } from './services/authService';
 
 // Componente para proteger rutas privadas
@@ -99,6 +100,13 @@ function App() {
                 <PrivateRoute>
                   <RoleBasedRoute>
                     <Perfil />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              } />
+              <Route path="/roles" element={
+                <PrivateRoute>
+                  <RoleBasedRoute>
+                    <Roles />
                   </RoleBasedRoute>
                 </PrivateRoute>
               } />

@@ -34,6 +34,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
         icon: '/building.png',
     },
     {
+        id: 'roles',
+        path: '/roles',
+        label: 'Roles',
+        icon: '/roles.png',
+    },
+    {
         id: 'perfil',
         path: '/perfil',
         label: 'Perfil',
@@ -43,7 +49,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
 
 // Configuración de menús por rol
 export const MENU_BY_ROLE: Record<UserRole, string[]> = {
-    admin: ['dashboard', 'auditorias', 'mis-tareas', 'empresas', 'perfil'],
+    admin: ['dashboard', 'auditorias', 'mis-tareas', 'empresas', 'roles', 'perfil'],
     auditor: ['dashboard', 'auditorias', 'empresas', 'perfil'],
     delegado: ['dashboard', 'mis-tareas', 'perfil'],
 };
@@ -57,6 +63,9 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
     '/mis-tareas': 'mis-tareas',
     '/mis-tareas/:id': 'mis-tareas',
     '/empresas': 'empresas',
+    '/roles': 'roles',
+    '/roles/nuevo': 'roles',
+    '/roles/:id': 'roles',
     '/perfil': 'perfil',
 };
 
@@ -70,10 +79,10 @@ export const getMenuItemsByRole = (role: UserRole): MenuItem[] => {
 export const canAccessRoute = (path: string, role: UserRole): boolean => {
     // Normalizar el rol a minúsculas
     const normalizedRole = role.toLowerCase() as UserRole;
-    
+
     // Buscar el ID del menú correspondiente a la ruta
     let menuId = ROUTE_TO_MENU_ID[path];
-    
+
     // Si no se encuentra una coincidencia exacta, buscar por patrón
     if (!menuId) {
         for (const [routePattern, id] of Object.entries(ROUTE_TO_MENU_ID)) {
@@ -86,10 +95,10 @@ export const canAccessRoute = (path: string, role: UserRole): boolean => {
             }
         }
     }
-    
+
     // Si no se encuentra el menuId, denegar acceso por defecto
     if (!menuId) return false;
-    
+
     // Verificar si el rol tiene acceso a este item del menú
     const allowedIds = MENU_BY_ROLE[normalizedRole] || MENU_BY_ROLE['delegado'];
     return allowedIds.includes(menuId);
