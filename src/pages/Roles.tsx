@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { useUser } from '../hooks/useUser';
+import { useRoles } from '../hooks/useRoles';
+import { useRoleForm } from '../hooks/useRoleForm';
 import { Role } from '../types/role';
 import { roleService } from '../services/roleService';
 import { RoleForm } from '../components/Roles/RoleForm';
@@ -14,56 +16,18 @@ export const Roles: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useUser(() => navigate('/login'));
     const { setUser } = useAuth();
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [showForm, setShowForm] = useState(false);
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const { roles, loading, error, loadRoles, deleteRole } = useRoles();
+    const { showForm, selectedRole, handleCreateNew, handleEdit, handleFormClose } = useRoleForm();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    useEffect(() => {
-        loadRoles();
-    }, []);
-
-    const loadRoles = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await roleService.getAllRoles();
-            setRoles(data);
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Error al cargar roles';
-            console.error('Load roles error:', errorMessage);
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCreateNew = () => {
-        setSelectedRole(null);
-        setShowForm(true);
-    };
-
-    const handleEdit = (role: Role) => {
-        setSelectedRole(role);
-        setShowForm(true);
-    };
 
     const handleDelete = async (id: string) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este rol?')) {
             try {
-                await roleService.deleteRole(id);
-                setRoles(roles.filter(r => r.id !== id));
+                await deleteRole(id);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Error al eliminar rol');
+                console.error('Delete error:', err);
             }
         }
-    };
-
-    const handleFormClose = () => {
-        setShowForm(false);
-        setSelectedRole(null);
     };
 
     const handleFormSubmit = async (success: boolean) => {
