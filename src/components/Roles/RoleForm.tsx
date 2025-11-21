@@ -147,10 +147,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({ role, onClose, onSubmit }) =
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 text-white rounded-lg font-medium transition-colors disabled:bg-gray-400"
-                            style={{ backgroundColor: loading ? '#ccc' : '#FF9411' }}
-                            onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#E68A0F')}
-                            onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#FF9411')}
+                            className="px-6 py-2 bg-primary-orange text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:bg-gray-400 disabled:opacity-100"
                             disabled={loading}
                         >
                             {loading ? 'Guardando...' : 'Guardar Rol'}

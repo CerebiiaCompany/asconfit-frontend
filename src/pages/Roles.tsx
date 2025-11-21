@@ -124,10 +124,7 @@ export const Roles: React.FC = () => {
                             <h3 className="text-lg font-semibold text-gray-900">Lista de Roles</h3>
                             <button
                                 onClick={handleCreateNew}
-                                className="text-white px-4 py-2 rounded-lg transition-colors font-medium"
-                                style={{ backgroundColor: '#FF9411' }}
-                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#E68A0F')}
-                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF9411')}
+                                className="bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
                             >
                                 Crear Nuevo Rol
                             </button>

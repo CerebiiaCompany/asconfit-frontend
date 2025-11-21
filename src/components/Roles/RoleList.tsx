@@ -61,10 +61,7 @@ export const RoleList: React.FC<RoleListProps> = ({ roles, loading, onEdit, onDe
                             <td className="px-6 py-4 text-center text-sm">
                                 <button
                                     onClick={() => onEdit(role)}
-                                    className="font-medium mr-4 transition-colors"
-                                    style={{ color: '#FF9411' }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E68A0F')}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = '#FF9411')}
+                                    className="text-primary-orange hover:opacity-70 font-medium mr-4 transition-opacity"
                                 >
                                     Editar
                                 </button>
