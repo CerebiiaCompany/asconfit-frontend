@@ -10,6 +10,13 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
   formData,
   onInputChange,
 }) => {
+  const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (value === "" || /^\d+$/.test(value)) {
+      onInputChange(e);
+    }
+  };
+
   return (
     <div className="mb-8">
       <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">
@@ -37,8 +44,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             type="text"
             name="nit"
             value={formData.nit}
-            onChange={onInputChange}
-            placeholder="1004404347E-0"
+            onChange={handleNumericChange}
+            placeholder="1004404347"
             className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
         </div>
@@ -102,7 +109,7 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             type="text"
             name="contacto"
             value={formData.contacto}
-            onChange={onInputChange}
+            onChange={handleNumericChange}
             placeholder="000 000 000"
             className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
