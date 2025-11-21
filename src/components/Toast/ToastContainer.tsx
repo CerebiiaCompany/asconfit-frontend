@@ -1,19 +1,22 @@
-import React from "react";
-import { Toast, ToastProps } from "./Toast";
+import React from 'react';
+import { Toast } from './Toast';
+import { useToast } from '../../contexts/ToastContext';
 
-interface ToastContainerProps {
-  toasts: Omit<ToastProps, "onClose">[];
-  onClose: (id: string) => void;
-}
+export const ToastContainer: React.FC = () => {
+  const { toasts, removeToast } = useToast();
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({
-  toasts,
-  onClose,
-}) => {
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end">
-      {toasts.map((toast) => (
-        <Toast key={toast.id} {...toast} onClose={onClose} />
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+      {toasts.map(toast => (
+        <div key={toast.id} className="pointer-events-auto">
+          <Toast
+            id={toast.id}
+            message={toast.message}
+            type={toast.type}
+            duration={toast.duration}
+            onClose={removeToast}
+          />
+        </div>
       ))}
     </div>
   );

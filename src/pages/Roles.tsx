@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-import { useAuth } from "../contexts/AuthContext";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
 import { useUser } from "../hooks/useUser";
@@ -45,7 +44,7 @@ export const Roles: React.FC = () => {
   } = useConfirmModal();
   const { activeTab, setActiveTab } = useTabs("users");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { toasts, showSuccess, showError, removeToast } = useToast();
+  const { showSuccess, showError } = useToast();
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -143,21 +142,19 @@ export const Roles: React.FC = () => {
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("users")}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    activeTab === "users"
-                      ? "text-primary-orange border-b-2 border-primary-orange"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`px-6 py-4 font-medium transition-colors ${activeTab === "users"
+                    ? "text-primary-orange border-b-2 border-primary-orange"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   Asignar Roles a Usuarios
                 </button>
                 <button
                   onClick={() => setActiveTab("roles")}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    activeTab === "roles"
-                      ? "text-primary-orange border-b-2 border-primary-orange"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`px-6 py-4 font-medium transition-colors ${activeTab === "roles"
+                    ? "text-primary-orange border-b-2 border-primary-orange"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   Gestión de Roles
                 </button>
@@ -227,7 +224,7 @@ export const Roles: React.FC = () => {
       />
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <ToastContainer />
     </div>
   );
 };

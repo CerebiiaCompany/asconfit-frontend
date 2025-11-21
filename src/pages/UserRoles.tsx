@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-import { useAuth } from "../contexts/AuthContext";
 import { Header } from "../components/Header";
 import { Sidebar } from "../components/Sidebar";
 import { useUser } from "../hooks/useUser";
@@ -129,7 +128,7 @@ export const UserRoles: React.FC = () => {
       />
 
       {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <ToastContainer />
     </div>
   );
 };

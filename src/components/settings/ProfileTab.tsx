@@ -59,10 +59,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           />
         </div>
 
-        {profileMessage && (
-          <Alert type={profileMessage.type} message={profileMessage.text} />
-        )}
-
         <button
           type="submit"
           disabled={profileLoading}

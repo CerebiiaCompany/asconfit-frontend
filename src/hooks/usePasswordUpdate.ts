@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { authService } from '../services/authService';
 import { Message } from '../types/userSettings.types';
+import { useToast } from '../contexts/ToastContext';
 
 export const usePasswordUpdate = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -8,6 +9,7 @@ export const usePasswordUpdate = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordLoading, setPasswordLoading] = useState(false);
     const [passwordMessage, setPasswordMessage] = useState<Message | null>(null);
+    const { addToast } = useToast();
 
     const handlePasswordUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,13 +17,17 @@ export const usePasswordUpdate = () => {
         setPasswordMessage(null);
 
         if (newPassword !== confirmPassword) {
-            setPasswordMessage({ type: 'error', text: 'Las contraseñas no coinciden' });
+            const errorText = 'Las contraseñas no coinciden';
+            setPasswordMessage({ type: 'error', text: errorText });
+            addToast(errorText, 'error');
             setPasswordLoading(false);
             return;
         }
 
         if (newPassword.length < 8) {
-            setPasswordMessage({ type: 'error', text: 'La contraseña debe tener al menos 8 caracteres' });
+            const errorText = 'La contraseña debe tener al menos 8 caracteres';
+            setPasswordMessage({ type: 'error', text: errorText });
+            addToast(errorText, 'error');
             setPasswordLoading(false);
             return;
         }
@@ -37,6 +43,7 @@ export const usePasswordUpdate = () => {
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
+            addToast(response.message, 'success');
         } catch (error: any) {
             const errorMessage = error.response?.data?.message
                 || error.response?.data?.errors?.current_password?.[0]
@@ -48,6 +55,7 @@ export const usePasswordUpdate = () => {
                 type: 'error',
                 text: errorMessage
             });
+            addToast(errorMessage, 'error');
         } finally {
             setPasswordLoading(false);
         }
