@@ -37,7 +37,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
         id: 'roles',
         path: '/roles',
         label: 'Roles',
-        icon: '/roles.png',
+        icon: '/profile.png',
     },
     {
         id: 'perfil',
