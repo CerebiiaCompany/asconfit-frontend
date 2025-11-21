@@ -4,13 +4,20 @@ export interface RolePermission {
 }
 
 export interface Role {
-    id?: string;
-    name: string;
+    id?: string | number;
+    name?: string;
+    nombre?: string;
     description?: string;
-    permissions: string[]; // Array de IDs de items del menú
+    descripcion?: string;
+    permissions?: string[]; // Array de IDs de items del menú
     createdAt?: string;
     updatedAt?: string;
 }
+
+// Helper para obtener el nombre del rol
+export const getRoleName = (role: Role): string => {
+    return role.name || role.nombre || 'Sin nombre';
+};
 
 export interface CreateRolePayload {
     name: string;

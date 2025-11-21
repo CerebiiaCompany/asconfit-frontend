@@ -6,10 +6,13 @@ import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { useUser } from '../hooks/useUser';
 import { useRoles } from '../hooks/useRoles';
+import { useUsers } from '../hooks/useUsers';
 import { useRoleForm } from '../hooks/useRoleForm';
 import { useConfirmModal } from '../hooks/useConfirmModal';
+import { useTabs } from '../hooks/useTabs';
 import { RoleForm } from '../components/Roles/RoleForm';
 import { RoleList } from '../components/Roles/RoleList';
+import { UserRoleList } from '../components/Users/UserRoleList';
 import { Modal } from '../components/Modal';
 
 export const Roles: React.FC = () => {
@@ -17,10 +20,13 @@ export const Roles: React.FC = () => {
     const { user } = useUser(() => navigate('/login'));
     const { setUser } = useAuth();
     const { roles, loading, error, loadRoles, deleteRole } = useRoles();
+    const { users, loading: usersLoading, updateUserRole } = useUsers();
     const { showForm, selectedRole, handleCreateNew, handleEdit, handleFormClose } = useRoleForm();
-    const { isOpen, title, message, openConfirm, closeConfirm, handleConfirm } = useConfirmModal();
+    const { isOpen, title, message, confirmText, openConfirm, closeConfirm, handleConfirm } = useConfirmModal();
+    const { activeTab, setActiveTab } = useTabs('roles');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const handleDelete = (id: string) => {
         setDeleteId(id);
@@ -33,7 +39,8 @@ export const Roles: React.FC = () => {
                 } catch (err) {
                     console.error('Delete error:', err);
                 }
-            }
+            },
+            'Eliminar'
         );
     };
 
@@ -42,6 +49,23 @@ export const Roles: React.FC = () => {
             handleFormClose();
             await loadRoles();
         }
+    };
+
+    const handleUpdateUserRole = async (userId: number, roleId: string) => {
+        openConfirm(
+            'Cambiar Rol',
+            '¿Estás seguro de que deseas cambiar el rol de este usuario?',
+            async () => {
+                try {
+                    await updateUserRole(userId, parseInt(roleId));
+                    setSuccessMessage('Rol actualizado correctamente');
+                    setTimeout(() => setSuccessMessage(null), 3000);
+                } catch (err) {
+                    console.error('Update error:', err);
+                }
+            },
+            'Cambiar'
+        );
     };
 
     const handleLogout = async () => {
@@ -82,6 +106,13 @@ export const Roles: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Success Message */}
+                    {successMessage && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
+                            {successMessage}
+                        </div>
+                    )}
+
                     {/* Error Message */}
                     {error && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
@@ -89,33 +120,74 @@ export const Roles: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Roles List */}
+                    {/* Tabs */}
                     <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-gray-900">Lista de Roles</h3>
-                            <button
-                                onClick={handleCreateNew}
-                                className="bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
-                            >
-                                Crear Nuevo Rol
-                            </button>
+                        <div className="border-b border-gray-200">
+                            <div className="flex">
+                                <button
+                                    onClick={() => setActiveTab('roles')}
+                                    className={`px-6 py-4 font-medium transition-colors ${activeTab === 'roles'
+                                        ? 'text-primary-orange border-b-2 border-primary-orange'
+                                        : 'text-gray-600 hover:text-gray-900'
+                                        }`}
+                                >
+                                    Gestión de Roles
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('users')}
+                                    className={`px-6 py-4 font-medium transition-colors ${activeTab === 'users'
+                                        ? 'text-primary-orange border-b-2 border-primary-orange'
+                                        : 'text-gray-600 hover:text-gray-900'
+                                        }`}
+                                >
+                                    Asignar Roles a Usuarios
+                                </button>
+                            </div>
                         </div>
-                        <div className="p-6">
-                            {showForm ? (
-                                <RoleForm
-                                    role={selectedRole}
-                                    onClose={handleFormClose}
-                                    onSubmit={handleFormSubmit}
-                                />
-                            ) : (
-                                <RoleList
+
+                        {/* Roles Tab */}
+                        {activeTab === 'roles' && (
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-lg font-semibold text-gray-900">Lista de Roles</h3>
+                                    {!showForm && (
+                                        <button
+                                            onClick={handleCreateNew}
+                                            className="bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+                                        >
+                                            Crear Nuevo Rol
+                                        </button>
+                                    )}
+                                </div>
+                                {showForm ? (
+                                    <RoleForm
+                                        role={selectedRole}
+                                        onClose={handleFormClose}
+                                        onSubmit={handleFormSubmit}
+                                    />
+                                ) : (
+                                    <RoleList
+                                        roles={roles}
+                                        loading={loading}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* Users Tab */}
+                        {activeTab === 'users' && (
+                            <div className="p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-6">Asignar Roles a Usuarios</h3>
+                                <UserRoleList
+                                    users={users}
                                     roles={roles}
-                                    loading={loading}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete}
+                                    loading={usersLoading || loading}
+                                    onUpdateRole={handleUpdateUserRole}
                                 />
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
@@ -127,7 +199,7 @@ export const Roles: React.FC = () => {
                 title={title}
                 message={message}
                 type="warning"
-                confirmText="Eliminar"
+                confirmText={confirmText}
                 onConfirm={handleConfirm}
             />
         </div>

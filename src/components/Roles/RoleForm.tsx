@@ -18,9 +18,9 @@ export const RoleForm: React.FC<RoleFormProps> = ({ role, onClose, onSubmit }) =
 
     useEffect(() => {
         if (role) {
-            setName(role.name);
-            setDescription(role.description || '');
-            setSelectedPermissions(role.permissions);
+            setName(role.name || role.nombre || '');
+            setDescription(role.description || role.descripcion || '');
+            setSelectedPermissions(role.permissions || []);
         }
     }, [role]);
 
