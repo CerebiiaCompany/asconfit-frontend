@@ -8,6 +8,7 @@ import { useAuditorias } from "../../hooks/useAuditorias";
 import { AuditoriaFilterBar } from "../../components/auditorias/auditorias/AuditoriaFilterBar";
 import { AuditoriaEmptyState } from "../../components/auditorias/auditorias/AuditoriaEmptyState";
 import { AuditoriaCardList } from "../../components/auditorias/auditorias/AuditoriaCardList";
+import { Pagination } from "../../components/Pagination";
 
 export const Auditorias: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export const Auditorias: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { auditorias, loading } = useAuditorias();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Filtrar auditorías según el término de búsqueda
   const filteredAuditorias = auditorias.filter((auditoria) => {
@@ -27,6 +30,22 @@ export const Auditorias: React.FC = () => {
       auditoria.responsable?.toLowerCase().includes(term)
     );
   });
+
+  const totalItems = filteredAuditorias.length;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedAuditorias = filteredAuditorias.slice(
+    startIndex,
+    startIndex + pageSize
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
   const handleNewAuditoria = () => {
     navigate("/auditorias/nueva");
@@ -89,10 +108,23 @@ export const Auditorias: React.FC = () => {
               </div>
             )
           ) : (
-            <AuditoriaCardList
-              auditorias={filteredAuditorias}
-              onViewAuditoria={handleViewAuditoria}
-            />
+            <>
+              <AuditoriaCardList
+                auditorias={paginatedAuditorias}
+                onViewAuditoria={handleViewAuditoria}
+              />
+              <Pagination
+                totalItems={totalItems}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                onGenerateReport={() => {
+                  // TODO: Implementar lógica real de generación de informe
+                  console.log("Generar informe de auditorías visibles");
+                }}
+              />
+            </>
           )}
         </div>
       </main>
