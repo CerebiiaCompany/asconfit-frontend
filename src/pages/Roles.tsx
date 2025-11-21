@@ -74,6 +74,11 @@ export const Roles: React.FC = () => {
     if (success) {
       handleFormClose();
       await loadRoles();
+      if (selectedRole && selectedRole.id) {
+        addToast("Rol actualizado correctamente", "success");
+      } else {
+        addToast("Rol creado correctamente", "success");
+      }
     }
   };
 
