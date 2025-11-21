@@ -5,12 +5,16 @@ interface SubtareaItemProps {
   subtarea: Subtarea;
   onRemove: () => void;
   onChange: (field: keyof Subtarea, value: string) => void;
+  fechaAuditoriaInicio: string;
+  fechaAuditoriaCorte: string;
 }
 
 export const SubtareaItem: React.FC<SubtareaItemProps> = ({
   subtarea,
   onRemove,
   onChange,
+  fechaAuditoriaInicio,
+  fechaAuditoriaCorte,
 }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
@@ -51,6 +55,8 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             type="date"
             value={subtarea.fechaSolicitud}
             onChange={(e) => onChange("fechaSolicitud", e.target.value)}
+            min={fechaAuditoriaInicio}
+            max={fechaAuditoriaCorte}
             className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
         </div>
@@ -62,6 +68,8 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             type="date"
             value={subtarea.tiempoEntrega}
             onChange={(e) => onChange("tiempoEntrega", e.target.value)}
+            min={fechaAuditoriaInicio}
+            max={fechaAuditoriaCorte}
             className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
         </div>

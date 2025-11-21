@@ -173,6 +173,8 @@ export const NuevaAuditoria: React.FC = () => {
               onRemoveSubtarea={handleRemoveSubtarea}
               onSubtareaChange={handleSubtareaChange}
               onLoadPlantilla={handleLoadPlantilla}
+              fechaAuditoriaInicio={formData.fechaInicial}
+              fechaAuditoriaCorte={formData.fechaCorte}
             />
 
             <FormActions

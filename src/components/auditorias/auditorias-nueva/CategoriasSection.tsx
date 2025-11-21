@@ -18,6 +18,8 @@ interface CategoriasSectionProps {
     value: string
   ) => void;
   onLoadPlantilla: (categoriaId: string, codigo: string) => void;
+  fechaAuditoriaInicio: string;
+  fechaAuditoriaCorte: string;
 }
 
 export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
@@ -29,6 +31,8 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   onRemoveSubtarea,
   onSubtareaChange,
   onLoadPlantilla,
+  fechaAuditoriaInicio,
+  fechaAuditoriaCorte,
 }) => {
   const [plantillasDisponibles, setPlantillasDisponibles] = useState<any[]>([]);
   const [plantillasModificadas, setPlantillasModificadas] = useState<
@@ -374,6 +378,8 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                 value
                               )
                             }
+                            fechaAuditoriaInicio={fechaAuditoriaInicio}
+                            fechaAuditoriaCorte={fechaAuditoriaCorte}
                           />
                         ))}
                       </div>
