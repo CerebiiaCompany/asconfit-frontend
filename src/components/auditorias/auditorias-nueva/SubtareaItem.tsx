@@ -59,10 +59,9 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             Tiempo entrega
           </label>
           <input
-            type="text"
+            type="date"
             value={subtarea.tiempoEntrega}
             onChange={(e) => onChange("tiempoEntrega", e.target.value)}
-            placeholder="Ej: 5 días"
             className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
         </div>
