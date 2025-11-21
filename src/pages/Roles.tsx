@@ -89,10 +89,10 @@ export const Roles: React.FC = () => {
   const handleLogout = async () => {
     try {
       await authService.logout();
-      setUser(null);
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
+      navigate("/login");
     }
   };
 
