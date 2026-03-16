@@ -35,7 +35,7 @@ export const Auditorias: React.FC = () => {
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedAuditorias = filteredAuditorias.slice(
     startIndex,
-    startIndex + pageSize
+    startIndex + pageSize,
   );
 
   const handlePageChange = (page: number) => {
@@ -81,7 +81,7 @@ export const Auditorias: React.FC = () => {
       <main className="lg:ml-32 ml-0 pt-20 py-4 px-3 sm:px-6 lg:px-8">
         <div className="sm:px-0">
           {/* Page Title */}
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
+          <h1 className="mt-6 text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
             Auditorías
           </h1>
 
