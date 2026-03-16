@@ -26,7 +26,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ menuItems, onClose }) =>
     };
 
     return (
-        <nav className="flex-1 py-4 overflow-y-auto">
+        <nav className="flex-1 py-4 overflow-hidden">
             <ul className="space-y-1">
                 {menuItems.map((item) => (
                     <SidebarMenuItem

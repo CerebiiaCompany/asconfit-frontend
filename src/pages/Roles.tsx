@@ -193,7 +193,7 @@ export const Roles: React.FC = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">
                     Lista de Roles
-                  </h3>
+                  </h3> 
                   {!showForm && (
                     <button
                       onClick={handleCreateNew}
