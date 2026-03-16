@@ -53,10 +53,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             type="email"
             id="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent transition duration-150"
-            required
+            disabled
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
           />
+          <p className="mt-1 text-xs text-gray-400">El correo no puede ser modificado.</p>
         </div>
 
         <button
