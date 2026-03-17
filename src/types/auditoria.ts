@@ -39,7 +39,7 @@ export interface Auditoria {
     fecha_inicial?: string;
     fecha_corte?: string;
     search_concepto?: string;
-    estado: 'pendiente' | 'en_progreso' | 'completada';
+    estado: 'pendiente' | 'check';
     categorias?: Categoria[];
     created_at: string;
     updated_at: string;
@@ -47,7 +47,6 @@ export interface Auditoria {
 
 export interface AuditoriaStats {
     total: number;
-    completadas: number;
-    en_progreso: number;
     pendientes: number;
+    checks: number;
 }

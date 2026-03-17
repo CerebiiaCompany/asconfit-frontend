@@ -11,13 +11,17 @@ export const EstadoInformacionBadge: React.FC<EstadoInformacionBadgeProps> = ({ 
 
     const badgeClass =
         estado === 'aprobado' ? 'bg-green-100 text-green-800' :
-            estado === 'recibido' ? 'bg-blue-100 text-blue-800' :
-                estado === 'revision' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800';
+            estado === 'rechazado' ? 'bg-red-100 text-red-700' :
+                'bg-gray-100 text-gray-500';
+
+    const label =
+        estado === 'aprobado' ? 'Aprobado' :
+            estado === 'rechazado' ? 'Rechazado' :
+                estado.charAt(0).toUpperCase() + estado.slice(1);
 
     return (
         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${badgeClass}`}>
-            {estado.charAt(0).toUpperCase() + estado.slice(1)}
+            {label}
         </span>
     );
 };

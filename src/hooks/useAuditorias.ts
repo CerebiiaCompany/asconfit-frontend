@@ -5,10 +5,9 @@ import { auditoriaService } from '../services/auditoriaService';
 export const useAuditorias = () => {
     const [auditorias, setAuditorias] = useState<Auditoria[]>([]);
     const [stats, setStats] = useState<AuditoriaStats>({
-        total: 0,
-        completadas: 0,
-        en_progreso: 0,
-        pendientes: 0
+    total: 0,
+        pendientes: 0,
+        checks: 0
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -32,9 +31,8 @@ export const useAuditorias = () => {
             setAuditorias([]);
             setStats({
                 total: 0,
-                completadas: 0,
-                en_progreso: 0,
-                pendientes: 0
+                pendientes: 0,
+                checks: 0,
             });
         } finally {
             setLoading(false);
@@ -44,9 +42,8 @@ export const useAuditorias = () => {
     const calculateStats = (data: Auditoria[]) => {
         const newStats: AuditoriaStats = {
             total: data.length,
-            completadas: data.filter(a => a.estado === 'completada').length,
-            en_progreso: data.filter(a => a.estado === 'en_progreso').length,
-            pendientes: data.filter(a => a.estado === 'pendiente').length
+            pendientes: data.filter(a => a.estado === 'pendiente').length,
+            checks: data.filter(a => a.estado === 'check').length,
         };
         setStats(newStats);
     };

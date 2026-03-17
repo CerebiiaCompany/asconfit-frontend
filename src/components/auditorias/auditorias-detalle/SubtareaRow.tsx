@@ -59,15 +59,14 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
       <td className="px-2 py-3 whitespace-nowrap">
         {userRole === "auditor" || userRole === "admin" ? (
           <select
-            value={subtarea.estado_informacion}
+            value={subtarea.estado_informacion || "pendiente"}
             onChange={handleEstadoChange}
             disabled={isUpdatingEstado}
             className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="pendiente">Pendiente</option>
-            <option value="recibido">Recibido</option>
-            <option value="revision">En Revisión</option>
             <option value="aprobado">Aprobado</option>
+            <option value="rechazado">Rechazado</option>
           </select>
         ) : (
           <EstadoInformacionBadge estado={subtarea.estado_informacion} />

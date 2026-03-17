@@ -106,27 +106,22 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
 
   const progress = calculateProgress();
 
-  const progressData = [
-    { label: "N/A", value: progress.na, color: "bg-orange-500" },
-    { label: "Check", value: progress.check, color: "bg-green-500" },
-    { label: "Pendiente", value: progress.pendiente, color: "bg-red-500" },
-    { label: "En proceso", value: progress.enProceso, color: "bg-green-400" },
-    { label: "Total", value: progress.total, color: "bg-blue-500" },
-  ];
+  const checkPct = progress.check;
+  const pendientePct = 100 - progress.check;
 
   const getEstadoBadge = (estado: Auditoria["estado"]) => {
-    const badges = {
-      pendiente: "text-red-600",
-      en_progreso: "text-blue-600",
-      completada: "text-green-600",
+    const badges: Record<string, string> = {
+      pendiente: "text-red-500",
+      check: "text-green-600",
     };
-    const labels = {
+    const labels: Record<string, string> = {
       pendiente: "Pendiente",
-      en_progreso: "En Proceso",
-      completada: "Completada",
+      check: "Check",
     };
     return (
-      <span className={`font-medium ${badges[estado]}`}>{labels[estado]}</span>
+      <span className={`font-medium ${badges[estado] ?? "text-gray-600"}`}>
+        {labels[estado] ?? estado}
+      </span>
     );
   };
 
@@ -177,27 +172,24 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             {/* Proceso - Compact version */}
             <div>
               <div className="text-xs text-gray-500 mb-2">Proceso</div>
-              <div className="grid grid-cols-3 gap-2">
-                {progressData.slice(0, 3).map((item, index) => (
-                  <div key={index} className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                    <span className="text-xs text-gray-600">{item.label}</span>
-                    <span className="text-xs font-medium">
-                      {item.value.toFixed(0)}%
-                    </span>
-                  </div>
-                ))}
+              {/* Progress bar */}
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2">
+                <div
+                  className="h-full bg-green-500 rounded-full transition-all duration-300"
+                  style={{ width: `${checkPct}%` }}
+                />
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-1">
-                {progressData.slice(3).map((item, index) => (
-                  <div key={index} className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                    <span className="text-xs text-gray-600">{item.label}</span>
-                    <span className="text-xs font-medium">
-                      {item.value.toFixed(0)}%
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-400" />
+                  <span className="text-xs text-gray-500">Pendiente</span>
+                  <span className="text-xs font-semibold text-gray-800">{pendientePct.toFixed(0)}%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-xs text-gray-500">Check</span>
+                  <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -270,18 +262,24 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
           {/* Proceso - Progress indicators */}
           <div className="col-span-3">
             <div className="text-xs text-gray-500 mb-2">Proceso</div>
-            <div className="flex items-center gap-3">
-              {progressData.map((item, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div className="flex items-center gap-1 mb-1">
-                    <span className="text-xs text-gray-600">{item.label}</span>
-                    <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-900">
-                    {item.value.toFixed(1)}%
-                  </span>
-                </div>
-              ))}
+            {/* Progress bar */}
+            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-300"
+                style={{ width: `${checkPct}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400 shrink-0" />
+                <span className="text-xs text-gray-500">Pendiente</span>
+                <span className="text-xs font-semibold text-gray-800">{pendientePct.toFixed(0)}%</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
+                <span className="text-xs text-gray-500">Check</span>
+                <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
+              </div>
             </div>
           </div>
         </div>
