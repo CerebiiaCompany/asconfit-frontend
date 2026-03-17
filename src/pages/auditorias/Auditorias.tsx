@@ -18,17 +18,35 @@ export const Auditorias: React.FC = () => {
   const { auditorias, loading } = useAuditorias();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
+  const [estadoFilter, setEstadoFilter] = useState("");
 
-  // Filtrar auditorías según el término de búsqueda
+  // Filtrar auditorías según búsqueda, fecha de visita y proceso
   const filteredAuditorias = auditorias.filter((auditoria) => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      auditoria.empresa?.toLowerCase().includes(term) ||
-      auditoria.nit?.toLowerCase().includes(term) ||
-      auditoria.razon_social?.toLowerCase().includes(term) ||
-      auditoria.responsable?.toLowerCase().includes(term)
-    );
+    // Filtro por texto
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const matchesSearch =
+        auditoria.empresa?.toLowerCase().includes(term) ||
+        auditoria.nit?.toLowerCase().includes(term) ||
+        auditoria.razon_social?.toLowerCase().includes(term) ||
+        auditoria.responsable?.toLowerCase().includes(term);
+      if (!matchesSearch) return false;
+    }
+
+    // Filtro por fecha de visita (fecha_inicial)
+    if (fechaDesde && auditoria.fecha_inicial) {
+      if (auditoria.fecha_inicial < fechaDesde) return false;
+    }
+    if (fechaHasta && auditoria.fecha_inicial) {
+      if (auditoria.fecha_inicial > fechaHasta) return false;
+    }
+
+    // Filtro por proceso / estado
+    if (estadoFilter && auditoria.estado !== estadoFilter) return false;
+
+    return true;
   });
 
   const totalItems = filteredAuditorias.length;
@@ -88,8 +106,14 @@ export const Auditorias: React.FC = () => {
           {/* Filter Bar */}
           <AuditoriaFilterBar
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
             onNewAuditoria={handleNewAuditoria}
+            fechaDesde={fechaDesde}
+            onFechaDesdeChange={(v) => { setFechaDesde(v); setCurrentPage(1); }}
+            fechaHasta={fechaHasta}
+            onFechaHastaChange={(v) => { setFechaHasta(v); setCurrentPage(1); }}
+            estadoFilter={estadoFilter}
+            onEstadoFilterChange={(v) => { setEstadoFilter(v); setCurrentPage(1); }}
           />
 
           {/* Auditorías List */}
