@@ -1,8 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
-import { Header } from "../components/Header";
-import { Sidebar } from "../components/Sidebar";
 import { useUser } from "../hooks/useUser";
 import { useRoles } from "../hooks/useRoles";
 import { useUsers } from "../hooks/useUsers";
@@ -14,7 +11,7 @@ import { RoleForm } from "../components/Roles/RoleForm";
 import { RoleList } from "../components/Roles/RoleList";
 import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
 import { Modal } from "../components/Modal";
-import { ToastContainer } from "../components/Toast/ToastContainer";
+import { authService } from "../services/authService";
 
 export const Roles: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +40,6 @@ export const Roles: React.FC = () => {
     handleConfirm,
   } = useConfirmModal();
   const { activeTab, setActiveTab } = useTabs("users");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { addToast } = useToast();
 
@@ -100,129 +96,110 @@ export const Roles: React.FC = () => {
     );
   };
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await authService.logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-      navigate("/login");
-    }
+  const handleLogout = useCallback(() => {
+    // Logout logic is now in AppLayout
+    navigate("/login");
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Header
-        userName={user?.name || "Usuario"}
-        onLogout={handleLogout}
-        onNavigateToSettings={() => navigate("/perfil")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-      <Sidebar
-        onLogout={handleLogout}
-        userRole={(user?.role?.nombre as any) || "delegado"}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="lg:ml-32 ml-0 pt-20 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Header Card */}
-          <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
-            <div className="bg-white px-6 py-8">
-              <h2 className="text-3xl font-bold text-gray-800">
+    <div className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-0">
+        {/* Header Card */}
+        <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
+          <div className="bg-white px-6 py-8">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Gestión de Roles
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Administra los roles y permisos del sistema
+            </p>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+          <div className="border-b border-gray-200">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab("users")}
+                className={`px-6 py-4 font-medium transition-colors ${
+                  activeTab === "users"
+                    ? "text-primary-orange border-b-2 border-primary-orange"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Asignar Roles a Usuarios
+              </button>
+              <button
+                onClick={() => setActiveTab("roles")}
+                className={`px-6 py-4 font-medium transition-colors ${
+                  activeTab === "roles"
+                    ? "text-primary-orange border-b-2 border-primary-orange"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
                 Gestión de Roles
-              </h2>
-              <p className="mt-2 text-gray-600">
-                Administra los roles y permisos del sistema
-              </p>
+              </button>
             </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
+          {/* Users Tab */}
+          {activeTab === "users" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Asignar Roles a Usuarios
+              </h3>
+              <UserRoleAssignment
+                users={users}
+                roles={roles}
+                loading={usersLoading || loading}
+                onUpdateRole={handleUpdateUserRole}
+              />
             </div>
           )}
 
-          {/* Tabs */}
-          <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-            <div className="border-b border-gray-200">
-              <div className="flex">
-                <button
-                  onClick={() => setActiveTab("users")}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    activeTab === "users"
-                      ? "text-primary-orange border-b-2 border-primary-orange"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Asignar Roles a Usuarios
-                </button>
-                <button
-                  onClick={() => setActiveTab("roles")}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    activeTab === "roles"
-                      ? "text-primary-orange border-b-2 border-primary-orange"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Gestión de Roles
-                </button>
-              </div>
-            </div>
-
-            {/* Users Tab */}
-            {activeTab === "users" && (
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Asignar Roles a Usuarios
-                </h3>
-                <UserRoleAssignment
-                  users={users}
-                  roles={roles}
-                  loading={usersLoading || loading}
-                  onUpdateRole={handleUpdateUserRole}
-                />
-              </div>
-            )}
-
-            {/* Roles Tab */}
-            {activeTab === "roles" && (
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Lista de Roles
-                  </h3> 
-                  {!showForm && (
-                    <button
-                      onClick={handleCreateNew}
-                      className="bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
-                    >
-                      Crear Nuevo Rol
-                    </button>
-                  )}
-                </div>
-                {showForm ? (
-                  <RoleForm
-                    role={selectedRole}
-                    onClose={handleFormClose}
-                    onSubmit={handleFormSubmit}
-                  />
-                ) : (
-                  <RoleList
-                    roles={roles}
-                    loading={loading}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    deletingId={deletingId}
-                  />
+          {/* Roles Tab */}
+          {activeTab === "roles" && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Lista de Roles
+                </h3> 
+                {!showForm && (
+                  <button
+                    onClick={handleCreateNew}
+                    className="bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+                  >
+                    Crear Nuevo Rol
+                  </button>
                 )}
               </div>
-            )}
-          </div>
+              {showForm ? (
+                <RoleForm
+                  role={selectedRole}
+                  onClose={handleFormClose}
+                  onSubmit={handleFormSubmit}
+                />
+              ) : (
+                <RoleList
+                  roles={roles}
+                  loading={loading}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  deletingId={deletingId}
+                />
+              )}
+            </div>
+          )}
         </div>
-      </main>
+      </div>
 
       {/* Confirmation Modal */}
       <Modal
@@ -234,9 +211,6 @@ export const Roles: React.FC = () => {
         confirmText={confirmText}
         onConfirm={handleConfirm}
       />
-
-      {/* Toast Notifications */}
-      <ToastContainer />
     </div>
   );
 };

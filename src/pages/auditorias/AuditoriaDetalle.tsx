@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authService } from "../../services/authService";
 import { auditoriaService } from "../../services/auditoriaService";
-import { Header } from "../../components/Header";
-import { Sidebar } from "../../components/Sidebar";
 import { Modal } from "../../components/Modal";
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
@@ -18,7 +15,6 @@ export const AuditoriaDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useUser(() => navigate("/login"));
   const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<
     number | null
   >(null);
@@ -85,22 +81,13 @@ export const AuditoriaDetalle: React.FC = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
-
   if (loading) {
     return <LoadingState message="Cargando auditoría..." />;
   }
 
   if (!auditoria) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[calc(100vh-5rem)]">
         <div className="text-center">
           <p className="text-gray-500 mb-4">No se encontró la auditoría</p>
           <button
@@ -115,74 +102,60 @@ export const AuditoriaDetalle: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Header
-        userName={user?.name || "Usuario"}
-        onLogout={handleLogout}
-        onNavigateToSettings={() => navigate("/perfil")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-      <Sidebar
-        onLogout={handleLogout}
-        userRole={(user?.role?.nombre as any) || "delegado"}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="lg:ml-32 ml-0 pt-20 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <button
-              onClick={() => navigate("/auditorias")}
-              className="flex items-center text-gray-600 hover:text-gray-900"
+    <div className="py-4 px-3 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
+          <button
+            onClick={() => navigate("/auditorias")}
+            className="flex items-center text-gray-600 hover:text-gray-900"
+          >
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="h-5 w-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Volver a auditorías
-            </button>
-            <EstadoBadge estado={auditoria.estado} />
-          </div>
-
-          {/* Información de la Auditoría */}
-          <AuditoriaInfoCard auditoria={auditoria} />
-
-          {/* Categorías y Subtareas */}
-          {auditoria.categorias && auditoria.categorias.length > 0 && (
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-gray-800">
-                Categorías y Requerimientos
-              </h3>
-
-              {auditoria.categorias.map((categoria: any) => (
-                <CategoriaCard
-                  key={categoria.id}
-                  categoria={categoria}
-                  uploadingSubtareaId={uploadingSubtareaId}
-                  fileInputRefs={fileInputRefs}
-                  onFileSelect={handleFileSelect}
-                  onFileChange={uploadFile}
-                  onOpenFile={handleOpenFile}
-                  getAcceptedFileTypes={getAcceptedFileTypes}
-                  onEstadoChange={handleEstadoChange}
-                  updatingEstadoSubtareaId={updatingEstadoSubtareaId}
-                  userRole={user?.role?.nombre || "delegado"}
-                />
-              ))}
-            </div>
-          )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Volver a auditorías
+          </button>
+          <EstadoBadge estado={auditoria.estado} />
         </div>
-      </main>
+
+        {/* Información de la Auditoría */}
+        <AuditoriaInfoCard auditoria={auditoria} />
+
+        {/* Categorías y Subtareas */}
+        {auditoria.categorias && auditoria.categorias.length > 0 && (
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-gray-800">
+              Categorías y Requerimientos
+            </h3>
+
+            {auditoria.categorias.map((categoria: any) => (
+              <CategoriaCard
+                key={categoria.id}
+                categoria={categoria}
+                uploadingSubtareaId={uploadingSubtareaId}
+                fileInputRefs={fileInputRefs}
+                onFileSelect={handleFileSelect}
+                onFileChange={uploadFile}
+                onOpenFile={handleOpenFile}
+                getAcceptedFileTypes={getAcceptedFileTypes}
+                onEstadoChange={handleEstadoChange}
+                updatingEstadoSubtareaId={updatingEstadoSubtareaId}
+                userRole={user?.role?.nombre || "delegado"}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       <Modal

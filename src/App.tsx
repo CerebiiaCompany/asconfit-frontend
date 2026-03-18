@@ -18,6 +18,7 @@ import { TareaDetalle } from './pages/TareaDetalle';
 import { Perfil } from './pages/Perfil';
 import { Roles } from './pages/Roles';
 import { authService } from './services/authService';
+import { AppLayout } from './components/layout/AppLayout';
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -50,70 +51,58 @@ function App() {
                   </PublicRoute>
                 } />
 
-                {/* Rutas privadas */}
-                <Route path="/dashboard" element={
+                {/* Rutas privadas envueltas en AppLayout */}
+                <Route element={
                   <PrivateRoute>
+                    <AppLayout />
+                  </PrivateRoute>
+                }>
+                  <Route path="/dashboard" element={
                     <RoleBasedRoute>
                       <Dashboard />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/empresas" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/empresas" element={
                     <RoleBasedRoute>
                       <Empresas />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/auditorias" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/auditorias" element={
                     <RoleBasedRoute>
                       <Auditorias />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/auditorias/nueva" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/auditorias/nueva" element={
                     <RoleBasedRoute>
                       <NuevaAuditoria />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/auditorias/:id" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/auditorias/:id" element={
                     <RoleBasedRoute>
                       <AuditoriaDetalle />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/mis-tareas" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/mis-tareas" element={
                     <RoleBasedRoute>
                       <MisTareas />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/mis-tareas/:id" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/mis-tareas/:id" element={
                     <RoleBasedRoute>
                       <TareaDetalle />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/perfil" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/perfil" element={
                     <RoleBasedRoute>
                       <Perfil />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
-                <Route path="/roles" element={
-                  <PrivateRoute>
+                  } />
+                  <Route path="/roles" element={
                     <RoleBasedRoute>
                       <Roles />
                     </RoleBasedRoute>
-                  </PrivateRoute>
-                } />
+                  } />
+                </Route>
 
                 {/* Ruta por defecto */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />

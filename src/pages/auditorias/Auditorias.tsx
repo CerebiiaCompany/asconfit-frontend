@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/authService";
-import { Header } from "../../components/Header";
-import { Sidebar } from "../../components/Sidebar";
 import { useUser } from "../../hooks/useUser";
 import { useAuditorias } from "../../hooks/useAuditorias";
 import { AuditoriaFilterBar } from "../../components/auditorias/auditorias/AuditoriaFilterBar";
@@ -15,7 +12,6 @@ export const Auditorias: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { auditorias, loading } = useAuditorias();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -75,30 +71,13 @@ export const Auditorias: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      await authService.logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+    // La lógica de logout ahora está en AppLayout
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Header
-        userName={user?.name || "Usuario"}
-        onLogout={handleLogout}
-        onNavigateToSettings={() => navigate("/perfil")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-      <Sidebar
-        onLogout={handleLogout}
-        userRole={(user?.role?.nombre as any) || "delegado"}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="lg:ml-32 ml-0 pt-20 py-4 px-3 sm:px-6 lg:px-8">
-        <div className="sm:px-0">
+    <div className="py-4 px-3 sm:px-6 lg:px-8">
+      <div className="sm:px-0">
           {/* Page Title */}
           <h1 className="mt-6 text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
             Auditorías
@@ -153,7 +132,6 @@ export const Auditorias: React.FC = () => {
             </>
           )}
         </div>
-      </main>
     </div>
   );
 };

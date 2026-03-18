@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "../../components/Header";
-import { Sidebar } from "../../components/Sidebar";
 import { Modal } from "../../components/Modal";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { AuditoriaHeader } from "../../components/auditorias/auditorias-nueva/AuditoriaHeader";
@@ -14,13 +12,11 @@ import { FormActions } from "../../components/auditorias/auditorias-nueva/FormAc
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaForm } from "../../hooks/useAuditoriaForm";
 import { useAuditoriaValidation } from "../../hooks/useAuditoriaValidation";
-import { authService } from "../../services/authService";
 import { auditoriaService } from "../../services/auditoriaService";
 
 export const NuevaAuditoria: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const [searchConcepto, setSearchConcepto] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,14 +96,7 @@ export const NuevaAuditoria: React.FC = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
+  // Logout logic in AppLayout
 
   const breadcrumbItems = [
     { label: "Auditorías", onClick: () => navigate("/auditorias") },
@@ -115,22 +104,8 @@ export const NuevaAuditoria: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Header
-        userName={user?.name || "Usuario"}
-        onLogout={handleLogout}
-        onNavigateToSettings={() => navigate("/perfil")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-      <Sidebar
-        onLogout={handleLogout}
-        userRole={(user?.role?.nombre as any) || "delegado"}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-
-      <main className="lg:ml-32 ml-0 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto pt-8">
           <Breadcrumb items={breadcrumbItems} />
 
           <AuditoriaHeader
@@ -183,8 +158,7 @@ export const NuevaAuditoria: React.FC = () => {
               isLoading={isSubmitting}
             />
           </div>
-        </div>
-      </main>
+      </div>
 
       <Modal
         isOpen={modal.isOpen}

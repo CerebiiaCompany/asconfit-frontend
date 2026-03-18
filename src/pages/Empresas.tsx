@@ -1,9 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
-import { useAuth } from "../contexts/AuthContext";
-import { Header } from "../components/Header";
-import { Sidebar } from "../components/Sidebar";
 import { useUser } from "../hooks/useUser";
 import { useEmpresas } from "../hooks/useEmpresas";
 import { EmpresaStatsCard } from "../components/empresas/EmpresaStatsCard";
@@ -13,9 +9,7 @@ import { EmpresaEmptyState } from "../components/empresas/EmpresaEmptyState";
 export const Empresas: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
-  const { setUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { stats, loading } = useEmpresas();
 
   const handleNewEmpresa = () => {
@@ -24,31 +18,13 @@ export const Empresas: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      await authService.logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-      navigate("/login");
-    }
+    // Logout logic is now in AppLayout
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Header
-        userName={user?.name || "Usuario"}
-        onLogout={handleLogout}
-        onNavigateToSettings={() => navigate("/perfil")}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-      <Sidebar
-        onLogout={handleLogout}
-        userRole={(user?.role?.nombre as any) || "delegado"}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="lg:ml-32 ml-0 pt-20 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+    <div className="py-6 px-4 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-0">
           {/* Header Card */}
           <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
             <div className="bg-white px-6 py-8">
@@ -151,7 +127,6 @@ export const Empresas: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
     </div>
   );
 };
