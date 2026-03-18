@@ -27,7 +27,7 @@ const getNotificationType = (tipo: string): 'info' | 'warning' | 'success' | 'er
         case 'tarea_asignada':
             return 'info';
         case 'archivo_subido':
-            return 'success';
+        case 'documento_aprobado':
         case 'auditoria_completada':
             return 'success';
         case 'documento_pendiente':
