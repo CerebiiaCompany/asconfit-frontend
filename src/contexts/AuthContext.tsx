@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, User } from '../services/authService';
 import { UserRole } from '../config/menuConfig';
+import { LoadingState } from '../components/common/LoadingState';
 
 interface AuthContextType {
     user: User | null;
@@ -42,7 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return (
         <AuthContext.Provider value={{ user, userRole, loading, setUser, refreshUser }}>
-            {children}
+            {loading ? <LoadingState message="Verificando sesión..." /> : children}
         </AuthContext.Provider>
     );
 };

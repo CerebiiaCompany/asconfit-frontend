@@ -9,6 +9,7 @@ import { AuditoriaFilterBar } from "../../components/auditorias/auditorias/Audit
 import { AuditoriaEmptyState } from "../../components/auditorias/auditorias/AuditoriaEmptyState";
 import { AuditoriaCardList } from "../../components/auditorias/auditorias/AuditoriaCardList";
 import { Pagination } from "../../components/Pagination";
+import { LoadingState } from "../../components/common/LoadingState";
 
 export const Auditorias: React.FC = () => {
   const navigate = useNavigate();
@@ -118,8 +119,9 @@ export const Auditorias: React.FC = () => {
 
           {/* Auditorías List */}
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <div className="py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+              <p className="mt-4 text-center text-gray-600">Cargando auditorías...</p>
             </div>
           ) : filteredAuditorias.length === 0 ? (
             auditorias.length === 0 ? (

@@ -11,6 +11,7 @@ import { useFileUpload } from "../../hooks/useFileUpload";
 import { AuditoriaInfoCard } from "../../components/auditorias/auditorias-detalle/AuditoriaInfoCard";
 import { CategoriaCard } from "../../components/auditorias/auditorias-detalle/CategoriaCard";
 import { EstadoBadge } from "../../components/auditorias/EstadoBadge";
+import { LoadingState } from "../../components/common/LoadingState";
 
 export const AuditoriaDetalle: React.FC = () => {
   const navigate = useNavigate();
@@ -94,11 +95,7 @@ export const AuditoriaDetalle: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingState message="Cargando auditoría..." />;
   }
 
   if (!auditoria) {
