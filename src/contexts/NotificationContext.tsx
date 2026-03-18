@@ -32,6 +32,8 @@ const getNotificationType = (tipo: string): 'info' | 'warning' | 'success' | 'er
             return 'success';
         case 'documento_pendiente':
             return 'warning';
+        case 'documento_rechazado':
+            return 'error';
         case 'error':
             return 'error';
         default:
