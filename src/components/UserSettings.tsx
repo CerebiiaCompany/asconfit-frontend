@@ -13,13 +13,21 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
 
   const {
     user,
-    name,
-    setName,
-    email,
-    setEmail,
+    name, setName,
+    email, setEmail,
+    cargo, setCargo,
+    firstName, setFirstName,
+    lastName, setLastName,
+    phone, setPhone,
+    documentType, setDocumentType,
+    documentNumber, setDocumentNumber,
+    country, setCountry,
+    city, setCity,
+    department, setDepartment,
     profileLoading,
     profileMessage,
     handleProfileUpdate,
+    handlePhotoUpload,
   } = useUserProfile(initialUser);
 
   const {
@@ -83,9 +91,28 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
             setName={setName}
             email={email}
             setEmail={setEmail}
+            cargo={cargo}
+            setCargo={setCargo}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            lastName={lastName}
+            setLastName={setLastName}
+            phone={phone}
+            setPhone={setPhone}
+            documentType={documentType}
+            setDocumentType={setDocumentType}
+            documentNumber={documentNumber}
+            setDocumentNumber={setDocumentNumber}
+            country={country}
+            setCountry={setCountry}
+            city={city}
+            setCity={setCity}
+            department={department}
+            setDepartment={setDepartment}
             profileLoading={profileLoading}
             profileMessage={profileMessage}
             handleProfileUpdate={handleProfileUpdate}
+            handlePhotoUpload={handlePhotoUpload}
           />
         )}
 

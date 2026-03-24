@@ -10,6 +10,16 @@ export interface User {
     name: string;
     email: string;
     role: Role;
+    cargo?: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    document_type?: string;
+    document_number?: string;
+    country?: string;
+    city?: string;
+    department?: string;
+    profile_photo_path?: string;
 }
 
 export interface AuthResponse {
@@ -33,6 +43,15 @@ export interface RegisterData {
 export interface UpdateProfileData {
     name: string;
     email: string;
+    cargo?: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    document_type?: string;
+    document_number?: string;
+    country?: string;
+    city?: string;
+    department?: string;
 }
 
 export interface UpdatePasswordData {
@@ -70,6 +89,12 @@ class AuthService {
 
     async updateProfile(data: UpdateProfileData): Promise<{ message: string; user: User }> {
         return api.put<{ message: string; user: User }>('/profile', data);
+    }
+
+    async updatePhoto(file: File): Promise<{ message: string; user: User; photo_url: string }> {
+        const formData = new FormData();
+        formData.append('photo', file);
+        return api.post<{ message: string; user: User; photo_url: string }>('/profile/photo', formData);
     }
 
     async updatePassword(data: UpdatePasswordData): Promise<{ message: string }> {

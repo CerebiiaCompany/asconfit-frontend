@@ -65,7 +65,8 @@ export const UserRoles: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Header
-        userName={user?.name || "Usuario"}
+        user={user}
+        userRole={(user?.role?.nombre as any) || "delegado"}
         onLogout={handleLogout}
         onNavigateToSettings={() => navigate("/perfil")}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}

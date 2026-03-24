@@ -1,12 +1,20 @@
 const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
-const getAuthHeaders = (): HeadersInit => {
+const getAuthHeaders = (extraHeaders: HeadersInit = {}, isFormData: boolean = false): HeadersInit => {
   const token = localStorage.getItem("auth_token");
-  return {
-    "Content-Type": "application/json",
+  const headers: any = {
+    "Accept": "application/json",
+    ...extraHeaders,
     ...(token && { Authorization: `Bearer ${token}` }),
   };
+
+  // Only add application/json if it's not FormData and Content-Type is not already set
+  if (!isFormData && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
 };
 
 export const api = {
@@ -20,17 +28,19 @@ export const api = {
     return response.json();
   },
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
+  async post<T>(endpoint: string, data: any, headers: HeadersInit = {}): Promise<T> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
+      const isFormData = data instanceof FormData;
 
       const response = await fetch(url, {
         method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
+        headers: getAuthHeaders(headers, isFormData),
+        body: isFormData ? data : JSON.stringify(data),
       });
-
+// ... (rest of the post method remains same)
       const contentType = response.headers.get("content-type");
+// ...
       const responseText = await response.text();
 
       // Check if response is HTML instead of JSON (routing/backend issue)
