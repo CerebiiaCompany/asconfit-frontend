@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UserSettingsProps, TabType } from "../types/userSettings.types";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { usePasswordUpdate } from "../hooks/usePasswordUpdate";
-import { SettingsHeader, ProfileTab, PasswordTab } from "./settings";
+import { ProfileTab, PasswordTab } from "./settings";
 
 export const UserSettings: React.FC<UserSettingsProps> = ({
   initialUser,
@@ -40,87 +40,74 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
   } = usePasswordUpdate();
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-      <SettingsHeader onBack={onBack} />
-
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="border-b border-gray-200">
-          <nav className="flex -mb-px">
+    <div className="max-w-[1200px] mx-auto py-10 px-6">
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Sidebar Menu */}
+        <aside className="w-full lg:w-64 flex-shrink-0">
+          <nav className="space-y-4">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-150 ${
+              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${
                 activeTab === "profile"
-                  ? "border-orange-600 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
+                  : "bg-transparent text-gray-400 hover:text-gray-600"
               }`}
             >
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Perfil
-              </div>
+              Cuenta
             </button>
             <button
               onClick={() => setActiveTab("password")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm transition duration-150 ${
+              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${
                 activeTab === "password"
-                  ? "border-orange-600 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
+                  : "bg-transparent text-gray-400 hover:text-gray-600"
               }`}
             >
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Contraseña
-              </div>
+              Cambiar Clave
             </button>
           </nav>
+        </aside>
+
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0">
+          {activeTab === "profile" ? (
+            <ProfileTab
+              user={user}
+              name={name}
+              setName={setName}
+              email={email}
+              setEmail={setEmail}
+              phone={phone}
+              setPhone={setPhone}
+              documentType={documentType}
+              setDocumentType={setDocumentType}
+              documentNumber={documentNumber}
+              setDocumentNumber={setDocumentNumber}
+              country={country}
+              setCountry={setCountry}
+              city={city}
+              setCity={setCity}
+              department={department}
+              setDepartment={setDepartment}
+              profileLoading={profileLoading}
+              profileMessage={profileMessage}
+              handleProfileUpdate={handleProfileUpdate}
+              handlePhotoUpload={handlePhotoUpload}
+            />
+          ) : (
+            <PasswordTab
+              currentPassword={currentPassword}
+              setCurrentPassword={setCurrentPassword}
+              newPassword={newPassword}
+              setNewPassword={setNewPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
+              passwordLoading={passwordLoading}
+              passwordMessage={passwordMessage}
+              handlePasswordUpdate={handlePasswordUpdate}
+            />
+          )}
         </div>
-
-        {/* Profile Tab */}
-        {activeTab === "profile" && (
-          <ProfileTab
-            user={user}
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
-            documentType={documentType}
-            setDocumentType={setDocumentType}
-            documentNumber={documentNumber}
-            setDocumentNumber={setDocumentNumber}
-            country={country}
-            setCountry={setCountry}
-            city={city}
-            setCity={setCity}
-            department={department}
-            setDepartment={setDepartment}
-            profileLoading={profileLoading}
-            profileMessage={profileMessage}
-            handleProfileUpdate={handleProfileUpdate}
-            handlePhotoUpload={handlePhotoUpload}
-          />
-        )}
-
-        {/* Password Tab */}
-        {activeTab === "password" && (
-          <PasswordTab
-            currentPassword={currentPassword}
-            setCurrentPassword={setCurrentPassword}
-            newPassword={newPassword}
-            setNewPassword={setNewPassword}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            passwordLoading={passwordLoading}
-            passwordMessage={passwordMessage}
-            handlePasswordUpdate={handlePasswordUpdate}
-          />
-        )}
       </div>
     </div>
   );

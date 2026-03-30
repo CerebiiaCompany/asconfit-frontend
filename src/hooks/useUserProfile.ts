@@ -37,6 +37,7 @@ export const useUserProfile = (initialUser: User) => {
             setProfileMessage({ type: 'success', text: response.message });
             setUser(response.user);
             addToast(response.message, 'success');
+            return true;
         } catch (error: any) {
             const errorText = error.response?.data?.message || error.message || 'Error al actualizar el perfil';
             setProfileMessage({
@@ -44,6 +45,7 @@ export const useUserProfile = (initialUser: User) => {
                 text: errorText
             });
             addToast(errorText, 'error');
+            return false;
         } finally {
             setProfileLoading(false);
         }

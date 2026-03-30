@@ -7,15 +7,16 @@ import { authService } from '../../services/authService';
 
 export const AppLayout: React.FC = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const handleLogout = async () => {
         try {
             await authService.logout();
-            navigate('/login');
         } catch (error) {
             console.error('Error logging out:', error);
+        } finally {
+            setUser(null);
             navigate('/login');
         }
     };

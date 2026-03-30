@@ -21,7 +21,7 @@ interface ProfileTabProps {
   setDepartment: (department: string) => void;
   profileLoading: boolean;
   profileMessage: { type: "success" | "error"; text: string } | null;
-  handleProfileUpdate: (e: React.FormEvent) => void;
+  handleProfileUpdate: (e: React.FormEvent) => Promise<boolean>;
   handlePhotoUpload: (file: File) => void;
 }
 
@@ -48,6 +48,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   handleProfileUpdate,
   handlePhotoUpload,
 }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const onPhotoClick = () => {
@@ -64,93 +65,221 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   const photoUrl = user.profile_photo_path
     ? `http://localhost:8000/storage/${user.profile_photo_path}`
     : null;
-  return (
-    <div className="p-6">
-      {/* Header / Photo Section */}
-      <div className="flex items-start bg-gray-50 p-6 rounded-xl border border-gray-100 mb-8 relative">
-        <div className="flex-shrink-0 w-32 h-40 bg-white border border-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <svg
-              className="w-12 h-12 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+
+  // Split name for display in View mode
+  const nameParts = (name || user.name || "").trim().split(" ");
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || "";
+
+  if (!isEditing) {
+    return (
+      <div className="p-8 space-y-8 max-w-5xl">
+        <h2 className="text-xl font-bold text-[#3B3B6D] mb-4">Mi Perfil</h2>
+
+        {/* Profile Card / Photo Section */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm flex items-start space-x-10 relative">
+          <div className="w-44 h-56 bg-white border border-gray-200 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
               />
-            </svg>
-          )}
+            ) : (
+              <svg
+                className="w-16 h-16 text-orange-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            )}
+          </div>
+
+          <div className="flex flex-col space-y-6 flex-grow pt-2">
+            <div className="flex items-center space-x-4">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={onFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                onClick={onPhotoClick}
+                className="bg-[#F97316] hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl flex items-center font-bold text-sm shadow-md transition-all"
+              >
+                Subir nueva foto
+                <svg
+                  className="ml-2 w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-400">Jpg o Png</p>
+
+            <div className="mt-auto">
+              <p className="text-xs text-gray-400 font-medium">Usuario</p>
+              <p className="text-lg font-bold text-gray-700">{user.email}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="ml-6 flex-grow">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={onFileChange}
-            accept="image/png, image/jpeg"
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={onPhotoClick}
-            disabled={profileLoading}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center text-sm transition duration-150 font-medium"
-          >
-            Subir nueva foto
-            <svg
-              className="ml-2 w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        {/* Personal Details Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm relative">
+          <div className="flex justify-between items-center mb-10">
+            <h3 className="text-xl font-bold text-gray-800">
+              Información Personal
+            </h3>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-[#F97316] hover:bg-orange-600 text-white px-5 py-2 rounded-lg flex items-center text-sm font-bold shadow-sm transition-all"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
-            </svg>
-          </button>
-          <p className="mt-2 text-xs text-gray-400">Jpg o Png</p>
+              Editar
+              <svg
+                className="ml-2 w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
+          </div>
 
-          <div className="mt-8">
-            <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
-              Usuario
-            </p>
-            <p className="text-sm font-medium text-gray-700">
-              {email || user.email}
-            </p>
+          <div className="grid grid-cols-2 gap-y-8 gap-x-12">
+            <div className="col-span-2">
+              <p className="text-xs text-gray-300 font-semibold mb-1">Cargo</p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {user.role?.nombre?.charAt(0).toUpperCase() +
+                  user.role?.nombre?.slice(1)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Nombres
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">{firstName}</p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Apellidos
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">{lastName}</p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Correo Electrónico
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">{user.email}</p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Teléfono
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {phone || "---"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Tipo de Documento
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {documentType === "CC"
+                  ? "CC Cédula de Ciudadanía"
+                  : documentType === "CE"
+                    ? "CE Cédula de Extranjería"
+                    : documentType === "NIT"
+                      ? "NIT"
+                      : documentType === "PP"
+                        ? "Pasaporte"
+                        : documentType || "---"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">Número</p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {documentNumber || "---"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">País</p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {country || "---"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">Ciudad</p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {city || "---"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-300 font-semibold mb-1">
+                Departamento
+              </p>
+              <p className="text-lg font-bold text-[#4B4B4B]">
+                {department || "---"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Personal Information Section */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 relative shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-bold text-gray-800">
-            Información Personal
-          </h3>
-        </div>
-
-        <form
-          onSubmit={handleProfileUpdate}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+  // Edit Mode (Current Form)
+  return (
+    <div className="p-8 space-y-8 max-w-5xl">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#3B3B6D]">Editar Perfil</h2>
+        <button
+          onClick={() => setIsEditing(false)}
+          className="text-gray-500 hover:text-gray-700 font-medium flex items-center"
         >
-          {/* Nombre - Full Width */}
+          Cancelar
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const success = await handleProfileUpdate(e);
+            if (success) {
+              setIsEditing(false);
+            }
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
           <div className="md:col-span-2">
             <label
               htmlFor="name"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               Nombre Completo
             </label>
@@ -158,55 +287,22 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(
+                  /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
+                  "",
+                );
+                setName(value);
+              }}
               placeholder="Ej. Juan Pérez"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          {/* Rol del Usuario */}
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
-            >
-              Cargo
-            </label>
-            <input
-              type="text"
-              id="role"
-              value={
-                user.role?.nombre?.charAt(0).toUpperCase() +
-                  user.role?.nombre?.slice(1) || ""
-              }
-              disabled
-              className="w-full px-4 py-2 border border-gray-100 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-
-          {/* Correo Electrónico (Nombres en imagen, pero se refiere a email secundario o el mismo?) */}
-          {/* En la imagen dice Correo Electrónico y muestra el email. Pondré el email base readonly */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
-            >
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              disabled
-              className="w-full px-4 py-2 border border-gray-100 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-
-          {/* Telefono */}
           <div>
             <label
               htmlFor="phone"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               Teléfono
             </label>
@@ -214,16 +310,18 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               type="text"
               id="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                setPhone(value);
+              }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          {/* Tipo de Documento */}
           <div>
             <label
               htmlFor="documentType"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               Tipo de Documento
             </label>
@@ -231,7 +329,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               id="documentType"
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             >
               <option value="">Seleccionar...</option>
               <option value="CC">CC Cédula de Ciudadanía</option>
@@ -241,28 +339,29 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             </select>
           </div>
 
-          {/* Número */}
           <div>
             <label
               htmlFor="documentNumber"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
-              Número
+              Número de Documento
             </label>
             <input
               type="text"
               id="documentNumber"
               value={documentNumber}
-              onChange={(e) => setDocumentNumber(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                setDocumentNumber(value);
+              }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          {/* País */}
           <div>
             <label
               htmlFor="country"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               País
             </label>
@@ -270,16 +369,21 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               type="text"
               id="country"
               value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              onChange={(e) => {
+                const value = e.target.value.replace(
+                  /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
+                  "",
+                );
+                setCountry(value);
+              }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          {/* Ciudad */}
           <div>
             <label
               htmlFor="city"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               Ciudad
             </label>
@@ -287,16 +391,21 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               type="text"
               id="city"
               value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              onChange={(e) => {
+                const value = e.target.value.replace(
+                  /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
+                  "",
+                );
+                setCity(value);
+              }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          {/* Departamento */}
-          <div className="md:col-span-2">
+          <div>
             <label
               htmlFor="department"
-              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-2"
             >
               Departamento
             </label>
@@ -304,16 +413,22 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               type="text"
               id="department"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
+              onChange={(e) => {
+                const value = e.target.value.replace(
+                  /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
+                  "",
+                );
+                setDepartment(value);
+              }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>
 
-          <div className="md:col-span-2 mt-4">
+          <div className="md:col-span-2 mt-6">
             <button
               type="submit"
               disabled={profileLoading}
-              className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-md"
+              className="w-full bg-[#F97316] text-white py-3 px-4 rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-md"
             >
               {profileLoading ? "Guardando..." : "Guardar cambios"}
             </button>
@@ -322,7 +437,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {profileMessage && (
-        <div className="mt-6">
+        <div className="mt-4">
           <Alert type={profileMessage.type} message={profileMessage.text} />
         </div>
       )}
