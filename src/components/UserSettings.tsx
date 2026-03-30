@@ -15,9 +15,6 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
     user,
     name, setName,
     email, setEmail,
-    cargo, setCargo,
-    firstName, setFirstName,
-    lastName, setLastName,
     phone, setPhone,
     documentType, setDocumentType,
     documentNumber, setDocumentNumber,
@@ -91,12 +88,6 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
             setName={setName}
             email={email}
             setEmail={setEmail}
-            cargo={cargo}
-            setCargo={setCargo}
-            firstName={firstName}
-            setFirstName={setFirstName}
-            lastName={lastName}
-            setLastName={setLastName}
             phone={phone}
             setPhone={setPhone}
             documentType={documentType}

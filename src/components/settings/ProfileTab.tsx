@@ -7,12 +7,6 @@ interface ProfileTabProps {
   setName: (name: string) => void;
   email: string;
   setEmail: (email: string) => void;
-  cargo: string;
-  setCargo: (cargo: string) => void;
-  firstName: string;
-  setFirstName: (firstName: string) => void;
-  lastName: string;
-  setLastName: (lastName: string) => void;
   phone: string;
   setPhone: (phone: string) => void;
   documentType: string;
@@ -35,9 +29,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   user,
   name, setName,
   email, setEmail,
-  cargo, setCargo,
-  firstName, setFirstName,
-  lastName, setLastName,
   phone, setPhone,
   documentType, setDocumentType,
   documentNumber, setDocumentNumber,
@@ -114,39 +105,15 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
         </div>
 
         <form onSubmit={handleProfileUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Cargo - Full Width */}
+          {/* Nombre - Full Width */}
           <div className="md:col-span-2">
-            <label htmlFor="cargo" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Cargo</label>
+            <label htmlFor="name" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre Completo</label>
             <input
               type="text"
-              id="cargo"
-              value={cargo}
-              onChange={(e) => setCargo(e.target.value)}
-              placeholder="Ej. Vicepresidente Ejecutivo"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
-            />
-          </div>
-
-          {/* Nombres */}
-          <div>
-            <label htmlFor="firstName" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombres</label>
-            <input
-              type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
-            />
-          </div>
-
-          {/* Apellidos */}
-          <div>
-            <label htmlFor="lastName" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Apellidos</label>
-            <input
-              type="text"
-              id="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ej. Juan Pérez"
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-150 text-gray-700"
             />
           </div>

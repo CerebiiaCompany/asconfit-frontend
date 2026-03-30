@@ -30,6 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         } catch (error) {
             console.error('Error al obtener usuario:', error);
+            authService.removeToken();
             setUser(null);
             setUserRole(null);
         } finally {

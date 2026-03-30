@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/Toast/ToastContainer';
@@ -22,12 +22,14 @@ import { AppLayout } from './components/layout/AppLayout';
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return authService.isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
+  const { user } = useAuth();
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 // Componente para redirigir usuarios autenticados
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return !authService.isAuthenticated() ? <>{children}</> : <Navigate to="/dashboard" replace />;
+  const { user } = useAuth();
+  return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
 function App() {

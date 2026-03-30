@@ -7,9 +7,6 @@ export const useUserProfile = (initialUser: User) => {
     const [user, setUser] = useState<User>(initialUser);
     const [name, setName] = useState(initialUser.name);
     const [email, setEmail] = useState(initialUser.email);
-    const [cargo, setCargo] = useState(initialUser.cargo || '');
-    const [firstName, setFirstName] = useState(initialUser.first_name || '');
-    const [lastName, setLastName] = useState(initialUser.last_name || '');
     const [phone, setPhone] = useState(initialUser.phone || '');
     const [documentType, setDocumentType] = useState(initialUser.document_type || '');
     const [documentNumber, setDocumentNumber] = useState(initialUser.document_number || '');
@@ -27,13 +24,9 @@ export const useUserProfile = (initialUser: User) => {
         setProfileMessage(null);
 
         try {
-            const fullName = `${firstName} ${lastName}`.trim() || name;
             const response = await authService.updateProfile({ 
-                name: fullName, 
+                name, 
                 email,
-                cargo,
-                first_name: firstName,
-                last_name: lastName,
                 phone,
                 document_type: documentType,
                 document_number: documentNumber,
@@ -74,9 +67,6 @@ export const useUserProfile = (initialUser: User) => {
         user,
         name, setName,
         email, setEmail,
-        cargo, setCargo,
-        firstName, setFirstName,
-        lastName, setLastName,
         phone, setPhone,
         documentType, setDocumentType,
         documentNumber, setDocumentNumber,

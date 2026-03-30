@@ -10,9 +10,6 @@ export interface User {
     name: string;
     email: string;
     role: Role;
-    cargo?: string;
-    first_name?: string;
-    last_name?: string;
     phone?: string;
     document_type?: string;
     document_number?: string;
@@ -43,9 +40,6 @@ export interface RegisterData {
 export interface UpdateProfileData {
     name: string;
     email: string;
-    cargo?: string;
-    first_name?: string;
-    last_name?: string;
     phone?: string;
     document_type?: string;
     document_number?: string;
