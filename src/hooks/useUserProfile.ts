@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { authService, User } from '../services/authService';
 import { Message } from '../types/userSettings.types';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useUserProfile = (initialUser: User) => {
+    const { setUser: setGlobalUser } = useAuth();
     const [user, setUser] = useState<User>(initialUser);
     const [name, setName] = useState(initialUser.name);
     const [email, setEmail] = useState(initialUser.email);
@@ -36,6 +38,7 @@ export const useUserProfile = (initialUser: User) => {
             });
             setProfileMessage({ type: 'success', text: response.message });
             setUser(response.user);
+            setGlobalUser(response.user); // Sincronizar con el estado global
             addToast(response.message, 'success');
             return true;
         } catch (error: any) {
@@ -56,6 +59,7 @@ export const useUserProfile = (initialUser: User) => {
         try {
             const response = await authService.updatePhoto(file);
             setUser(response.user);
+            setGlobalUser(response.user); // Sincronizar con el estado global
             addToast(response.message, 'success');
         } catch (error: any) {
             const errorText = error.response?.data?.message || error.message || 'Error al subir la foto';
