@@ -74,27 +74,29 @@ export const RoleList: React.FC<RoleListProps> = ({
                   ))}
                 </div>
               </td>
-              <td className="px-6 py-4 text-center text-sm">
-                <button
-                  onClick={() => onEdit(role)}
-                  className="text-primary-orange hover:opacity-70 font-medium mr-4 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={deletingId !== null}
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => {
-                    if (role.id) {
-                      onDelete(role.id.toString());
-                    }
-                  }}
-                  className="text-red-600 hover:text-red-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={deletingId !== null}
-                >
-                  {deletingId === role.id?.toString()
-                    ? "Eliminando..."
-                    : "Eliminar"}
-                </button>
+              <td className="px-6 py-4 text-center text-sm whitespace-nowrap">
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => onEdit(role)}
+                    className="text-primary-orange hover:opacity-70 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={deletingId !== null}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (role.id) {
+                        onDelete(role.id.toString());
+                      }
+                    }}
+                    className="text-red-600 hover:text-red-800 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={deletingId !== null}
+                  >
+                    {deletingId === role.id?.toString()
+                      ? "Eliminando..."
+                      : "Eliminar"}
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -40,6 +40,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/adminstracion.png",
   },
   {
+    id: "papelera",
+    path: "/papelera",
+    label: "Papelera",
+    icon: "/bin.png",
+  },
+  {
     id: "perfil",
     path: "/perfil",
     label: "Perfil",
@@ -55,6 +61,7 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "mis-tareas",
     "empresas",
     "roles",
+    "papelera",
     "perfil",
   ],
   auditor: ["dashboard", "auditorias", "empresas", "perfil"],
@@ -74,12 +81,19 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/roles/nuevo": "roles",
   "/roles/:id": "roles",
   "/perfil": "perfil",
+  "/papelera": "papelera",
 };
 
 // Función para obtener items del menú según el rol
 export const getMenuItemsByRole = (role: UserRole): MenuItem[] => {
   const allowedIds = MENU_BY_ROLE[role] || MENU_BY_ROLE["delegado"];
   return ALL_MENU_ITEMS.filter((item) => allowedIds.includes(item.id));
+};
+
+// Función para obtener items del menú según los permisos granulares
+export const getMenuItemsByPermissions = (permissions: string[]): MenuItem[] => {
+  if (!permissions || permissions.length === 0) return [];
+  return ALL_MENU_ITEMS.filter((item) => permissions.includes(item.id));
 };
 
 // Función para verificar si un usuario puede acceder a una ruta

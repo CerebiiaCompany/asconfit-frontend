@@ -40,6 +40,7 @@ export const AppLayout: React.FC = () => {
       <Sidebar
         onLogout={handleLogout}
         userRole={(user?.role?.nombre as any) || "delegado"}
+        permissions={user?.role?.permissions || []}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />

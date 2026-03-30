@@ -3,6 +3,7 @@ import { api } from "./api";
 export interface Role {
   id: number;
   nombre: string;
+  permissions?: string[];
 }
 
 export interface User {
