@@ -9,7 +9,8 @@ import { Login } from "./components/auth/Login";
 import { Register } from "./components/auth/Register";
 import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
 import { Dashboard } from "./pages/Dashboard";
-import { Empresas } from "./pages/Empresas";
+import { Empresas } from "./pages/Empresas/Empresas";
+import { VerEmpresas } from "./pages/Empresas/VerEmpresas";
 import { Auditorias } from "./pages/auditorias/Auditorias";
 import { NuevaAuditoria } from "./pages/auditorias/NuevaAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
@@ -20,6 +21,7 @@ import { Roles } from "./pages/Roles";
 import { Papelera } from "./pages/Papelera";
 import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
+import { CrearEmpresa } from "./pages/Empresas/CrearEmpresa";
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -83,6 +85,22 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <Empresas />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/empresas/ver"
+                    element={
+                      <RoleBasedRoute>
+                        <VerEmpresas />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/empresas/crear"
+                    element={
+                      <RoleBasedRoute>
+                        <CrearEmpresa />
                       </RoleBasedRoute>
                     }
                   />

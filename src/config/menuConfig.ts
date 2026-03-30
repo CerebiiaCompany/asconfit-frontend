@@ -77,6 +77,8 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/mis-tareas": "mis-tareas",
   "/mis-tareas/:id": "mis-tareas",
   "/empresas": "empresas",
+  "/empresas/crear": "empresas",
+  "/empresas/ver": "empresas",
   "/roles": "roles",
   "/roles/nuevo": "roles",
   "/roles/:id": "roles",
