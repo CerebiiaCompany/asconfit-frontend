@@ -17,8 +17,7 @@ import { MisTareas } from './pages/MisTareas';
 import { TareaDetalle } from './pages/TareaDetalle';
 import { Perfil } from './pages/Perfil';
 import { Roles } from './pages/Roles';
-import { authService } from './services/authService';
-import { AppLayout } from './components/layout/AppLayout';
+import { AppLayout } from './components/AppLayout';
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

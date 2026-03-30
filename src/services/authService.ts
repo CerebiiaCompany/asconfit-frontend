@@ -1,115 +1,122 @@
-import { api } from './api';
+import { api } from "./api";
 
 export interface Role {
-    id: number;
-    nombre: string;
+  id: number;
+  nombre: string;
 }
 
 export interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: Role;
-    phone?: string;
-    document_type?: string;
-    document_number?: string;
-    country?: string;
-    city?: string;
-    department?: string;
-    profile_photo_path?: string;
+  id: number;
+  name: string;
+  email: string;
+  role: Role;
+  phone?: string;
+  document_type?: string;
+  document_number?: string;
+  country?: string;
+  city?: string;
+  department?: string;
+  profile_photo_path?: string;
 }
 
 export interface AuthResponse {
-    access_token: string;
-    token_type: string;
-    user: User;
+  access_token: string;
+  token_type: string;
+  user: User;
 }
 
 export interface LoginCredentials {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterData {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
 }
 
 export interface UpdateProfileData {
-    name: string;
-    email: string;
-    phone?: string;
-    document_type?: string;
-    document_number?: string;
-    country?: string;
-    city?: string;
-    department?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  document_type?: string;
+  document_number?: string;
+  country?: string;
+  city?: string;
+  department?: string;
 }
 
 export interface UpdatePasswordData {
-    current_password: string;
-    new_password: string;
-    new_password_confirmation: string;
+  current_password: string;
+  new_password: string;
+  new_password_confirmation: string;
 }
 
 class AuthService {
-    private tokenKey = 'auth_token';
+  private tokenKey = "auth_token";
 
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/login', credentials);
-        this.setToken(response.access_token);
-        return response;
-    }
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/login", credentials);
+    this.setToken(response.access_token);
+    return response;
+  }
 
-    async register(data: RegisterData): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/register', data);
-        this.setToken(response.access_token);
-        return response;
-    }
+  async register(data: RegisterData): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>("/register", data);
+    this.setToken(response.access_token);
+    return response;
+  }
 
-    async logout(): Promise<void> {
-        try {
-            await api.post('/logout', {});
-        } finally {
-            this.removeToken();
-        }
+  async logout(): Promise<void> {
+    try {
+      await api.post("/logout", {});
+    } finally {
+      this.removeToken();
     }
+  }
 
-    async getCurrentUser(): Promise<User> {
-        return api.get<User>('/me');
-    }
+  async getCurrentUser(): Promise<User> {
+    return api.get<User>("/me");
+  }
 
-    async updateProfile(data: UpdateProfileData): Promise<{ message: string; user: User }> {
-        return api.put<{ message: string; user: User }>('/profile', data);
-    }
+  async updateProfile(
+    data: UpdateProfileData,
+  ): Promise<{ message: string; user: User }> {
+    return api.put<{ message: string; user: User }>("/profile", data);
+  }
 
-    async updatePhoto(file: File): Promise<{ message: string; user: User; photo_url: string }> {
-        const formData = new FormData();
-        formData.append('photo', file);
-        return api.post<{ message: string; user: User; photo_url: string }>('/profile/photo', formData);
-    }
+  async updatePhoto(
+    file: File,
+  ): Promise<{ message: string; user: User; photo_url: string }> {
+    const formData = new FormData();
+    formData.append("photo", file);
+    return api.post<{ message: string; user: User; photo_url: string }>(
+      "/profile/photo",
+      formData,
+    );
+  }
 
-    async updatePassword(data: UpdatePasswordData): Promise<{ message: string }> {
-        return api.put<{ message: string }>('/password', data);
-    }
+  async updatePassword(data: UpdatePasswordData): Promise<{ message: string }> {
+    return api.put<{ message: string }>("/password", data);
+  }
 
-    setToken(token: string): void {
-        localStorage.setItem(this.tokenKey, token);
-    }
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token);
+  }
 
-    getToken(): string | null {
-        return localStorage.getItem(this.tokenKey);
-    }
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
 
-    removeToken(): void {
-        localStorage.removeItem(this.tokenKey);
-    }
+  removeToken(): void {
+    localStorage.removeItem(this.tokenKey);
+  }
 
-    isAuthenticated(): boolean {
-        return !!this.getToken();
-    }
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
 }
 
 export const authService = new AuthService();

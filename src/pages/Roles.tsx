@@ -108,7 +108,7 @@ export const Roles: React.FC = () => {
         <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
           <div className="bg-white px-6 py-8">
             <h2 className="text-3xl font-bold text-gray-800">
-              Gestión de Roles
+              Roles
             </h2>
             <p className="mt-2 text-gray-600">
               Administra los roles y permisos del sistema
@@ -135,7 +135,7 @@ export const Roles: React.FC = () => {
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                Asignar Roles a Usuarios
+                Usuarios
               </button>
               <button
                 onClick={() => setActiveTab("roles")}
@@ -145,7 +145,7 @@ export const Roles: React.FC = () => {
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                Gestión de Roles
+                Roles
               </button>
             </div>
           </div>
@@ -154,7 +154,7 @@ export const Roles: React.FC = () => {
           {activeTab === "users" && (
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Asignar Roles a Usuarios
+                Usuarios
               </h3>
               <UserRoleAssignment
                 users={users}

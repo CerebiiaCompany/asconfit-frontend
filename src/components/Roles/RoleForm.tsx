@@ -34,7 +34,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     setSelectedPermissions((prev) =>
       prev.includes(menuItemId)
         ? prev.filter((id) => id !== menuItemId)
-        : [...prev, menuItemId]
+        : [...prev, menuItemId],
     );
   };
 

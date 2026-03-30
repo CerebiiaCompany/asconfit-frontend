@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { Header } from '../Header';
-import { Sidebar } from '../Sidebar';
-import { authService } from '../../services/authService';
+import { useAuth } from '../contexts/AuthContext';
+import { Header } from './Header';
+import { Sidebar } from './Sidebar';
+import { authService } from '../services/authService';
 
 export const AppLayout: React.FC = () => {
     const navigate = useNavigate();
