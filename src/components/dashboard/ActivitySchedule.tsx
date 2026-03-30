@@ -2,14 +2,22 @@ import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const ActivitySchedule: React.FC = () => {
-    // Static calendar for demonstration matching the image (September 2021)
-    const days = [
-        '', '', '', 1, 2, 3, 4,
-        5, 6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17, 18,
-        19, 20, 21, 22, 23, 24, 25,
-        26, 27, 28, 29, 30, 31, ''
-    ];
+    // Cálculo dinámico del mes actual
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    // Nombre del mes en español
+    const monthName = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(now);
+    const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+    // Generar array de días (incluyendo espacios en blanco al inicio)
+    const days = Array.from({ length: 42 }, (_, i) => {
+        const dayNumber = i - firstDay + 1;
+        return dayNumber > 0 && dayNumber <= totalDays ? dayNumber : '';
+    });
 
     const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -24,7 +32,7 @@ export const ActivitySchedule: React.FC = () => {
                         <button className="text-gray-400 hover:text-gray-600">
                             <ChevronLeft size={20} />
                         </button>
-                        <span className="font-bold text-gray-700">September 2021</span>
+                        <span className="font-bold text-gray-700">{capitalizedMonth} {currentYear}</span>
                         <button className="text-gray-400 hover:text-gray-600">
                             <ChevronRight size={20} />
                         </button>
