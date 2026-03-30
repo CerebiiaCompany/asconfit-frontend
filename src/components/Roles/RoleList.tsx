@@ -64,14 +64,18 @@ export const RoleList: React.FC<RoleListProps> = ({
               </td>
               <td className="px-6 py-4 text-sm">
                 <div className="flex flex-wrap gap-2">
-                  {(role.permissions || []).map((permId) => (
-                    <span
-                      key={permId}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                    >
-                      {ALL_MENU_ITEMS.find((item) => item.id === permId)?.label}
-                    </span>
-                  ))}
+                  {(role.permissions || []).map((permId) => {
+                    const menuItem = ALL_MENU_ITEMS.find((item) => item.id === permId);
+                    if (!menuItem) return null;
+                    return (
+                      <span
+                        key={permId}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      >
+                        {menuItem.label}
+                      </span>
+                    );
+                  })}
                 </div>
               </td>
               <td className="px-6 py-4 text-center text-sm whitespace-nowrap">
