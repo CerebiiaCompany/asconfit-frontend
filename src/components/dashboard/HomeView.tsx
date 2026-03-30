@@ -17,20 +17,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ user }) => {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
                 {/* Row 1 */}
-                <div className="w-full">
-                    <ActivitySchedule />
-                </div>
-                <div className="w-full">
-                    <AnnouncementUploader />
-                </div>
+                <ActivitySchedule />
+                <AnnouncementUploader />
 
                 {/* Row 2 */}
-                <div className="w-full">
-                    <OurServices />
-                </div>
-                <div className="w-full">
-                    <FounderBanner />
-                </div>
+                <OurServices />
+                <FounderBanner />
             </div>
         </div>
     );
