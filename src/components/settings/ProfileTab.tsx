@@ -27,14 +27,22 @@ interface ProfileTabProps {
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({
   user,
-  name, setName,
-  email, setEmail,
-  phone, setPhone,
-  documentType, setDocumentType,
-  documentNumber, setDocumentNumber,
-  country, setCountry,
-  city, setCity,
-  department, setDepartment,
+  name,
+  setName,
+  email,
+  setEmail,
+  phone,
+  setPhone,
+  documentType,
+  setDocumentType,
+  documentNumber,
+  setDocumentNumber,
+  country,
+  setCountry,
+  city,
+  setCity,
+  department,
+  setDepartment,
   profileLoading,
   profileMessage,
   handleProfileUpdate,
@@ -53,7 +61,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
     }
   };
 
-  const photoUrl = user.profile_photo_path 
+  const photoUrl = user.profile_photo_path
     ? `http://localhost:8000/storage/${user.profile_photo_path}`
     : null;
   return (
@@ -62,14 +70,28 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       <div className="flex items-start bg-gray-50 p-6 rounded-xl border border-gray-100 mb-8 relative">
         <div className="flex-shrink-0 w-32 h-40 bg-white border border-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
           {photoUrl ? (
-            <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            <img
+              src={photoUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-12 h-12 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
           )}
         </div>
-        
+
         <div className="ml-6 flex-grow">
           <input
             type="file"
@@ -85,15 +107,29 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center text-sm transition duration-150 font-medium"
           >
             Subir nueva foto
-            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            <svg
+              className="ml-2 w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
             </svg>
           </button>
           <p className="mt-2 text-xs text-gray-400">Jpg o Png</p>
-          
+
           <div className="mt-8">
-            <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Usuario</p>
-            <p className="text-sm font-medium text-gray-700">{email || user.email}</p>
+            <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              Usuario
+            </p>
+            <p className="text-sm font-medium text-gray-700">
+              {email || user.email}
+            </p>
           </div>
         </div>
       </div>
@@ -101,13 +137,23 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       {/* Personal Information Section */}
       <div className="bg-white rounded-xl border border-gray-100 p-6 relative shadow-sm">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-bold text-gray-800">Información Personal</h3>
+          <h3 className="text-lg font-bold text-gray-800">
+            Información Personal
+          </h3>
         </div>
 
-        <form onSubmit={handleProfileUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={handleProfileUpdate}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {/* Nombre - Full Width */}
           <div className="md:col-span-2">
-            <label htmlFor="name" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Nombre Completo</label>
+            <label
+              htmlFor="name"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Nombre Completo
+            </label>
             <input
               type="text"
               id="name"
@@ -118,10 +164,35 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             />
           </div>
 
+          {/* Rol del Usuario */}
+          <div>
+            <label
+              htmlFor="role"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Cargo
+            </label>
+            <input
+              type="text"
+              id="role"
+              value={
+                user.role?.nombre?.charAt(0).toUpperCase() +
+                  user.role?.nombre?.slice(1) || ""
+              }
+              disabled
+              className="w-full px-4 py-2 border border-gray-100 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+            />
+          </div>
+
           {/* Correo Electrónico (Nombres en imagen, pero se refiere a email secundario o el mismo?) */}
           {/* En la imagen dice Correo Electrónico y muestra el email. Pondré el email base readonly */}
           <div>
-            <label htmlFor="email" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Correo Electrónico</label>
+            <label
+              htmlFor="email"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Correo Electrónico
+            </label>
             <input
               type="email"
               id="email"
@@ -133,7 +204,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* Telefono */}
           <div>
-            <label htmlFor="phone" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Teléfono</label>
+            <label
+              htmlFor="phone"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Teléfono
+            </label>
             <input
               type="text"
               id="phone"
@@ -145,7 +221,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* Tipo de Documento */}
           <div>
-            <label htmlFor="documentType" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Tipo de Documento</label>
+            <label
+              htmlFor="documentType"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Tipo de Documento
+            </label>
             <select
               id="documentType"
               value={documentType}
@@ -162,7 +243,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* Número */}
           <div>
-            <label htmlFor="documentNumber" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Número</label>
+            <label
+              htmlFor="documentNumber"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Número
+            </label>
             <input
               type="text"
               id="documentNumber"
@@ -174,7 +260,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* País */}
           <div>
-            <label htmlFor="country" className="block text-xs font-semibold text-gray-400 uppercase mb-1">País</label>
+            <label
+              htmlFor="country"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              País
+            </label>
             <input
               type="text"
               id="country"
@@ -186,7 +277,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* Ciudad */}
           <div>
-            <label htmlFor="city" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Ciudad</label>
+            <label
+              htmlFor="city"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Ciudad
+            </label>
             <input
               type="text"
               id="city"
@@ -198,7 +294,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
           {/* Departamento */}
           <div className="md:col-span-2">
-            <label htmlFor="department" className="block text-xs font-semibold text-gray-400 uppercase mb-1">Departamento</label>
+            <label
+              htmlFor="department"
+              className="block text-xs font-semibold text-gray-400 uppercase mb-1"
+            >
+              Departamento
+            </label>
             <input
               type="text"
               id="department"
