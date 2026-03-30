@@ -36,9 +36,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }`}
                 style={{ backgroundColor: '#2D3748' }}
             >
-                <SidebarHeader onClose={onClose} />
-                <SidebarNav menuItems={menuItems} onClose={onClose} />
-                <SidebarFooter onLogout={onLogout} onClose={onClose} />
+                <div className="flex flex-col h-full">
+                    <SidebarHeader onClose={onClose} />
+                    <SidebarNav menuItems={menuItems} onClose={onClose} />
+                    <SidebarFooter onLogout={onLogout} onClose={onClose} />
+                </div>
             </aside>
         </>
     );
