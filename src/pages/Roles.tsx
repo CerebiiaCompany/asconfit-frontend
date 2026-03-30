@@ -60,10 +60,10 @@ export const Roles: React.FC = () => {
             setDeletingId(null);
           }
         },
-        "Eliminar"
+        "Eliminar",
       );
     },
-    [openConfirm, deleteRole, addToast]
+    [openConfirm, deleteRole, addToast],
   );
 
   const handleFormSubmit = async (success: boolean) => {
@@ -92,7 +92,7 @@ export const Roles: React.FC = () => {
           addToast("Error al actualizar el rol", "error");
         }
       },
-      "Cambiar"
+      "Cambiar",
     );
   };
 
@@ -171,7 +171,7 @@ export const Roles: React.FC = () => {
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">
                   Lista de Roles
-                </h3> 
+                </h3>
                 {!showForm && (
                   <button
                     onClick={handleCreateNew}

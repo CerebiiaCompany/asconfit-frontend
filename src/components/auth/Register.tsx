@@ -13,11 +13,11 @@ export const Register: React.FC = () => {
                     <div className="px-8 py-10">
                         {/* Logo */}
                         <div className="text-center mb-6">
-                            <div className="inline-block rounded-xl p-4" style={{ backgroundColor: '#FF9411' }}>
+                            <div className="inline-block rounded-xl p-4">
                                 <img
-                                    src="/Asconfit.png"
+                                    src="/login.png"
                                     alt="Asconfit Logo"
-                                    className="h-12 w-auto"
+                                    className="h-30 w-auto"
                                 />
                             </div>
                         </div>
