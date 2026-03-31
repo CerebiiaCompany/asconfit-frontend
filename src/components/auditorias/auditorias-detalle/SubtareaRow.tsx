@@ -35,6 +35,20 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onEstadoChange(subtarea.id, e.target.value);
   };
+
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return "-";
+    try {
+      // Si es formato ISO, tomamos solo la parte de la fecha
+      if (dateString.includes("T")) {
+        return dateString.split("T")[0];
+      }
+      return dateString;
+    } catch {
+      return dateString || "-";
+    }
+  };
+
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-3 py-3">
@@ -51,10 +65,10 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         <PriorityBadge prioridad={subtarea.prioridad} />
       </td>
       <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-        {subtarea.fecha_solicitud || "-"}
+        {formatDate(subtarea.fecha_solicitud)}
       </td>
       <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-        {subtarea.tiempo_entrega || "-"}
+        {formatDate(subtarea.tiempo_entrega)}
       </td>
       <td className="px-2 py-3 whitespace-nowrap">
         {userRole === "auditor" || userRole === "admin" ? (
