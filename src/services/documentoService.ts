@@ -29,6 +29,15 @@ export interface Documento {
     tamano: number;
     url: string;
     created_at?: string;
+    deleted_at?: string;
+    carpeta?: {
+        id: number;
+        nombre: string;
+        empresa?: {
+            id: number;
+            razon_social: string;
+        }
+    };
 }
 
 export const documentoService = {
@@ -77,5 +86,22 @@ export const documentoService = {
 
     deleteDocumento: async (documentoId: number): Promise<void> => {
         await axios.delete(`${API_URL}/documentos/${documentoId}`, getAuthHeaders());
+    },
+
+    // Papelera
+    getTrashedDocumentos: async (): Promise<Documento[]> => {
+        const response = await axios.get(`${API_URL}/papelera/documentos`, getAuthHeaders());
+        return response.data.map((doc: Documento) => ({
+            ...doc,
+            url: BASE_URL + doc.url
+        }));
+    },
+
+    restoreDocumentos: async (ids: number[]): Promise<void> => {
+        await axios.post(`${API_URL}/papelera/restaurar`, { ids }, getAuthHeaders());
+    },
+
+    forceDeleteDocumentos: async (ids: number[]): Promise<void> => {
+        await axios.post(`${API_URL}/papelera/destruir`, { ids }, getAuthHeaders());
     }
 };
