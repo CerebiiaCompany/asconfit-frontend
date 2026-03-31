@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { ChevronDown } from 'lucide-react';
 import { empresaService, Empresa } from '../../services/empresaService';
 import { useToast } from "../../contexts/ToastContext";
 
-export const CrearEmpresaForm: React.FC = () => {
+interface FormProps {
+  isEdit?: boolean;
+  initialData?: Empresa | null;
+}
+
+export const CrearEmpresaForm: React.FC<FormProps> = ({ isEdit, initialData }) => {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -30,6 +35,17 @@ export const CrearEmpresaForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (isEdit && initialData) {
+      setFormData({
+        ...initialData,
+        // Evitamos valores nulos en inputs controlados
+        telefono_empresarial: initialData.telefono_empresarial || '',
+        correo_empresarial: initialData.correo_empresarial || '',
+      });
+    }
+  }, [isEdit, initialData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -40,9 +56,14 @@ export const CrearEmpresaForm: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await empresaService.create(formData);
-      addToast("Empresa creada con éxito", "success");
-      navigate("/empresas");
+      if (isEdit && initialData?.id) {
+        await empresaService.update(initialData.id, formData);
+        addToast("Empresa actualizada con éxito", "success");
+      } else {
+        await empresaService.create(formData);
+        addToast("Empresa creada con éxito", "success");
+      }
+      navigate("/empresas/ver");
     } catch (err: any) {
       console.error("Error validando o creando empresa", err);
       const errorMsg = err.response?.data?.message || err.message || "Ocurrió un error al guardar la empresa. Verifica los datos.";
@@ -298,7 +319,7 @@ export const CrearEmpresaForm: React.FC = () => {
             disabled={loading}
             className={`w-full font-bold py-3 rounded text-sm transition-colors shadow-sm text-white ${loading ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#f97316] hover:bg-[#ea580c]'}`}
           >
-            {loading ? 'Guardando...' : 'Guardar'}
+            {loading ? (isEdit ? 'Actualizando...' : 'Guardando...') : (isEdit ? 'Actualizar' : 'Guardar')}
           </button>
         </div>
         

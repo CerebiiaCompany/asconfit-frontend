@@ -151,7 +151,7 @@ export const VerEmpresas: React.FC = () => {
                 <Eye className="w-4 h-4" />
               </button>
               <button 
-                onClick={() => navigate(`/empresas?id=${empresa.id}`)}
+                onClick={() => navigate(`/empresas/crear?id=${empresa.id}`)}
                 className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm"
               >
                 Actualizar datos

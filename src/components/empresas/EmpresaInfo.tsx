@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Empresa as EmpresaModel, empresaService } from "../../services/empresaService";
-import { useToast } from "../../contexts/ToastContext";
+import { Empresa as EmpresaModel } from "../../services/empresaService";
 
 interface EmpresaInfoProps {
   initialData?: EmpresaModel | null;
 }
 
 export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
-  const { addToast } = useToast();
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Form State
@@ -31,24 +31,9 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
     }
   }, [initialData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleUpdate = async () => {
-    if (!initialData?.id) {
-       addToast("No se seleccionó una empresa válida para actualizar.", "warning");
-       return;
-    }
-    setIsUpdating(true);
-    try {
-      await empresaService.update(initialData.id, formData);
-      addToast("Datos básicos actualizados correctamente", "success");
-    } catch (error: any) {
-      console.error("Error updating", error);
-      addToast(error.response?.data?.message || "Ocurrió un error al actualizar los datos", "error");
-    } finally {
-      setIsUpdating(false);
+  const handleUpdate = () => {
+    if (initialData?.id) {
+       navigate(`/empresas/crear?id=${initialData.id}`);
     }
   };
 
@@ -154,12 +139,10 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
           <button 
             type="button"
             onClick={handleUpdate}
-            disabled={isUpdating || !initialData}
-            className={`px-6 py-2 border border-orange-400 rounded text-sm font-medium transition-colors ${
-              isUpdating ? "bg-orange-100 text-orange-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-orange-50"
-            }`}
+            disabled={!initialData}
+            className={`px-6 py-2 border border-orange-400 rounded text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-orange-50`}
           >
-            {isUpdating ? "Actualizando..." : "Actualizar Datos"}
+            Actualizar Datos
           </button>
         </div>
       </div>
