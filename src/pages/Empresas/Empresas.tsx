@@ -10,7 +10,7 @@ import {
   Upload,
   Plus,
 } from "lucide-react";
-import { Empresa } from "../../components/empresas/Empresa";
+import { Empresa } from "../../components/empresas/EmpresaHeader";
 import { EmpresaInfo } from "../../components/empresas/EmpresaInfo";
 
 export const Empresas: React.FC = () => {
