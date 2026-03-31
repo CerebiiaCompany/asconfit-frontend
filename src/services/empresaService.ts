@@ -26,6 +26,8 @@ export interface Empresa {
   direccion: string;
   telefono_empresarial?: string | null;
   correo_empresarial?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const empresaService = {
