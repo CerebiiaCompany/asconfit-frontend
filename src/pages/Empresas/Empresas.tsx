@@ -8,10 +8,10 @@ import {
   Lock,
   Users,
   Upload,
-  Plus,
 } from "lucide-react";
 import { Empresa } from "../../components/empresas/EmpresaHeader";
 import { EmpresaInfo } from "../../components/empresas/EmpresaInfo";
+import { EmpresaTabs } from "../../components/empresas/EmpresaTabs";
 
 export const Empresas: React.FC = () => {
   // const navigate = useNavigate();
@@ -23,18 +23,7 @@ export const Empresas: React.FC = () => {
 
       <EmpresaInfo />
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-2">
-        <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2.5 rounded text-sm font-bold shadow-sm transition-colors">
-          Papeles de trabajo
-        </button>
-        <button className="bg-white border border-orange-200 text-gray-600 px-8 py-2.5 rounded text-sm font-bold shadow-sm hover:bg-gray-50 transition-colors">
-          Auditorías
-        </button>
-        <button className="bg-white border border-orange-200 text-orange-400 px-4 py-2.5 rounded shadow-sm hover:bg-gray-50 transition-colors flex items-center justify-center">
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
+      <EmpresaTabs />
 
       {/* Papeles de trabajo Box */}
       <div className="bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200 p-6 relative min-h-[500px]">
