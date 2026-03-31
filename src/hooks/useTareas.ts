@@ -41,8 +41,8 @@ export const useTareas = () => {
                     categoria.subtareas?.forEach((subtarea: any) => {
                         tareasFlat.push({
                             auditoriaId: auditoria.id,
-                            auditoriaEmpresa: auditoria.empresa || 'Sin nombre',
-                            auditoriaNit: auditoria.nit || 'Sin NIT',
+                            auditoriaEmpresa: auditoria.empresa?.razon_social || 'Sin nombre',
+                            auditoriaNit: auditoria.empresa?.nit || 'Sin NIT',
                             categoriaId: categoria.id,
                             categoriaNombre: categoria.nombre,
                             subtareaId: subtarea.id,

@@ -31,20 +31,19 @@ export const AuditoriaInfoCard: React.FC<AuditoriaInfoCardProps> = ({
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InfoField label="Empresa" value={auditoria.empresa} />
-          <InfoField label="NIT" value={auditoria.nit} />
+          <InfoField label="NIT" value={auditoria.empresa?.nit || auditoria.nit} />
           <InfoField
             label="Razón Social"
-            value={auditoria.razon_social}
+            value={auditoria.empresa?.razon_social || auditoria.razon_social}
             className="md:col-span-2"
           />
           <InfoField
             label="Actividad Económica"
-            value={auditoria.actividad_economica}
+            value={auditoria.empresa?.actividad_economica || auditoria.actividad_economica}
           />
-          <InfoField label="Dirección" value={auditoria.direccion} />
-          <InfoField label="Responsable" value={auditoria.responsable} />
-          <InfoField label="Contacto" value={auditoria.contacto} />
+          <InfoField label="Dirección" value={auditoria.empresa?.direccion || auditoria.direccion} />
+          <InfoField label="Responsable" value={auditoria.empresa?.representante_legal || auditoria.responsable} />
+          <InfoField label="Contacto" value={auditoria.empresa?.telefono_empresarial || auditoria.contacto} />
           <InfoField label="PT" value={auditoria.pt} />
           <InfoField
             label="Fecha Inicial"

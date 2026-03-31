@@ -44,7 +44,7 @@ export const TareaDetalle: React.FC = () => {
     <div className="pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto pt-8">
           <BreadcrumbTarea
-            empresa={auditoria.empresa}
+            empresa={auditoria.empresa?.razon_social || auditoria.razon_social}
             onNavigateBack={() => navigate("/mis-tareas")}
           />
 

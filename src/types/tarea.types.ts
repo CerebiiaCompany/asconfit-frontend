@@ -18,11 +18,12 @@ export interface Categoria {
 
 export interface Auditoria {
   id: string;
-  empresa: string;
-  nit: string;
-  razon_social: string;
-  responsable: string;
-  contacto: string;
+  empresa_id?: number | string;
+  empresa?: any; // Objeto de relación
+  nit?: string;
+  razon_social?: string;
+  responsable?: string;
+  contacto?: string;
   actividad_economica?: string;
   direccion?: string;
   pt?: string;
