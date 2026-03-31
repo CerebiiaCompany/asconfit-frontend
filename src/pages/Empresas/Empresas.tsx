@@ -18,6 +18,7 @@ export const Empresas: React.FC = () => {
 
   const [empresaState, setEmpresaState] = useState<EmpresaModel | null>(null);
   const [loading, setLoading] = useState(!!empresaId);
+  const [activeCarpetaId, setActiveCarpetaId] = useState<number | null>(null);
 
   useEffect(() => {
     if (empresaId) {
@@ -50,8 +51,18 @@ export const Empresas: React.FC = () => {
       ) : empresaState ? (
         <>
           <EmpresaInfo initialData={empresaState} />
-          <EmpresaTabs />
-          <PapelesTrabajo />
+          <EmpresaTabs 
+            empresaId={empresaState.id!} 
+            activeCarpetaId={activeCarpetaId}
+            setActiveCarpetaId={setActiveCarpetaId}
+          />
+          {activeCarpetaId ? (
+            <PapelesTrabajo carpetaId={activeCarpetaId} />
+          ) : (
+            <div className="py-20 text-center text-gray-400 font-medium bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200">
+              Cargando interfaz de documentos...
+            </div>
+          )}
         </>
       ) : (
         <div className="py-20 text-center text-gray-400">
