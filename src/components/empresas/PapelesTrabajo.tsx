@@ -63,6 +63,7 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
   };
 
   const handleDelete = async (docId: number, e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (!window.confirm("¿Estás seguro de que deseas eliminar este archivo de forma permanente?")) return;
     
