@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Download } from "lucide-react";
+import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye } from "lucide-react";
 import { documentoService, Documento } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 
@@ -139,8 +139,8 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
                 
                 {/* Hover Action Blur */}
                 <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
-                   <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                      <Download className="w-5 h-5" />
+                   <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg" title="Ver documento">
+                      <Eye className="w-5 h-5" />
                    </div>
                    <button 
                      onClick={(e) => handleDelete(doc.id, e)} 
