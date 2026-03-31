@@ -76,10 +76,10 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
       setLoading(true);
       await documentoService.deleteDocumento(docToDelete);
       setDocumentos(prev => prev.filter(d => d.id !== docToDelete));
-      addToast("Documento eliminado con éxito", "success");
+      addToast("Documento movido a la papelera", "success");
     } catch (error) {
       console.error(error);
-      addToast("Error al eliminar el documento", "error");
+      addToast("Error al mover a la papelera", "error");
     } finally {
       setLoading(false);
       setDocToDelete(null);
@@ -154,7 +154,7 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
                    <button 
                      onClick={(e) => handleDeleteRequest(doc.id, e)} 
                      className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-red-600 transition-colors"
-                     title="Eliminar este archivo"
+                     title="Mover a papelera"
                    >
                       <Trash2 className="w-5 h-5" />
                    </button>

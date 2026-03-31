@@ -15,8 +15,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onClose,
   onConfirm,
   loading = false,
-  title = "Eliminar Documento",
-  message = "¿Estás seguro de que deseas eliminar este archivo de forma permanente?\nEsta acción no se puede deshacer."
+  title = "Mover a Papelera",
+  message = "¿Deseas mover este archivo a la papelera?\nEl archivo dejará de ser visible en la carpeta."
 }) => {
   if (!isOpen) return null;
 
@@ -43,7 +43,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             disabled={loading}
             className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-lg transition-colors shadow-lg shadow-red-500/30 disabled:bg-red-300 flex justify-center items-center"
           >
-            {loading ? 'Eliminando...' : 'Sí, eliminar'}
+            {loading ? 'Moviendo...' : 'Sí, mover a papelera'}
           </button>
         </div>
       </div>
