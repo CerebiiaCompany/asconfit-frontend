@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Empresa as EmpresaModel } from "../../services/empresaService";
+import { Calendar, CalendarEvent } from "../common/Calendar";
 
 interface EmpresaInfoProps {
   initialData?: EmpresaModel | null;
@@ -9,7 +9,6 @@ interface EmpresaInfoProps {
 
 export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
   const navigate = useNavigate();
-  const [currentDate, setCurrentDate] = useState(new Date());
 
   // Form State
   const [formData, setFormData] = useState<Partial<EmpresaModel>>({
@@ -18,7 +17,6 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
     representante_legal: "",
     correo_empresarial: "",
   });
-  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -37,83 +35,24 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
     }
   };
 
-  // Calendar
-  const [events, setEvents] = useState<Record<number, string>>({});
+  // Calendar Events
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
     if (initialData?.id) {
       const { empresaService } = require("../../services/empresaService");
       empresaService.getCalendario(initialData.id)
         .then((data: any[]) => {
-          const filteredEvents: Record<number, string> = {};
-          data.forEach((evt) => {
-            // Usamos split para evitar problemas de zona horaria con new Date(string)
-            const [year, month, day] = evt.fecha.split('-').map(Number);
-            const evtDate = new Date(year, month - 1, day);
-            
-            if (evtDate.getMonth() === currentDate.getMonth() && 
-                evtDate.getFullYear() === currentDate.getFullYear()) {
-              // Si ya hay un evento en ese día, los concatenamos
-              if (filteredEvents[day]) {
-                filteredEvents[day] += ` | ${evt.titulo}`;
-              } else {
-                filteredEvents[day] = evt.titulo;
-              }
-            }
-          });
-          setEvents(filteredEvents);
+          const events: CalendarEvent[] = data.map(evt => ({
+            date: evt.fecha,
+            title: evt.titulo,
+            color: 'bg-orange-500' // Color estándar para requerimientos
+          }));
+          setCalendarEvents(events);
         })
         .catch((err: any) => console.error("Error cargando calendario:", err));
     }
-  }, [initialData, currentDate]);
-
-  const handlePrevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const month = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(currentDate);
-  const formattedMonth = month.charAt(0).toUpperCase() + month.slice(1);
-  const currentMonthYear = `${formattedMonth} ${currentDate.getFullYear()}`;
-
-  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-
-  const blanks = Array.from({ length: firstDayOfMonth }, (_, i) => (
-    <div key={`blank-${i}`}></div>
-  ));
-
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
-    const day = i + 1;
-    const eventMsg = events[day];
-
-    if (eventMsg) {
-      return (
-        <div key={`day-${day}`} className="relative group">
-          <div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto cursor-pointer shadow-sm">
-            {day}
-          </div>
-          <div className="absolute top-1/2 right-full mr-2 transform -translate-y-1/2 w-[160px] bg-gray-300/80 text-gray-800 p-1.5 rounded shadow-sm flex gap-1.5 items-center z-10 backdrop-blur-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-            <span className="font-bold text-xs bg-gray-400/30 px-1 py-0.5 rounded">
-              {day}
-            </span>
-            <span className="text-[9px] font-semibold leading-tight text-left">
-              {eventMsg}
-            </span>
-            <div className="absolute right-[-4px] top-1/2 transform -translate-y-1/2 w-2 h-2 bg-gray-300/80 rotate-45 backdrop-blur-sm"></div>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div key={`day-${day}`}>
-        {day}
-      </div>
-    );
-  });
+  }, [initialData]);
 
   return (
     <div className="flex flex-col lg:flex-row justify-between gap-12 mb-8">
@@ -171,30 +110,9 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
         </div>
       </div>
 
-      {/* Calendar Widget */}
+      {/* Reusable Calendar Component */}
       <div className="flex justify-start lg:justify-end">
-        <div className="border border-gray-300 rounded-lg shadow-sm p-4 w-[280px] bg-white relative">
-          <div className="flex justify-between items-center mb-6 text-gray-600 px-2">
-            <ChevronLeft onClick={handlePrevMonth} className="w-4 h-4 cursor-pointer text-gray-400 hover:text-orange-500 transition-colors" />
-            <span className="font-bold text-sm text-gray-700">
-              {currentMonthYear}
-            </span>
-            <ChevronRight onClick={handleNextMonth} className="w-4 h-4 cursor-pointer text-gray-400 hover:text-orange-500 transition-colors" />
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-gray-400 mb-4 tracking-wider">
-            <div>SUN</div>
-            <div>MON</div>
-            <div>TUE</div>
-            <div>WED</div>
-            <div>THU</div>
-            <div>FRI</div>
-            <div>SAT</div>
-          </div>
-          <div className="grid grid-cols-7 gap-y-3 text-center text-xs text-gray-800 font-bold">
-            {blanks}
-            {days}
-          </div>
-        </div>
+        <Calendar events={calendarEvents} />
       </div>
     </div>
   );
