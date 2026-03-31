@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye } from "lucide-react";
 import { documentoService, Documento } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
+import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
 
 interface PapelesTrabajoProps {
   carpetaId: number;
@@ -11,6 +12,7 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [docToDelete, setDocToDelete] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
 
@@ -62,18 +64,25 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
     }
   };
 
-  const handleDelete = async (docId: number, e: React.MouseEvent) => {
+  const handleDeleteRequest = (docId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!window.confirm("¿Estás seguro de que deseas eliminar este archivo de forma permanente?")) return;
-    
+    setDocToDelete(docId);
+  };
+
+  const confirmDelete = async () => {
+    if (!docToDelete) return;
     try {
-      await documentoService.deleteDocumento(docId);
-      setDocumentos(prev => prev.filter(d => d.id !== docId));
+      setLoading(true);
+      await documentoService.deleteDocumento(docToDelete);
+      setDocumentos(prev => prev.filter(d => d.id !== docToDelete));
       addToast("Documento eliminado con éxito", "success");
     } catch (error) {
       console.error(error);
       addToast("Error al eliminar el documento", "error");
+    } finally {
+      setLoading(false);
+      setDocToDelete(null);
     }
   };
 
@@ -143,7 +152,7 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
                       <Eye className="w-5 h-5" />
                    </div>
                    <button 
-                     onClick={(e) => handleDelete(doc.id, e)} 
+                     onClick={(e) => handleDeleteRequest(doc.id, e)} 
                      className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-red-600 transition-colors"
                      title="Eliminar este archivo"
                    >
@@ -184,6 +193,14 @@ export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => 
         {loading ? 'Subiendo...' : 'Subir archivo'}
         <Upload className="w-4 h-4 ml-1" />
       </button>
+
+      {/* Beautiful Tailwind CSS Modal for Deletion Confirmation */}
+      <DeleteConfirmModal 
+        isOpen={docToDelete !== null}
+        onClose={() => setDocToDelete(null)}
+        onConfirm={confirmDelete}
+        loading={loading}
+      />
 
     </div>
   );
