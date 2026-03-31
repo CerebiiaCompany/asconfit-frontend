@@ -144,12 +144,16 @@ export const VerEmpresas: React.FC = () => {
             
             <div className="flex gap-2 mt-auto">
               <button 
+                onClick={() => navigate(`/empresas?id=${empresa.id}`)}
                 className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-orange-400 rounded-md text-orange-500 hover:bg-orange-50 transition-colors"
                 title="Ver detalles"
               >
                 <Eye className="w-4 h-4" />
               </button>
-              <button className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm">
+              <button 
+                onClick={() => navigate(`/empresas?id=${empresa.id}`)}
+                className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm"
+              >
                 Actualizar datos
               </button>
             </div>

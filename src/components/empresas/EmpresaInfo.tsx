@@ -1,9 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Empresa as EmpresaModel, empresaService } from "../../services/empresaService";
+import { useToast } from "../../contexts/ToastContext";
 
-export const EmpresaInfo: React.FC = () => {
+interface EmpresaInfoProps {
+  initialData?: EmpresaModel | null;
+}
+
+export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
+  const { addToast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  // Form State
+  const [formData, setFormData] = useState<Partial<EmpresaModel>>({
+    nit: "",
+    razon_social: "",
+    representante_legal: "",
+    correo_empresarial: "",
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        nit: initialData.nit || "",
+        razon_social: initialData.razon_social || "",
+        representante_legal: initialData.representante_legal || "",
+        correo_empresarial: initialData.correo_empresarial || initialData.correo_personal || "",
+      });
+    }
+  }, [initialData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleUpdate = async () => {
+    if (!initialData?.id) {
+       addToast("No se seleccionó una empresa válida para actualizar.", "warning");
+       return;
+    }
+    setIsUpdating(true);
+    try {
+      await empresaService.update(initialData.id, formData);
+      addToast("Datos básicos actualizados correctamente", "success");
+    } catch (error: any) {
+      console.error("Error updating", error);
+      addToast(error.response?.data?.message || "Ocurrió un error al actualizar los datos", "error");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Calendar
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
@@ -50,7 +99,6 @@ export const EmpresaInfo: React.FC = () => {
         </div>
       );
     }
-
     return (
       <div key={`day-${day}`}>
         {day}
@@ -66,7 +114,8 @@ export const EmpresaInfo: React.FC = () => {
           <label className="text-gray-400 text-sm">Nit:</label>
           <input
             type="text"
-            value="1024525647-5"
+            name="nit"
+            value={formData.nit || ""}
             readOnly
             className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
           />
@@ -75,32 +124,42 @@ export const EmpresaInfo: React.FC = () => {
           <label className="text-gray-400 text-sm">Razón social:</label>
           <input
             type="text"
-            value="Ceramica Italia SAS"
+            name="razon_social"
+            value={formData.razon_social || ""}
             readOnly
             className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
           />
         </div>
         <div className="grid grid-cols-[160px_1fr] items-center">
-          <label className="text-gray-400 text-sm">Auditor encargado:</label>
+          <label className="text-gray-400 text-sm">Representante legal:</label>
           <input
             type="text"
-            value="Jhon Monsalve"
+            name="representante_legal"
+            value={formData.representante_legal || ""}
             readOnly
             className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
           />
         </div>
         <div className="grid grid-cols-[160px_1fr] items-center">
-          <label className="text-gray-400 text-sm">Auditor encargado:</label>
+          <label className="text-gray-400 text-sm">Correo Corporativo:</label>
           <input
-            type="text"
-            value="Erik Herrera"
+            type="email"
+            name="correo_empresarial"
+            value={formData.correo_empresarial || ""}
             readOnly
             className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
           />
         </div>
         <div className="flex justify-end pt-2">
-          <button className="px-6 py-2 border border-orange-400 text-gray-700 rounded text-sm font-medium hover:bg-orange-50 transition-colors">
-            Actualizar Datos
+          <button 
+            type="button"
+            onClick={handleUpdate}
+            disabled={isUpdating || !initialData}
+            className={`px-6 py-2 border border-orange-400 rounded text-sm font-medium transition-colors ${
+              isUpdating ? "bg-orange-100 text-orange-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-orange-50"
+            }`}
+          >
+            {isUpdating ? "Actualizando..." : "Actualizar Datos"}
           </button>
         </div>
       </div>
@@ -108,7 +167,6 @@ export const EmpresaInfo: React.FC = () => {
       {/* Calendar Widget */}
       <div className="flex justify-start lg:justify-end">
         <div className="border border-gray-300 rounded-lg shadow-sm p-4 w-[280px] bg-white relative">
-          {/* Calendar Header */}
           <div className="flex justify-between items-center mb-6 text-gray-600 px-2">
             <ChevronLeft onClick={handlePrevMonth} className="w-4 h-4 cursor-pointer text-gray-400 hover:text-orange-500 transition-colors" />
             <span className="font-bold text-sm text-gray-700">
@@ -116,7 +174,6 @@ export const EmpresaInfo: React.FC = () => {
             </span>
             <ChevronRight onClick={handleNextMonth} className="w-4 h-4 cursor-pointer text-gray-400 hover:text-orange-500 transition-colors" />
           </div>
-          {/* Days row */}
           <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-gray-400 mb-4 tracking-wider">
             <div>SUN</div>
             <div>MON</div>
@@ -126,7 +183,6 @@ export const EmpresaInfo: React.FC = () => {
             <div>FRI</div>
             <div>SAT</div>
           </div>
-          {/* Dates Grid */}
           <div className="grid grid-cols-7 gap-y-3 text-center text-xs text-gray-800 font-bold">
             {blanks}
             {days}
