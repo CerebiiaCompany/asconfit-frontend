@@ -33,7 +33,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.empresa}
             onChange={onInputChange}
             placeholder="Nombre de la empresa"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -46,7 +47,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.nit}
             onChange={handleNumericChange}
             placeholder="1004404347"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -59,7 +61,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.direccion}
             onChange={onInputChange}
             placeholder="calle 0 numero 0-200"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -72,7 +75,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.razonSocial}
             onChange={onInputChange}
             placeholder="Comercializadora los Robles SAS"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -85,7 +89,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.responsable}
             onChange={onInputChange}
             placeholder="Mauricio contreras"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -98,7 +103,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.actividadEconomica}
             onChange={onInputChange}
             placeholder="1105"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -111,7 +117,8 @@ export const EmpresaSection: React.FC<EmpresaSectionProps> = ({
             value={formData.contacto}
             onChange={handleNumericChange}
             placeholder="000 000 000"
-            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            disabled
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed text-sm sm:text-base focus:outline-none"
           />
         </div>
       </div>

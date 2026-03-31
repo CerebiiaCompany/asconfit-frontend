@@ -146,6 +146,7 @@ export const useAuditoriaForm = () => {
 
   return {
     formData,
+    setFormData,
     categorias,
     handleInputChange,
     handleAddCategoria,

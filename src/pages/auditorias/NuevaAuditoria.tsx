@@ -34,6 +34,7 @@ export const NuevaAuditoria: React.FC = () => {
 
   const {
     formData,
+    setFormData,
     categorias,
     handleInputChange,
     handleAddCategoria,
@@ -44,6 +45,19 @@ export const NuevaAuditoria: React.FC = () => {
     handleSubtareaChange,
     handleLoadPlantilla,
   } = useAuditoriaForm();
+
+  const handleSelectEmpresa = (empresa: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      empresa: empresa.razon_social || "",
+      nit: empresa.nit || "",
+      razonSocial: empresa.razon_social || "",
+      direccion: empresa.direccion || "",
+      responsable: empresa.representante_legal || "",
+      actividadEconomica: empresa.actividad_economica || "",
+      contacto: empresa.telefono_empresarial || empresa.telefono_personal || "",
+    }));
+  };
 
   const { validateForm } = useAuditoriaValidation();
 
@@ -113,6 +127,7 @@ export const NuevaAuditoria: React.FC = () => {
             searchConcepto={searchConcepto}
             onSearchEmpresaChange={setSearchEmpresa}
             onSearchConceptoChange={setSearchConcepto}
+            onSelectEmpresa={handleSelectEmpresa}
             onBack={() => navigate("/auditorias")}
           />
 
