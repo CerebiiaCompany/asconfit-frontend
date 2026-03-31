@@ -8,11 +8,10 @@ import {
   Lock,
   Users,
   Upload,
-  ChevronLeft,
-  ChevronRight,
   Plus,
 } from "lucide-react";
 import { Empresa } from "../../components/empresas/Empresa";
+import { EmpresaInfo } from "../../components/empresas/EmpresaInfo";
 
 export const Empresas: React.FC = () => {
   // const navigate = useNavigate();
@@ -22,128 +21,7 @@ export const Empresas: React.FC = () => {
     <div className="p-6 max-w-[1200px] mx-auto font-sans min-h-screen">
       <Empresa />
 
-      {/* Main Info Section */}
-      <div className="flex flex-col lg:flex-row justify-between gap-12 mb-8">
-        {/* Form Details */}
-        <div className="space-y-4 w-full max-w-[550px] pt-4 pl-4 md:pl-8">
-          <div className="grid grid-cols-[160px_1fr] items-center">
-            <label className="text-gray-400 text-sm">Nit:</label>
-            <input
-              type="text"
-              value="1024525647-5"
-              readOnly
-              className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
-            />
-          </div>
-          <div className="grid grid-cols-[160px_1fr] items-center">
-            <label className="text-gray-400 text-sm">Razón social:</label>
-            <input
-              type="text"
-              value="Ceramica Italia SAS"
-              readOnly
-              className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
-            />
-          </div>
-          <div className="grid grid-cols-[160px_1fr] items-center">
-            <label className="text-gray-400 text-sm">Auditor encargado:</label>
-            <input
-              type="text"
-              value="Jhon Monsalve"
-              readOnly
-              className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
-            />
-          </div>
-          <div className="grid grid-cols-[160px_1fr] items-center">
-            <label className="text-gray-400 text-sm">Auditor encargado:</label>
-            <input
-              type="text"
-              value="Erik Herrera"
-              readOnly
-              className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
-            />
-          </div>
-          <div className="flex justify-end pt-2">
-            <button className="px-6 py-2 border border-orange-400 text-gray-700 rounded text-sm font-medium hover:bg-orange-50 transition-colors">
-              Actualizar Datos
-            </button>
-          </div>
-        </div>
-
-        {/* Calendar Widget */}
-        <div className="flex justify-start lg:justify-end">
-          <div className="border border-gray-300 rounded-lg shadow-sm p-4 w-[280px] bg-white relative">
-            {/* Calendar Header */}
-            <div className="flex justify-between items-center mb-6 text-gray-600 px-2">
-              <ChevronLeft className="w-4 h-4 cursor-pointer text-gray-400" />
-              <span className="font-bold text-sm text-gray-700">
-                September 2021
-              </span>
-              <ChevronRight className="w-4 h-4 cursor-pointer text-gray-400" />
-            </div>
-            {/* Days row */}
-            <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-gray-400 mb-4 tracking-wider">
-              <div>SUN</div>
-              <div>MON</div>
-              <div>TUE</div>
-              <div>WED</div>
-              <div>THU</div>
-              <div>FRI</div>
-              <div>SAT</div>
-            </div>
-            {/* Dates Grid */}
-            <div className="grid grid-cols-7 gap-y-3 text-center text-xs text-gray-800 font-bold">
-              <div className="col-start-4">4</div>
-              <div>5</div>
-              <div>6</div>
-              <div>7</div>
-              <div>8</div>
-              <div>9</div>
-
-              <div className="relative">
-                <div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto cursor-pointer shadow-sm">
-                  10
-                </div>
-                {/* Tooltip pointing to 10 */}
-                <div className="absolute top-1/2 right-full mr-2 transform -translate-y-1/2 w-[160px] bg-gray-300/80 text-gray-800 p-1.5 rounded shadow-sm flex gap-1.5 items-center z-10 backdrop-blur-sm">
-                  <span className="font-bold text-xs bg-gray-400/30 px-1 py-0.5 rounded">
-                    10
-                  </span>
-                  <span className="text-[9px] font-semibold leading-tight text-left">
-                    Fecha limite para información general
-                  </span>
-                  <div className="absolute right-[-4px] top-1/2 transform -translate-y-1/2 w-2 h-2 bg-gray-300/80 rotate-45 backdrop-blur-sm"></div>
-                </div>
-              </div>
-
-              <div>11</div>
-              <div>12</div>
-              <div>13</div>
-              <div>14</div>
-              <div>15</div>
-              <div>16</div>
-              <div>17</div>
-              <div>18</div>
-              <div>
-                <div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto cursor-pointer shadow-sm">
-                  19
-                </div>
-              </div>
-              <div>20</div>
-              <div>21</div>
-              <div>22</div>
-              <div>23</div>
-              <div>24</div>
-              <div>25</div>
-              <div>26</div>
-              <div>27</div>
-              <div>28</div>
-              <div>29</div>
-              <div>30</div>
-              <div>31</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmpresaInfo />
 
       {/* Tabs */}
       <div className="flex gap-2 mb-2">
