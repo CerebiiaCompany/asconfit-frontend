@@ -56,6 +56,7 @@ export const NuevaAuditoria: React.FC = () => {
       responsable: empresa.representante_legal || "",
       actividadEconomica: empresa.actividad_economica || "",
       contacto: empresa.telefono_empresarial || empresa.telefono_personal || "",
+      empresaId: empresa.id || null,
     }));
   };
 

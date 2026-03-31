@@ -38,6 +38,35 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
   };
 
   // Calendar
+  const [events, setEvents] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    if (initialData?.id) {
+      const { empresaService } = require("../../services/empresaService");
+      empresaService.getCalendario(initialData.id)
+        .then((data: any[]) => {
+          const filteredEvents: Record<number, string> = {};
+          data.forEach((evt) => {
+            // Usamos split para evitar problemas de zona horaria con new Date(string)
+            const [year, month, day] = evt.fecha.split('-').map(Number);
+            const evtDate = new Date(year, month - 1, day);
+            
+            if (evtDate.getMonth() === currentDate.getMonth() && 
+                evtDate.getFullYear() === currentDate.getFullYear()) {
+              // Si ya hay un evento en ese día, los concatenamos
+              if (filteredEvents[day]) {
+                filteredEvents[day] += ` | ${evt.titulo}`;
+              } else {
+                filteredEvents[day] = evt.titulo;
+              }
+            }
+          });
+          setEvents(filteredEvents);
+        })
+        .catch((err: any) => console.error("Error cargando calendario:", err));
+    }
+  }, [initialData, currentDate]);
+
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
@@ -52,11 +81,6 @@ export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-
-  const events: Record<number, string> = {
-    10: "Fecha límite para información general",
-    19: "Auditoría programada",
-  };
 
   const blanks = Array.from({ length: firstDayOfMonth }, (_, i) => (
     <div key={`blank-${i}`}></div>

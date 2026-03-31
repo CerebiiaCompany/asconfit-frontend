@@ -43,7 +43,7 @@ export const useAuditorias = () => {
         const newStats: AuditoriaStats = {
             total: data.length,
             pendientes: data.filter(a => a.estado === 'pendiente').length,
-            checks: data.filter(a => a.estado === 'check').length,
+            checks: data.filter(a => a.estado === 'aprobado').length,
         };
         setStats(newStats);
     };

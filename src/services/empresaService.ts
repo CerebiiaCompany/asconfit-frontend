@@ -64,5 +64,12 @@ export const empresaService = {
       headers: getAuthHeader(),
     });
     return response.data;
+  },
+
+  async getCalendario(id: number): Promise<any[]> {
+    const response = await axios.get(`${API_URL}/empresas/${id}/calendario`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
   }
 };

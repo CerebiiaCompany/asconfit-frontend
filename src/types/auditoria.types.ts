@@ -28,6 +28,7 @@ export interface AuditoriaFormData {
     fechaInicial: string;
     fechaCorte: string;
     delegadoId: number | null;
+    empresaId: number | null;
 }
 
 export interface NuevaAuditoriaData {

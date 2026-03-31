@@ -24,11 +24,11 @@ export const Auditorias: React.FC = () => {
     // Filtro por texto
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      const empresa = auditoria.empresa;
       const matchesSearch =
-        auditoria.empresa?.toLowerCase().includes(term) ||
-        auditoria.nit?.toLowerCase().includes(term) ||
-        auditoria.razon_social?.toLowerCase().includes(term) ||
-        auditoria.responsable?.toLowerCase().includes(term);
+        empresa?.razon_social?.toLowerCase().includes(term) ||
+        empresa?.nit?.toLowerCase().includes(term) ||
+        empresa?.representante_legal?.toLowerCase().includes(term);
       if (!matchesSearch) return false;
     }
 

@@ -17,6 +17,7 @@ const initialFormData: AuditoriaFormData = {
   fechaInicial: "",
   fechaCorte: "",
   delegadoId: null,
+  empresaId: null,
 };
 
 export const useAuditoriaForm = () => {

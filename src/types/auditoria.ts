@@ -28,7 +28,8 @@ export interface Categoria {
 export interface Auditoria {
     id: number;
     user_id: number;
-    empresa?: string;
+    empresa_id?: number;
+    empresa?: any; // Para la relación Eloquent si se carga como 'empresa'
     nit?: string;
     razon_social?: string;
     actividad_economica?: string;
@@ -39,7 +40,7 @@ export interface Auditoria {
     fecha_inicial?: string;
     fecha_corte?: string;
     search_concepto?: string;
-    estado: 'pendiente' | 'check';
+    estado: 'pendiente' | 'en_progreso' | 'completada' | 'aprobado';
     categorias?: Categoria[];
     created_at: string;
     updated_at: string;
