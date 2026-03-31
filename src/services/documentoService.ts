@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+const BASE_URL = API_URL.replace(/\/api\/?$/, '');
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('auth_token');
@@ -49,7 +50,10 @@ export const documentoService = {
     // Documentos
     getDocumentosByCarpeta: async (carpetaId: number): Promise<Documento[]> => {
         const response = await axios.get(`${API_URL}/carpetas/${carpetaId}/documentos`, getAuthHeaders());
-        return response.data;
+        return response.data.map((doc: Documento) => ({
+            ...doc,
+            url: BASE_URL + doc.url
+        }));
     },
 
     uploadDocumento: async (carpetaId: number, file: File): Promise<Documento> => {
@@ -63,7 +67,12 @@ export const documentoService = {
                 'Content-Type': 'multipart/form-data',
             }
         });
-        return response.data.documento;
+        
+        const doc = response.data.documento;
+        return {
+            ...doc,
+            url: BASE_URL + doc.url
+        };
     },
 
     deleteDocumento: async (documentoId: number): Promise<void> => {
