@@ -11,7 +11,7 @@ import {
 import { empresaService, Empresa } from "../../services/empresaService";
 import { useToast } from "../../contexts/ToastContext";
 
-export const VerEmpresas: React.FC = () => {
+export const ViewCompanies: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   

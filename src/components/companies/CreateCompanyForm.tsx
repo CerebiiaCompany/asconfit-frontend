@@ -9,7 +9,7 @@ interface FormProps {
   initialData?: Empresa | null;
 }
 
-export const CrearEmpresaForm: React.FC<FormProps> = ({ isEdit, initialData }) => {
+export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) => {
   const navigate = useNavigate();
   const { addToast } = useToast();
 

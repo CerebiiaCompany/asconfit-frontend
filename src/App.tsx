@@ -9,8 +9,8 @@ import { Login } from "./components/auth/Login";
 import { Register } from "./components/auth/Register";
 import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
 import { Dashboard } from "./pages/Dashboard";
-import { Empresas } from "./pages/Empresas/Empresas";
-import { VerEmpresas } from "./pages/Empresas/VerEmpresas";
+import { Companies } from "./pages/Companies/Companies";
+import { ViewCompanies } from "./pages/Companies/ViewCompanies";
 import { Auditorias } from "./pages/auditorias/Auditorias";
 import { NuevaAuditoria } from "./pages/auditorias/NuevaAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
@@ -21,7 +21,7 @@ import { Roles } from "./pages/Roles";
 import { Papelera } from "./pages/Papelera";
 import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
-import { CrearEmpresa } from "./pages/Empresas/CrearEmpresa";
+import { CreateCompany } from "./pages/Companies/CreateCompany";
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -84,7 +84,7 @@ function App() {
                     path="/empresas"
                     element={
                       <RoleBasedRoute>
-                        <Empresas />
+                        <Companies />
                       </RoleBasedRoute>
                     }
                   />
@@ -92,7 +92,7 @@ function App() {
                     path="/empresas/ver"
                     element={
                       <RoleBasedRoute>
-                        <VerEmpresas />
+                        <ViewCompanies />
                       </RoleBasedRoute>
                     }
                   />
@@ -100,7 +100,7 @@ function App() {
                     path="/empresas/crear"
                     element={
                       <RoleBasedRoute>
-                        <CrearEmpresa />
+                        <CreateCompany />
                       </RoleBasedRoute>
                     }
                   />

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, PlusCircle, FileText } from 'lucide-react';
 
-export const CrearEmpresaHeader: React.FC<{ isEdit?: boolean }> = ({ isEdit }) => {
+export const CreateCompanyHeader: React.FC<{ isEdit?: boolean }> = ({ isEdit }) => {
   const navigate = useNavigate();
 
   return (

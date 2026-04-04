@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Empresa as EmpresaHeader } from "../../components/empresas/EmpresaHeader";
-import { EmpresaInfo } from "../../components/empresas/EmpresaInfo";
-import { EmpresaTabs } from "../../components/empresas/EmpresaTabs";
-import { PapelesTrabajo } from "../../components/empresas/PapelesTrabajo";
+import { CompanyHeader } from "../../components/companies/CompanyHeader";
+import { CompanyInfo } from "../../components/companies/CompanyInfo";
+import { CompanyTabs } from "../../components/companies/CompanyTabs";
+import { WorkPapers } from "../../components/companies/WorkPapers";
 import { empresaService, Empresa as EmpresaModel } from "../../services/empresaService";
 import { useToast } from "../../contexts/ToastContext";
 
-export const Empresas: React.FC = () => {
+export const Companies: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -42,7 +42,7 @@ export const Empresas: React.FC = () => {
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto font-sans min-h-screen">
-      <EmpresaHeader />
+      <CompanyHeader />
 
       {loading ? (
         <div className="py-20 text-center text-gray-500 font-bold">
@@ -50,14 +50,14 @@ export const Empresas: React.FC = () => {
         </div>
       ) : empresaState ? (
         <>
-          <EmpresaInfo initialData={empresaState} />
-          <EmpresaTabs 
+          <CompanyInfo initialData={empresaState} />
+          <CompanyTabs 
             empresaId={empresaState.id!} 
             activeCarpetaId={activeCarpetaId}
             setActiveCarpetaId={setActiveCarpetaId}
           />
           {activeCarpetaId ? (
-            <PapelesTrabajo carpetaId={activeCarpetaId} />
+            <WorkPapers carpetaId={activeCarpetaId} />
           ) : (
             <div className="py-20 text-center text-gray-400 font-medium bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200">
               Cargando interfaz de documentos...

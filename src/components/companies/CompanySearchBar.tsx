@@ -1,16 +1,16 @@
 import React from 'react';
 import { SearchInput } from '../SearchInput';
 
-interface EmpresaSearchBarProps {
+interface CompanySearchBarProps {
     searchTerm: string;
     onSearchChange: (value: string) => void;
-    onNewEmpresa: () => void;
+    onNewCompany: () => void;
 }
 
-export const EmpresaSearchBar: React.FC<EmpresaSearchBarProps> = ({
+export const CompanySearchBar: React.FC<CompanySearchBarProps> = ({
     searchTerm,
     onSearchChange,
-    onNewEmpresa
+    onNewCompany
 }) => {
     return (
         <div className="bg-white shadow-lg rounded-xl p-6 mb-6">
@@ -22,7 +22,7 @@ export const EmpresaSearchBar: React.FC<EmpresaSearchBarProps> = ({
                     className="flex-1 w-full"
                 />
                 <button
-                    onClick={onNewEmpresa}
+                    onClick={onNewCompany}
                     className="w-full sm:w-auto px-6 py-2 text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2"
                     style={{ backgroundColor: '#FF9411' }}
                 >

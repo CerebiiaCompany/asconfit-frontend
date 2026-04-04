@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Empresa as EmpresaModel } from "../../services/empresaService";
 import { Calendar, CalendarEvent } from "../common/Calendar";
 
-interface EmpresaInfoProps {
+interface CompanyInfoProps {
   initialData?: EmpresaModel | null;
 }
 
-export const EmpresaInfo: React.FC<EmpresaInfoProps> = ({ initialData }) => {
+export const CompanyInfo: React.FC<CompanyInfoProps> = ({ initialData }) => {
   const navigate = useNavigate();
 
   // Form State

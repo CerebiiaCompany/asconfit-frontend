@@ -4,11 +4,11 @@ import { documentoService, Documento } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
 
-interface PapelesTrabajoProps {
+interface WorkPapersProps {
   carpetaId: number;
 }
 
-export const PapelesTrabajo: React.FC<PapelesTrabajoProps> = ({ carpetaId }) => {
+export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");

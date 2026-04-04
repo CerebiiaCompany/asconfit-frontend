@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, PlusCircle, FileText, Building2 } from "lucide-react";
 import { empresaService, Empresa as EmpresaModel } from "../../services/empresaService";
 
-export const Empresa: React.FC = () => {
+export const CompanyHeader: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [empresas, setEmpresas] = useState<EmpresaModel[]>([]);

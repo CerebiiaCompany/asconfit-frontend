@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface EmpresaStatsCardProps {
+interface CompanyStatsCardProps {
     title: string;
     value: number;
     icon: React.ReactNode;
@@ -30,7 +30,7 @@ const colorClasses = {
     }
 };
 
-export const EmpresaStatsCard: React.FC<EmpresaStatsCardProps> = ({ title, value, icon, color }) => {
+export const CompanyStatsCard: React.FC<CompanyStatsCardProps> = ({ title, value, icon, color }) => {
     const colors = colorClasses[color];
 
     return (

@@ -3,13 +3,13 @@ import { Plus } from "lucide-react";
 import { documentoService, Carpeta } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 
-interface EmpresaTabsProps {
+interface CompanyTabsProps {
   empresaId: number;
   activeCarpetaId: number | null;
   setActiveCarpetaId: (id: number) => void;
 }
 
-export const EmpresaTabs: React.FC<EmpresaTabsProps> = ({ empresaId, activeCarpetaId, setActiveCarpetaId }) => {
+export const CompanyTabs: React.FC<CompanyTabsProps> = ({ empresaId, activeCarpetaId, setActiveCarpetaId }) => {
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const { addToast } = useToast();
 
