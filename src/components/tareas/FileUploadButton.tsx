@@ -5,13 +5,15 @@ interface FileUploadButtonProps {
     acceptedFileTypes: string;
     hasFile: boolean;
     uploading?: boolean;
+    disabled?: boolean;
 }
 
 export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
     onFileSelect,
     acceptedFileTypes,
     hasFile,
-    uploading = false
+    uploading = false,
+    disabled = false
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,10 +39,11 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                     onChange={handleFileChange}
                     disabled={uploading}
                 />
-                <div className={`px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors text-center whitespace-nowrap flex items-center gap-2 ${uploading
+                <div className={`px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors text-center whitespace-nowrap flex items-center gap-2 ${
+                    uploading || disabled
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-orange-500 hover:bg-orange-600'
-                    }`}>
+                }`}>
                     {uploading ? (
                         <>
                             <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -60,14 +63,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                 </div>
             </label>
 
-            {hasFile && (
-                <div className="flex items-center gap-1 text-xs text-green-600">
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Archivo subido</span>
-                </div>
-            )}
+            {/* El estado ahora se maneja en el componente padre TareaCard */}
         </div>
     );
 };

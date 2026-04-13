@@ -14,6 +14,7 @@ export interface TareaFlat {
     observaciones: string | null;
     fechaSolicitud: string | null;
     fechaEntrega: string | null;
+    estadoInformacion: string | null;
 }
 
 export interface AuditoriaAgrupada {
@@ -53,7 +54,8 @@ export const useTareas = () => {
                             archivoNombre: subtarea.archivo_nombre,
                             observaciones: subtarea.observaciones,
                             fechaSolicitud: subtarea.fecha_solicitud,
-                            fechaEntrega: subtarea.tiempo_entrega
+                            fechaEntrega: subtarea.tiempo_entrega,
+                            estadoInformacion: subtarea.estado_informacion
                         });
                     });
                 });
