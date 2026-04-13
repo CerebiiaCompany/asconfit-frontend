@@ -30,14 +30,14 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
 
     return (
         <div className="flex flex-col gap-2 items-end">
-            <label className="cursor-pointer">
+            <label className={uploading || disabled ? 'cursor-not-allowed' : 'cursor-pointer'}>
                 <input
                     ref={inputRef}
                     type="file"
                     className="hidden"
                     accept={acceptedFileTypes}
                     onChange={handleFileChange}
-                    disabled={uploading}
+                    disabled={uploading || disabled}
                 />
                 <div className={`px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors text-center whitespace-nowrap flex items-center gap-2 ${
                     uploading || disabled
