@@ -31,13 +31,6 @@ export const useAuditoriaValidation = () => {
       }
     }
 
-    // Validar que se haya seleccionado un delegado
-    if (!formData.delegadoId) {
-      return {
-        isValid: false,
-        message: "Debe seleccionar un delegado responsable",
-      };
-    }
 
     // Validar que haya al menos una categoría
     if (categorias.length === 0 || !categorias[0].nombre) {
@@ -55,6 +48,14 @@ export const useAuditoriaValidation = () => {
         return {
           isValid: false,
           message: `La categoría ${i + 1} debe tener un nombre`,
+        };
+      }
+
+      // Validar que se haya seleccionado un delegado para la categoría
+      if (!categoria.delegadoId) {
+        return {
+          isValid: false,
+          message: `Debe seleccionar un delegado responsable para la categoría "${categoria.nombre}"`,
         };
       }
 

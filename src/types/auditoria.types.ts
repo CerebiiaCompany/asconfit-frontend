@@ -13,6 +13,7 @@ export interface Subtarea {
 export interface Categoria {
     id: string;
     nombre: string;
+    delegadoId: number | null;
     subtareas: Subtarea[];
 }
 
@@ -27,7 +28,6 @@ export interface AuditoriaFormData {
     pt: string;
     fechaInicial: string;
     fechaCorte: string;
-    delegadoId: number | null;
     empresaId: number | null;
 }
 

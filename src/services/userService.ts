@@ -46,6 +46,9 @@ export const userService = {
   },
 
   async getDelegados(): Promise<User[]> {
-    return this.getUsersByRole(3); // rol delegado id = 3
+    const response = await axios.get(`${API_URL}/users/delegados`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
   },
 };

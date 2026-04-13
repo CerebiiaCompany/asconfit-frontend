@@ -4,7 +4,6 @@ import { Modal } from "../../components/Modal";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { AuditoriaHeader } from "../../components/auditorias/auditorias-nueva/AuditoriaHeader";
 import { EmpresaSection } from "../../components/auditorias/auditorias-nueva/EmpresaSection";
-import { DelegadoSection } from "../../components/auditorias/auditorias-nueva/DelegadoSection";
 import { PTSection } from "../../components/auditorias/auditorias-nueva/PTSection";
 import { FechasSection } from "../../components/auditorias/auditorias-nueva/FechasSection";
 import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/CategoriasSection";
@@ -138,14 +137,6 @@ export const NuevaAuditoria: React.FC = () => {
               onInputChange={handleInputChange}
             />
 
-            <DelegadoSection
-              selectedDelegadoId={formData.delegadoId}
-              onDelegadoChange={(delegadoId) =>
-                handleInputChange({
-                  target: { name: "delegadoId", value: delegadoId },
-                } as any)
-              }
-            />
 
             <PTSection value={formData.pt} onChange={handleInputChange} />
 

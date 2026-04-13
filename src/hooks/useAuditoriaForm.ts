@@ -16,14 +16,13 @@ const initialFormData: AuditoriaFormData = {
   pt: "",
   fechaInicial: "",
   fechaCorte: "",
-  delegadoId: null,
   empresaId: null,
 };
 
 export const useAuditoriaForm = () => {
   const [formData, setFormData] = useState<AuditoriaFormData>(initialFormData);
   const [categorias, setCategorias] = useState<Categoria[]>([
-    { id: "1", nombre: "", subtareas: [] },
+    { id: "1", nombre: "", delegadoId: null, subtareas: [] },
   ]);
 
   const handleInputChange = (
@@ -39,7 +38,7 @@ export const useAuditoriaForm = () => {
   const handleAddCategoria = () => {
     setCategorias((prev) => [
       ...prev,
-      { id: Date.now().toString(), nombre: "", subtareas: [] },
+      { id: Date.now().toString(), nombre: "", delegadoId: null, subtareas: [] },
     ]);
   };
 
@@ -47,9 +46,9 @@ export const useAuditoriaForm = () => {
     setCategorias((prev) => prev.filter((cat) => cat.id !== id));
   };
 
-  const handleCategoriaChange = (id: string, value: string) => {
+  const handleCategoriaChange = (id: string, field: keyof Categoria, value: any) => {
     setCategorias((prev) =>
-      prev.map((cat) => (cat.id === id ? { ...cat, nombre: value } : cat))
+      prev.map((cat) => (cat.id === id ? { ...cat, [field]: value } : cat))
     );
   };
 
@@ -134,7 +133,7 @@ export const useAuditoriaForm = () => {
                 formatoArchivo: req.formato_archivo || "",
               })
             );
-            return { ...cat, subtareas };
+            return { ...cat, subtareas, delegadoId: cat.delegadoId };
           }
           return cat;
         })
