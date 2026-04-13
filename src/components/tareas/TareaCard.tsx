@@ -15,6 +15,15 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     acceptedFileTypes,
     uploading = false
 }) => {
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return null;
+        const parts = dateStr.split('T')[0].split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return dateStr;
+    };
+
     return (
         <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
             {/* Información de la categoría */}
@@ -40,6 +49,18 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                                 <span className="text-orange-600 font-semibold">{tarea.formatoArchivo}</span>
                             </p>
                         )}
+                        <div className="flex flex-wrap gap-x-6 gap-y-1">
+                            {tarea.fechaSolicitud && (
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-medium text-gray-700">Solicitud:</span> {formatDate(tarea.fechaSolicitud)}
+                                </p>
+                            )}
+                            {tarea.fechaEntrega && (
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-medium text-gray-700">Entrega:</span> {formatDate(tarea.fechaEntrega)}
+                                </p>
+                            )}
+                        </div>
                         {tarea.observaciones && (
                             <p className="text-sm text-gray-600">
                                 <span className="font-medium">Observaciones:</span> {tarea.observaciones}
