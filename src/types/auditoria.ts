@@ -37,6 +37,7 @@ export interface Auditoria {
     responsable?: string;
     contacto?: string;
     pt?: string;
+    tipo_auditoria?: string;
     fecha_inicial?: string;
     fecha_corte?: string;
     search_concepto?: string;

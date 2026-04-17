@@ -22,7 +22,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
           NIT
         </div>
         <div className="col-span-2 text-xs font-medium text-gray-500 uppercase">
-          Razón social
+          Razón social - Tipo
         </div>
         <div className="col-span-2 text-xs font-medium text-gray-500 uppercase">
           Visita de:

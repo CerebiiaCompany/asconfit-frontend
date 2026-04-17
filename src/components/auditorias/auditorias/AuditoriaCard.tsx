@@ -150,6 +150,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               <div className="text-xs text-gray-500">Razón social</div>
               <div className="text-sm font-medium text-gray-900">
                 {auditoria.empresa?.razon_social || auditoria.razon_social || "-"}
+                {auditoria.tipo_auditoria && ` - ${auditoria.tipo_auditoria}`}
               </div>
             </div>
 
@@ -242,6 +243,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             <div className="text-xs text-gray-500 mb-1">Razón social</div>
             <div className="text-sm font-medium text-gray-900">
               {auditoria.empresa?.razon_social || auditoria.razon_social || "-"}
+              {auditoria.tipo_auditoria && ` - ${auditoria.tipo_auditoria}`}
             </div>
           </div>
 

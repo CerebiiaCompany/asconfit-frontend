@@ -49,7 +49,7 @@ export const AuditoriaList: React.FC<AuditoriaListProps> = ({
               NIT
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Razón Social
+              Razón Social - Tipo
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Estado
@@ -80,7 +80,7 @@ export const AuditoriaList: React.FC<AuditoriaListProps> = ({
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm text-gray-500 max-w-xs truncate">
-                  {auditoria.razon_social || "-"}
+                  {auditoria.razon_social || "-"} {auditoria.tipo_auditoria && ` - ${auditoria.tipo_auditoria}`}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
