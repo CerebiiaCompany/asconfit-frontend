@@ -21,6 +21,7 @@ export interface AuditoriaAgrupada {
     auditoriaId: number;
     empresa: string;
     nit: string;
+    tipoAuditoria: string;
     tareas: TareaFlat[];
 }
 
@@ -71,6 +72,7 @@ export const useTareas = () => {
                         auditoriaId: tarea.auditoriaId,
                         empresa: tarea.auditoriaEmpresa,
                         nit: tarea.auditoriaNit,
+                        tipoAuditoria: (auditorias.find((a: any) => a.id === tarea.auditoriaId))?.tipo_auditoria || 'N/A',
                         tareas: []
                     });
                 }
