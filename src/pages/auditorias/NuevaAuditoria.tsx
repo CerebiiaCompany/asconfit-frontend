@@ -5,6 +5,7 @@ import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { AuditoriaHeader } from "../../components/auditorias/auditorias-nueva/AuditoriaHeader";
 import { EmpresaSection } from "../../components/auditorias/auditorias-nueva/EmpresaSection";
 import { PTSection } from "../../components/auditorias/auditorias-nueva/PTSection";
+import { TipoAuditoriaSection } from "../../components/auditorias/auditorias-nueva/TipoAuditoriaSection";
 import { FechasSection } from "../../components/auditorias/auditorias-nueva/FechasSection";
 import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/CategoriasSection";
 import { FormActions } from "../../components/auditorias/auditorias-nueva/FormActions";
@@ -110,8 +111,6 @@ export const NuevaAuditoria: React.FC = () => {
     }
   };
 
-  // Logout logic in AppLayout
-
   const breadcrumbItems = [
     { label: "Auditorías", onClick: () => navigate("/auditorias") },
     { label: "Crear auditoría", isActive: true },
@@ -137,8 +136,9 @@ export const NuevaAuditoria: React.FC = () => {
               onInputChange={handleInputChange}
             />
 
-
             <PTSection value={formData.pt} onChange={handleInputChange} />
+
+            <TipoAuditoriaSection value={formData.tipoAuditoria} onChange={handleInputChange} />
 
             <FechasSection
               fechaInicial={formData.fechaInicial}

@@ -26,6 +26,7 @@ export interface AuditoriaFormData {
     responsable: string;
     contacto: string;
     pt: string;
+    tipoAuditoria: string;
     fechaInicial: string;
     fechaCorte: string;
     empresaId: number | null;

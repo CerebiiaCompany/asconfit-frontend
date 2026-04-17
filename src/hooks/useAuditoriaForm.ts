@@ -14,6 +14,7 @@ const initialFormData: AuditoriaFormData = {
   responsable: "",
   contacto: "",
   pt: "",
+  tipoAuditoria: "",
   fechaInicial: "",
   fechaCorte: "",
   empresaId: null,
@@ -140,7 +141,6 @@ export const useAuditoriaForm = () => {
       );
     } catch (error) {
       console.error("Error al cargar plantilla:", error);
-      // No mostrar alert si la plantilla no existe (puede ser una categoría nueva)
     }
   };
 
