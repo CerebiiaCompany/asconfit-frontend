@@ -5,28 +5,33 @@ import { Calendar, CalendarEvent } from '../common/Calendar';
 export const ActivitySchedule: React.FC = () => {
     const { auditorias } = useAuditorias();
 
-    // Paleta de colores para las auditorías
-    const colors = [
-        'bg-orange-500', 
-        'bg-blue-600', 
-        'bg-green-500', 
-        'bg-purple-600', 
-        'bg-emerald-600'
-    ];
+    // Mapeo de colores "aleatorio pero consistente" basado en el ID de la auditoría
+    const getAuditColor = (auditId: number) => {
+        const palette = [
+            'bg-blue-600', 'bg-orange-500', 'bg-green-500', 'bg-purple-600', 
+            'bg-emerald-600', 'bg-rose-500', 'bg-amber-500', 'bg-indigo-600',
+            'bg-cyan-600', 'bg-teal-600', 'bg-pink-600', 'bg-violet-600'
+        ];
+        // Usar el ID para elegir siempre el mismo color para la misma auditoría
+        return palette[auditId % palette.length];
+    };
 
     // Obtener todas las tareas programadas (inicio de auditoría + subtareas)
-    const allActivities = auditorias.flatMap((audit, index) => {
-        const auditColor = colors[index % colors.length];
+    const allActivities = auditorias.flatMap((audit) => {
+        const auditColor = getAuditColor(audit.id);
+        const tipoLabel = audit.tipo_auditoria ? ` - ${audit.tipo_auditoria}` : '';
         const activities: any[] = [];
 
         // 1. Agregar el inicio de la auditoría
         if (audit.fecha_inicial) {
             activities.push({
                 id: `audit-${audit.id}`,
+                auditId: audit.id,
                 date: audit.fecha_inicial,
-                title: `Inicio: ${audit.empresa?.razon_social || audit.razon_social || 'Auditoría'}`,
+                title: `Inicio: ${audit.empresa?.razon_social || audit.razon_social || 'Auditoría'}${tipoLabel}`,
                 colorClass: auditColor,
-                empresa: audit.empresa?.razon_social || audit.razon_social
+                empresa: audit.empresa?.razon_social || audit.razon_social,
+                tipo: audit.tipo_auditoria
             });
         }
 
@@ -36,10 +41,12 @@ export const ActivitySchedule: React.FC = () => {
                 if (sub.tiempo_entrega) {
                     activities.push({
                         id: `sub-${sub.id}`,
+                        auditId: audit.id,
                         date: sub.tiempo_entrega,
-                        title: `${sub.nombre} (${audit.empresa?.razon_social || audit.razon_social || 'Auditoría'})`,
+                        title: `${sub.nombre} (${audit.empresa?.razon_social || audit.razon_social || 'Auditoría'})${tipoLabel}`,
                         colorClass: auditColor,
                         empresa: audit.empresa?.razon_social || audit.razon_social,
+                        tipo: audit.tipo_auditoria,
                         isSubtarea: true
                     });
                 }
@@ -52,13 +59,11 @@ export const ActivitySchedule: React.FC = () => {
     // Ordenar todas las actividades por fecha para la lógica de agrupación
     const sortedAll = [...allActivities].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Obtener la actividad más próxima por cada empresa (única aparición en la lista)
-    const nextActivityPerAudit = new Map<string, any>();
+    // Obtener la actividad más próxima por cada auditoría única
+    const nextActivityPerAudit = new Map<number, any>();
     
     sortedAll.forEach(act => {
-        // Usamos el ID de la auditoría (que viene en el prefijo o podemos extraerlo)
-        // Para simplificar, usaremos el nombre de la empresa como clave única
-        const key = act.empresa || 'Empresa';
+        const key = act.auditId;
         const date = new Date(act.date);
         date.setHours(0, 0, 0, 0);
         const today = new Date();
@@ -115,6 +120,11 @@ export const ActivitySchedule: React.FC = () => {
                                         <div className="text-[12px] font-bold truncate">
                                             {act.empresa || 'Empresa'}
                                         </div>
+                                        {act.tipo && (
+                                            <div className="text-[10px] opacity-90 truncate italic">
+                                                {act.tipo}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );
