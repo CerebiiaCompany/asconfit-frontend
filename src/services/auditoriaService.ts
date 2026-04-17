@@ -80,4 +80,13 @@ export const auditoriaService = {
     );
     return response.data;
   },
+
+  async analizarIA(empresaId: string, tipoAuditoria: string) {
+    const response = await axios.post(
+      `${API_URL}/auditorias/analizar-ia`,
+      { empresa_id: empresaId, tipo_auditoria: tipoAuditoria },
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
 };

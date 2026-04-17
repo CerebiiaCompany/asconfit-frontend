@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Sparkles, Brain, AlertTriangle, ChevronDown, Rocket, LayoutGrid } from 'lucide-react';
 import { useEmpresas } from '../hooks/useEmpresas';
 import { useAuditorias } from '../hooks/useAuditorias';
+import { auditoriaService } from '../services/auditoriaService';
 
 interface PredictiveAlert {
     id: number;
@@ -19,6 +20,8 @@ const AIAnalysis: React.FC = () => {
     const [selectedType, setSelectedType] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [analysisData, setAnalysisData] = useState<{ resumen: string, alertas: PredictiveAlert[] } | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     // Obtener los tipos de auditoría disponibles para la empresa seleccionada
     const availableTypes = useMemo(() => {
@@ -33,60 +36,25 @@ const AIAnalysis: React.FC = () => {
     const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCompany(e.target.value);
         setSelectedType(''); // Resetear el tipo cuando cambia la empresa
+        setShowResults(false);
+        setAnalysisData(null);
     };
 
-    const alerts: PredictiveAlert[] = [
-        {
-            id: 1,
-            level: 'CRITICA',
-            title: 'Alta probabilidad de incumplimiento tributario',
-            description: 'Se detectan patrones recurrentes de retrasos en declaraciones tributarias. El área tributaria presenta hallazgos en 3 de las últimas 4 auditorías con tendencia creciente.',
-            area: 'Tributaria',
-            probability: '87%'
-        },
-        {
-            id: 2,
-            level: 'CRITICA',
-            title: 'Riesgo de fraude en tesorería por falta de controles',
-            description: 'La ausencia de segregación de funciones combinada con pagos sin autorización representa un riesgo crítico. Se han identificado 3 hallazgos relacionados en el último año.',
-            area: 'Tesorería',
-            probability: '82%'
-        },
-        {
-            id: 3,
-            level: 'ALTA',
-            title: 'Vulnerabilidad en infraestructura tecnológica',
-            description: 'El control de accesos deficiente al ERP junto con la falta de backups del servidor principal expone a la organización a pérdida de datos y accesos no autorizados.',
-            area: 'TI',
-            probability: '75%'
-        },
-        {
-            id: 4,
-            level: 'ALTA',
-            title: 'Riesgo de pérdida por inventario obsoleto',
-            description: 'El inventario sin rotación por más de 12 meses indica posibles pérdidas por obsolescencia. Se recomienda realizar una evaluación de deterioro.',
-            area: 'Inventarios',
-            probability: '68%'
-        },
-        {
-            id: 5,
-            level: 'MEDIA',
-            title: 'Deficiencias contractuales recurrentes',
-            description: 'La documentación incompleta en contratos podría generar contingencias legales. Se sugiere reforzar el proceso de revisión documental.',
-            area: 'Contratos',
-            probability: '55%'
-        }
-    ];
-
-    const handleExecuteAnalysis = () => {
+    const handleExecuteAnalysis = async () => {
         if (!selectedCompany || !selectedType) return;
         
         setIsAnalyzing(true);
-        // Simular tiempo de procesamiento de IA
-        setTimeout(() => {
-            setIsAnalyzing(false);
+        setError(null);
+        try {
+            const data = await auditoriaService.analizarIA(selectedCompany, selectedType);
+            setAnalysisData(data);
             setShowResults(true);
-        }, 2000);
+        } catch (err: any) {
+            console.error('Error al analizar con IA:', err);
+            setError(err.response?.data?.error || 'No se pudo completar el análisis en este momento.');
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const getAlertColor = (level: string) => {
@@ -191,7 +159,15 @@ const AIAnalysis: React.FC = () => {
                 </div>
             </div>
 
-            {showResults && !isAnalyzing && (
+            {/* Error Message */}
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">{error}</p>
+                </div>
+            )}
+
+            {showResults && !isAnalyzing && analysisData && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Summary Section */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
@@ -200,7 +176,7 @@ const AIAnalysis: React.FC = () => {
                             Resumen del Análisis
                         </div>
                         <p className="text-gray-600 leading-relaxed bg-orange-50/30 p-4 rounded-lg border border-orange-100/30">
-                            El análisis de 8 hallazgos históricos revela un patrón preocupante: las áreas de Tesorería y TI concentran el 62% de los hallazgos críticos con tendencia al alza. Se identifican 5 alertas predictivas, siendo las más urgentes el riesgo de incumplimiento tributario (87%) y fraude en tesorería (82%). Se recomienda priorizar la implementación de controles en segregación de funciones y gestión de accesos al ERP.
+                            {analysisData.resumen}
                         </p>
                     </div>
 
@@ -211,7 +187,7 @@ const AIAnalysis: React.FC = () => {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {alerts.map((alert) => (
+                        {analysisData.alertas.map((alert) => (
                             <div 
                                 key={alert.id}
                                 className={`border rounded-xl p-5 transition-all hover:shadow-md ${getAlertColor(alert.level)}`}
