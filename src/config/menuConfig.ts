@@ -22,6 +22,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/search.png",
   },
   {
+    id: "ai-analysis",
+    path: "/ai-analysis",
+    label: "Análisis IA",
+    icon: "/ai-analysis.png",
+  },
+  {
     id: "mis-tareas",
     path: "/mis-tareas",
     label: "Mis Tareas",
@@ -58,13 +64,14 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
   admin: [
     "dashboard",
     "auditorias",
+    "ai-analysis",
     "mis-tareas",
     "empresas",
     "roles",
     "papelera",
     "perfil",
   ],
-  auditor: ["dashboard", "auditorias", "empresas", "perfil"],
+  auditor: ["dashboard", "auditorias", "ai-analysis", "empresas", "perfil"],
   delegado: ["dashboard", "mis-tareas", "perfil"],
 };
 
@@ -74,6 +81,7 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/auditorias": "auditorias",
   "/auditorias/nueva": "auditorias",
   "/auditorias/:id": "auditorias",
+  "/ai-analysis": "ai-analysis",
   "/mis-tareas": "mis-tareas",
   "/mis-tareas/:id": "mis-tareas",
   "/empresas": "empresas",

@@ -22,6 +22,7 @@ import { Papelera } from "./pages/Papelera";
 import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
 import { CreateCompany } from "./pages/Companies/CreateCompany";
+import AIAnalysis from "./pages/AIAnalysis";
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -109,6 +110,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <Auditorias />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/ai-analysis"
+                    element={
+                      <RoleBasedRoute>
+                        <AIAnalysis />
                       </RoleBasedRoute>
                     }
                   />
