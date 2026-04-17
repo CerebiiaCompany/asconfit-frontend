@@ -75,8 +75,7 @@ export const ActivitySchedule: React.FC = () => {
     });
 
     const upcomingActivities = Array.from(nextActivityPerAudit.values())
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .slice(0, 5); // Mostrar el top 5 de empresas próximas
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     // Convertir a formato de eventos del calendario (AQUÍ SÍ SE MUESTRAN TODOS LOS PUNTOS)
     const calendarEvents: CalendarEvent[] = allActivities.map(act => ({
@@ -96,7 +95,7 @@ export const ActivitySchedule: React.FC = () => {
                 </div>
 
                 {/* Activities List */}
-                <div className="flex-1 flex flex-col gap-3 justify-start overflow-y-auto max-h-[350px] lg:max-h-none pr-1 custom-scrollbar">
+                <div className="flex-1 flex flex-col gap-3 justify-start overflow-y-auto max-h-[350px] pr-1 custom-scrollbar">
                     {upcomingActivities.length > 0 ? (
                         upcomingActivities.map((act) => {
                             // Parsear fecha manualmente para evitar desfases de zona horaria
