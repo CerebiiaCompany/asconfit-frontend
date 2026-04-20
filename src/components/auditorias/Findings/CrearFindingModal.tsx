@@ -4,7 +4,7 @@ import { CrearFindingModalProps } from "../../../types/finding.types";
 import { useFindings } from "../../../hooks/useFindings";
 import { useActividadDropdown } from "../../../hooks/useActividadDropdown";
 import { FindingTabs } from "./FindingTabs";
-import { ActividadDropdown } from "./ActividadDropdown";
+import { ActividadDropdown } from "../auditorias/ActividadDropdown";
 import { SeveridadSelector } from "./SeveridadSelector";
 import { FechaLimiteField } from "./FechaLimiteField";
 
@@ -51,16 +51,12 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
     const maxDate = selectedAct?.tiempo_entrega ? selectedAct.tiempo_entrega.slice(0, 10) : undefined;
     const fechaDisabled = !current.actividad_id;
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
+    const handleDateChange = (val: string) => {
         if (!val) { update(activeIndex, "fecha_limite", ""); return; }
         const outOfRange =
             (minDate && val < minDate) ||
             (maxDate && val > maxDate);
-        if (outOfRange) {
-            e.target.value = current.fecha_limite;
-            return;
-        }
+        if (outOfRange) return;
         update(activeIndex, "fecha_limite", val);
     };
 

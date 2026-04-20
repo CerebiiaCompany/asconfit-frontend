@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Auditoria } from "../../../types/auditoria";
-import { CrearFindingModal } from "./CrearFindingModal";
+import { CrearFindingModal } from "../Findings/CrearFindingModal";
 
 interface AuditoriaCardProps {
   auditoria: Auditoria;
