@@ -1,5 +1,6 @@
 import React from "react";
 import { Subtarea } from "../../../types/auditoria.types";
+import { DatePicker } from "../../common/DatePicker";
 
 interface SubtareaItemProps {
   subtarea: Subtarea;
@@ -51,26 +52,28 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           <label className="block text-sm text-gray-600 mb-2">
             Fecha de solicitud
           </label>
-          <input
-            type="date"
+          <DatePicker
             value={subtarea.fechaSolicitud}
-            onChange={(e) => onChange("fechaSolicitud", e.target.value)}
+            onChange={(val) => {
+              onChange("fechaSolicitud", val);
+              // Si la entrega queda antes de la nueva solicitud, limpiarla
+              if (subtarea.tiempoEntrega && val && subtarea.tiempoEntrega < val) {
+                onChange("tiempoEntrega", "");
+              }
+            }}
             min={fechaAuditoriaInicio}
-            max={fechaAuditoriaCorte}
-            className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            max={subtarea.tiempoEntrega || fechaAuditoriaCorte}
           />
         </div>
         <div>
           <label className="block text-sm text-gray-600 mb-2">
             Tiempo entrega
           </label>
-          <input
-            type="date"
+          <DatePicker
             value={subtarea.tiempoEntrega}
-            onChange={(e) => onChange("tiempoEntrega", e.target.value)}
-            min={fechaAuditoriaInicio}
+            onChange={(val) => onChange("tiempoEntrega", val)}
+            min={subtarea.fechaSolicitud || fechaAuditoriaInicio}
             max={fechaAuditoriaCorte}
-            className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
           />
         </div>
       </div>
