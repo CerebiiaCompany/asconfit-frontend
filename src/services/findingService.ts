@@ -3,8 +3,7 @@ import { api } from "./api";
 export interface FindingPayload {
     titulo: string;
     descripcion?: string;
-    actividad?: string;
-    subtarea_id?: number;
+    actividad_id?: number;
     severidad: "critico" | "grave" | "leve";
     responsable?: string;
     fecha_limite?: string;

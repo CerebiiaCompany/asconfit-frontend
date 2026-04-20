@@ -5,7 +5,7 @@ import { findingService } from "../../../services/findingService";
 interface Finding {
     titulo: string;
     descripcion: string;
-    subtarea_id: number | null;
+    actividad_id: number | null;
     severidad: "critico" | "grave" | "leve" | "";
     responsable: string;
     fecha_limite: string;
@@ -26,7 +26,7 @@ const SEVERIDAD_CONFIG = {
 const emptyFinding = (): Finding => ({
     titulo: "",
     descripcion: "",
-    subtarea_id: null,
+    actividad_id: null,
     severidad: "",
     responsable: "",
     fecha_limite: "",
@@ -102,7 +102,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                 findings.map((f) => ({
                     titulo: f.titulo,
                     descripcion: f.descripcion || undefined,
-                    subtarea_id: f.subtarea_id ?? undefined,
+                    actividad_id: f.actividad_id ?? undefined,
                     severidad: f.severidad as "critico" | "grave" | "leve",
                     responsable: f.responsable || undefined,
                     fecha_limite: f.fecha_limite || undefined,
@@ -216,9 +216,9 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                                 onClick={() => { setActividadOpen((o) => !o); setActividadSearch(""); }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-left"
                             >
-                                <span className={current.subtarea_id ? "text-gray-800" : "text-gray-400"}>
-                                    {current.subtarea_id
-                                        ? allSubtareas.find((s) => s.id === current.subtarea_id)?.nombre ?? "Seleccionar"
+                                <span className={current.actividad_id ? "text-gray-800" : "text-gray-400"}>
+                                    {current.actividad_id
+                                        ? allSubtareas.find((s) => s.id === current.actividad_id)?.nombre ?? "Seleccionar"
                                         : "Seleccionar actividad"}
                                 </span>
                                 <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,11 +248,11 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                                                 <li
                                                     key={s.id}
                                                     onClick={() => {
-                                                        update(activeIndex, "subtarea_id", s.id);
+                                                        update(activeIndex, "actividad_id", s.id);
                                                         setActividadOpen(false);
                                                         setActividadSearch("");
                                                     }}
-                                                    className={`px-3 py-2 text-xs cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors ${current.subtarea_id === s.id ? "bg-orange-50 text-orange-700 font-medium" : "text-gray-700"
+                                                    className={`px-3 py-2 text-xs cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors ${current.actividad_id === s.id ? "bg-orange-50 text-orange-700 font-medium" : "text-gray-700"
                                                         }`}
                                                 >
                                                     {s.nombre}
