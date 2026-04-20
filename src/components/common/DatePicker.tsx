@@ -6,6 +6,7 @@ interface DatePickerProps {
     min?: string;
     max?: string;
     placeholder?: string;
+    disabled?: boolean;
 }
 
 const DAYS = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
@@ -27,7 +28,7 @@ function toStr(date: Date) {
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
-    value, onChange, min, max, placeholder = "dd/mm/aaaa",
+    value, onChange, min, max, placeholder = "dd/mm/aaaa", disabled = false,
 }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -95,8 +96,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <div ref={ref} className="relative">
             <button
                 type="button"
-                onClick={() => setOpen(o => !o)}
-                className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+                onClick={() => !disabled && setOpen(o => !o)}
+                disabled={disabled}
+                className={`w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white ${disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""}`}
             >
                 <span className={displayValue ? "text-gray-800" : "text-gray-400"}>{displayValue || placeholder}</span>
                 <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

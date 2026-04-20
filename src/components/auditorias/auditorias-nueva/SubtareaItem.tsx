@@ -54,15 +54,16 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           </label>
           <DatePicker
             value={subtarea.fechaSolicitud}
+            disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
             onChange={(val) => {
               onChange("fechaSolicitud", val);
-              // Si la entrega queda antes de la nueva solicitud, limpiarla
               if (subtarea.tiempoEntrega && val && subtarea.tiempoEntrega < val) {
                 onChange("tiempoEntrega", "");
               }
             }}
             min={fechaAuditoriaInicio}
             max={subtarea.tiempoEntrega || fechaAuditoriaCorte}
+            placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
           />
         </div>
         <div>
@@ -71,9 +72,11 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           </label>
           <DatePicker
             value={subtarea.tiempoEntrega}
+            disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
             onChange={(val) => onChange("tiempoEntrega", val)}
             min={subtarea.fechaSolicitud || fechaAuditoriaInicio}
             max={fechaAuditoriaCorte}
+            placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
           />
         </div>
       </div>
