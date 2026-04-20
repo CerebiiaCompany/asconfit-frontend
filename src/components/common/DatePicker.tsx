@@ -152,11 +152,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         })}
                     </div>
 
-                    {(min || max) && (
-                        <p className="mt-2 text-[10px] text-gray-400 text-center border-t border-gray-100 pt-2">
-                            {min ? toDate(min).toLocaleDateString("es-CO") : "—"} → {max ? toDate(max).toLocaleDateString("es-CO") : "—"}
-                        </p>
-                    )}
                     {value && (
                         <button
                             type="button"

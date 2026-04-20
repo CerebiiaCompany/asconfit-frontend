@@ -1,27 +1,54 @@
 import React from "react";
+import { DatePicker } from "../../common/DatePicker";
 
 interface FechasSectionProps {
   fechaInicial: string;
   fechaCorte: string;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFechaInicialChange?: (val: string) => void;
+  onFechaCorteChange?: (val: string) => void;
 }
 
 export const FechasSection: React.FC<FechasSectionProps> = ({
   fechaInicial,
   fechaCorte,
   onInputChange,
+  onFechaInicialChange,
+  onFechaCorteChange,
 }) => {
-  // Calcular fecha mínima para fecha de corte (fecha inicial + 1 día)
+  const today = new Date().toISOString().split("T")[0];
+
   const getMinFechaCorte = () => {
     if (!fechaInicial) {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       return tomorrow.toISOString().split("T")[0];
     }
-
     const date = new Date(fechaInicial);
-    date.setDate(date.getDate() + 1); // Sumar 1 día
+    date.setDate(date.getDate() + 1);
     return date.toISOString().split("T")[0];
+  };
+
+  // Adapter: si no se pasan los handlers directos, simula el evento para compatibilidad
+  const handleFechaInicial = (val: string) => {
+    if (onFechaInicialChange) {
+      onFechaInicialChange(val);
+    } else {
+      onInputChange({ target: { name: "fechaInicial", value: val } } as React.ChangeEvent<HTMLInputElement>);
+    }
+    // Si la fecha de corte queda antes de la nueva fecha inicial, limpiarla
+    if (fechaCorte && val && fechaCorte <= val) {
+      if (onFechaCorteChange) onFechaCorteChange("");
+      else onInputChange({ target: { name: "fechaCorte", value: "" } } as React.ChangeEvent<HTMLInputElement>);
+    }
+  };
+
+  const handleFechaCorte = (val: string) => {
+    if (onFechaCorteChange) {
+      onFechaCorteChange(val);
+    } else {
+      onInputChange({ target: { name: "fechaCorte", value: val } } as React.ChangeEvent<HTMLInputElement>);
+    }
   };
 
   return (
@@ -31,20 +58,14 @@ export const FechasSection: React.FC<FechasSectionProps> = ({
           Fecha inicial de auditoría
         </label>
         <div className="flex items-center gap-2">
-          <img
-            src="/Date.png"
-            alt="Calendar"
-            className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0"
-          />
-          <input
-            type="date"
-            name="fechaInicial"
-            value={fechaInicial}
-            onChange={onInputChange}
-            min={new Date().toISOString().split("T")[0]}
-            className="flex-1 sm:w-64 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
-            style={{ colorScheme: "light" }}
-          />
+          <img src="/Date.png" alt="Calendar" className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+          <div className="flex-1">
+            <DatePicker
+              value={fechaInicial}
+              onChange={handleFechaInicial}
+              min={today}
+            />
+          </div>
         </div>
       </div>
       <div>
@@ -52,20 +73,14 @@ export const FechasSection: React.FC<FechasSectionProps> = ({
           Fecha de Corte:
         </label>
         <div className="flex items-center gap-2">
-          <img
-            src="/Date.png"
-            alt="Calendar"
-            className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0"
-          />
-          <input
-            type="date"
-            name="fechaCorte"
-            value={fechaCorte}
-            onChange={onInputChange}
-            min={getMinFechaCorte()}
-            className="flex-1 sm:w-64 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
-            style={{ colorScheme: "light" }}
-          />
+          <img src="/Date.png" alt="Calendar" className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+          <div className="flex-1">
+            <DatePicker
+              value={fechaCorte}
+              onChange={handleFechaCorte}
+              min={getMinFechaCorte()}
+            />
+          </div>
         </div>
       </div>
     </div>
