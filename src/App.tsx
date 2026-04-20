@@ -23,6 +23,7 @@ import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
 import { CreateCompany } from "./pages/Companies/CreateCompany";
 import AIAnalysis from "./pages/AIAnalysis";
+import { Findings } from "./pages/Findings";
 
 // Componente para proteger rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -102,6 +103,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <CreateCompany />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/hallazgos"
+                    element={
+                      <RoleBasedRoute>
+                        <Findings />
                       </RoleBasedRoute>
                     }
                   />

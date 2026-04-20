@@ -16,6 +16,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/dashboard.png",
   },
   {
+    id: "hallazgos",
+    path: "/hallazgos",
+    label: "Hallazgos",
+    icon: "/search.png",
+  },
+  {
     id: "auditorias",
     path: "/auditorias",
     label: "Auditorias",
@@ -63,6 +69,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
 export const MENU_BY_ROLE: Record<UserRole, string[]> = {
   admin: [
     "dashboard",
+    "hallazgos",
     "auditorias",
     "ai-analysis",
     "mis-tareas",
@@ -71,13 +78,14 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "papelera",
     "perfil",
   ],
-  auditor: ["dashboard", "auditorias", "ai-analysis", "empresas", "perfil"],
+  auditor: ["dashboard", "hallazgos", "auditorias", "ai-analysis", "empresas", "perfil"],
   delegado: ["dashboard", "mis-tareas", "perfil"],
 };
 
 // Mapeo de rutas a IDs de menú (incluyendo rutas anidadas)
 export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/dashboard": "dashboard",
+  "/hallazgos": "hallazgos",
   "/auditorias": "auditorias",
   "/auditorias/nueva": "auditorias",
   "/auditorias/:id": "auditorias",
