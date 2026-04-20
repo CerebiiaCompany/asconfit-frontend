@@ -119,6 +119,30 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
 
     const current = findings[activeIndex];
 
+    // Actividad seleccionada y su rango de fechas
+    // Recortamos a YYYY-MM-DD para compatibilidad con el input type="date"
+    // (la API puede devolver timestamps ISO completos como "2026-04-20T05:00:00.000000Z")
+    const selectedAct = current.actividad_id
+        ? allSubtareas.find((s) => s.id === current.actividad_id)
+        : null;
+    const minDate = selectedAct?.fecha_solicitud ? selectedAct.fecha_solicitud.slice(0, 10) : undefined;
+    const maxDate = selectedAct?.tiempo_entrega ? selectedAct.tiempo_entrega.slice(0, 10) : undefined;
+    const fechaDisabled = !current.actividad_id;
+
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value; // siempre YYYY-MM-DD
+        if (!val) { update(activeIndex, "fecha_limite", ""); return; }
+        const outOfRange =
+            (minDate && val < minDate) ||
+            (maxDate && val > maxDate);
+        if (outOfRange) {
+            // Rechazar: restaurar valor anterior sin actualizar estado
+            e.target.value = current.fecha_limite;
+            return;
+        }
+        update(activeIndex, "fecha_limite", val);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -248,6 +272,16 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                                                 <li
                                                     key={s.id}
                                                     onClick={() => {
+                                                        // Limpiar fecha si queda fuera del nuevo rango
+                                                        const newMin = s.fecha_solicitud ?? "";
+                                                        const newMax = s.tiempo_entrega ?? "";
+                                                        const curFecha = findings[activeIndex].fecha_limite;
+                                                        if (curFecha) {
+                                                            const outOfRange =
+                                                                (newMin && curFecha < newMin) ||
+                                                                (newMax && curFecha > newMax);
+                                                            if (outOfRange) update(activeIndex, "fecha_limite", "");
+                                                        }
                                                         update(activeIndex, "actividad_id", s.id);
                                                         setActividadOpen(false);
                                                         setActividadSearch("");
@@ -308,14 +342,36 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                         </div>
                     </div>
 
+                    {/* Fecha límite — restringida al rango de la actividad */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Fecha límite</label>
                         <input
                             type="date"
                             value={current.fecha_limite}
-                            onChange={(e) => update(activeIndex, "fecha_limite", e.target.value)}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                            min={minDate}
+                            max={maxDate}
+                            disabled={fechaDisabled}
+                            onChange={handleDateChange}
+                            className={`w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none transition-colors ${
+                                fechaDisabled
+                                    ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed pointer-events-none"
+                                    : "border-gray-200 focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                            }`}
                         />
+                        {fechaDisabled ? (
+                            <p className="mt-1 text-xs text-gray-400 italic">Selecciona una actividad primero</p>
+                        ) : (minDate || maxDate) ? (
+                            <p className="mt-1 text-xs text-gray-400">
+                                Rango permitido:{" "}
+                                {minDate
+                                    ? new Date(minDate).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
+                                    : "—"}
+                                {" → "}
+                                {maxDate
+                                    ? new Date(maxDate).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
+                                    : "—"}
+                            </p>
+                        ) : null}
                     </div>
 
                     {findings.length === 1 && (
