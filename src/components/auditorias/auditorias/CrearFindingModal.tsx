@@ -1,127 +1,49 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Auditoria, Subtarea } from "../../../types/auditoria";
-import { findingService } from "../../../services/findingService";
-
-interface Finding {
-    titulo: string;
-    descripcion: string;
-    actividad_id: number | null;
-    severidad: "critico" | "grave" | "leve" | "";
-    responsable: string;
-    fecha_limite: string;
-}
-
-interface CrearFindingModalProps {
-    auditoria: Auditoria;
-    onClose: () => void;
-    onSave?: (findings: Finding[]) => void;
-}
-
-const SEVERIDAD_CONFIG = {
-    critico: { label: "Crítico", color: "bg-red-500", ring: "ring-red-500", text: "text-red-600" },
-    grave: { label: "Grave", color: "bg-yellow-400", ring: "ring-yellow-400", text: "text-yellow-600" },
-    leve: { label: "Leve", color: "bg-green-500", ring: "ring-green-500", text: "text-green-600" },
-};
-
-const emptyFinding = (): Finding => ({
-    titulo: "",
-    descripcion: "",
-    actividad_id: null,
-    severidad: "",
-    responsable: "",
-    fecha_limite: "",
-});
+import React from "react";
+import { Subtarea } from "../../../types/auditoria";
+import { CrearFindingModalProps } from "../../../types/finding.types";
+import { useFindings } from "../../../hooks/useFindings";
+import { useActividadDropdown } from "../../../hooks/useActividadDropdown";
+import { FindingTabs } from "./FindingTabs";
+import { ActividadDropdown } from "./ActividadDropdown";
+import { SeveridadSelector } from "./SeveridadSelector";
+import { FechaLimiteField } from "./FechaLimiteField";
 
 export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
     auditoria,
     onClose,
     onSave,
 }) => {
-    const [findings, setFindings] = useState<Finding[]>([emptyFinding()]);
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [actividadSearch, setActividadSearch] = useState("");
-    const [actividadOpen, setActividadOpen] = useState(false);
-    const actividadRef = useRef<HTMLDivElement>(null);
+    const {
+        findings,
+        activeIndex,
+        setActiveIndex,
+        saving,
+        error,
+        current,
+        update,
+        addFinding,
+        removeFinding,
+        handleSave,
+    } = useFindings(auditoria, onClose, onSave);
 
-    // Flatten all subtareas from all categories
     const allSubtareas: Subtarea[] = (auditoria.categorias ?? []).flatMap(
         (cat) => cat.subtareas ?? []
     );
 
-    const filteredSubtareas = actividadSearch.trim()
-        ? allSubtareas.filter((s) =>
-            s.nombre.toLowerCase().includes(actividadSearch.toLowerCase())
-        )
-        : allSubtareas.slice(0, 5);
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (actividadRef.current && !actividadRef.current.contains(e.target as Node)) {
-                setActividadOpen(false);
-            }
-        };
-        if (actividadOpen) document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, [actividadOpen]);
+    const {
+        actividadSearch,
+        setActividadSearch,
+        actividadOpen,
+        actividadRef,
+        filteredSubtareas,
+        openDropdown,
+        closeDropdown,
+    } = useActividadDropdown(allSubtareas);
 
     const empresaNombre =
         auditoria.empresa?.razon_social || auditoria.razon_social || `Auditoría #${auditoria.id}`;
 
-    const update = <K extends keyof Finding>(index: number, field: K, value: Finding[K]) => {
-        setFindings((prev) =>
-            prev.map((f, i) => (i === index ? { ...f, [field]: value } : f))
-        );
-    };
-
-    const addFinding = () => {
-        setFindings((prev) => [...prev, emptyFinding()]);
-        setActiveIndex(findings.length);
-    };
-
-    const removeFinding = (index: number) => {
-        if (findings.length === 1) return;
-        const next = findings.filter((_, i) => i !== index);
-        setFindings(next);
-        setActiveIndex(Math.min(activeIndex, next.length - 1));
-    };
-
-    const handleSave = async () => {
-        const invalid = findings.find((f) => !f.titulo.trim() || !f.severidad);
-        if (invalid) {
-            setError("Todos los hallazgos deben tener título y severidad.");
-            return;
-        }
-        setSaving(true);
-        setError(null);
-        try {
-            await findingService.create(
-                auditoria.id,
-                findings.map((f) => ({
-                    titulo: f.titulo,
-                    descripcion: f.descripcion || undefined,
-                    actividad_id: f.actividad_id ?? undefined,
-                    severidad: f.severidad as "critico" | "grave" | "leve",
-                    responsable: f.responsable || undefined,
-                    fecha_limite: f.fecha_limite || undefined,
-                }))
-            );
-            onSave?.(findings);
-            onClose();
-        } catch (err: any) {
-            setError(err.message || "Error al guardar los hallazgos.");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const current = findings[activeIndex];
-
-    // Actividad seleccionada y su rango de fechas
-    // Recortamos a YYYY-MM-DD para compatibilidad con el input type="date"
-    // (la API puede devolver timestamps ISO completos como "2026-04-20T05:00:00.000000Z")
+    // Rango de fechas de la actividad seleccionada (recortado a YYYY-MM-DD)
     const selectedAct = current.actividad_id
         ? allSubtareas.find((s) => s.id === current.actividad_id)
         : null;
@@ -130,22 +52,34 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
     const fechaDisabled = !current.actividad_id;
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value; // siempre YYYY-MM-DD
+        const val = e.target.value;
         if (!val) { update(activeIndex, "fecha_limite", ""); return; }
         const outOfRange =
             (minDate && val < minDate) ||
             (maxDate && val > maxDate);
         if (outOfRange) {
-            // Rechazar: restaurar valor anterior sin actualizar estado
             e.target.value = current.fecha_limite;
             return;
         }
         update(activeIndex, "fecha_limite", val);
     };
 
+    const handleSelectActividad = (s: Subtarea) => {
+        const newMin = s.fecha_solicitud ? s.fecha_solicitud.slice(0, 10) : "";
+        const newMax = s.tiempo_entrega ? s.tiempo_entrega.slice(0, 10) : "";
+        const curFecha = current.fecha_limite;
+        if (curFecha) {
+            const outOfRange = (newMin && curFecha < newMin) || (newMax && curFecha > newMax);
+            if (outOfRange) update(activeIndex, "fecha_limite", "");
+        }
+        update(activeIndex, "actividad_id", s.id);
+        closeDropdown();
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <div>
@@ -163,40 +97,18 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                 </div>
 
                 {/* Tabs */}
-                {findings.length > 1 && (
-                    <div className="flex items-center gap-2 px-6 pt-3 overflow-x-auto">
-                        {findings.map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setActiveIndex(i)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${activeIndex === i
-                                    ? "bg-orange-500 text-white"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                    }`}
-                            >
-                                Hallazgo {i + 1}
-                                <span
-                                    onClick={(e) => { e.stopPropagation(); removeFinding(i); }}
-                                    className="ml-1 hover:text-red-300 cursor-pointer"
-                                >
-                                    ×
-                                </span>
-                            </button>
-                        ))}
-                        <button
-                            onClick={addFinding}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-colors whitespace-nowrap"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Agregar
-                        </button>
-                    </div>
-                )}
+                <FindingTabs
+                    findings={findings}
+                    activeIndex={activeIndex}
+                    onSelect={setActiveIndex}
+                    onRemove={removeFinding}
+                    onAdd={addFinding}
+                />
 
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+
+                    {/* Título */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Título del hallazgo <span className="text-red-500">*</span>
@@ -210,6 +122,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                         />
                     </div>
 
+                    {/* Descripción */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                         <textarea
@@ -221,6 +134,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                         />
                     </div>
 
+                    {/* Auditoría + Actividad */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -230,105 +144,30 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                                 {empresaNombre}
                             </div>
                         </div>
-                        {/* Actividad — dropdown con buscador */}
-                        <div ref={actividadRef} className="relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Actividad <span className="text-red-500">*</span>
-                            </label>
-                            <button
-                                type="button"
-                                onClick={() => { setActividadOpen((o) => !o); setActividadSearch(""); }}
-                                className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-left"
-                            >
-                                <span className={current.actividad_id ? "text-gray-800" : "text-gray-400"}>
-                                    {current.actividad_id
-                                        ? allSubtareas.find((s) => s.id === current.actividad_id)?.nombre ?? "Seleccionar"
-                                        : "Seleccionar actividad"}
-                                </span>
-                                <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            {actividadOpen && (
-                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                                    {/* Buscador */}
-                                    <div className="p-2 border-b border-gray-100">
-                                        <input
-                                            autoFocus
-                                            type="text"
-                                            value={actividadSearch}
-                                            onChange={(e) => setActividadSearch(e.target.value)}
-                                            placeholder="Buscar actividad..."
-                                            className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                                        />
-                                    </div>
-                                    {/* Lista */}
-                                    <ul className="max-h-44 overflow-y-auto">
-                                        {filteredSubtareas.length === 0 ? (
-                                            <li className="px-3 py-2 text-xs text-gray-400">Sin resultados</li>
-                                        ) : (
-                                            filteredSubtareas.map((s) => (
-                                                <li
-                                                    key={s.id}
-                                                    onClick={() => {
-                                                        // Limpiar fecha si queda fuera del nuevo rango
-                                                        const newMin = s.fecha_solicitud ?? "";
-                                                        const newMax = s.tiempo_entrega ?? "";
-                                                        const curFecha = findings[activeIndex].fecha_limite;
-                                                        if (curFecha) {
-                                                            const outOfRange =
-                                                                (newMin && curFecha < newMin) ||
-                                                                (newMax && curFecha > newMax);
-                                                            if (outOfRange) update(activeIndex, "fecha_limite", "");
-                                                        }
-                                                        update(activeIndex, "actividad_id", s.id);
-                                                        setActividadOpen(false);
-                                                        setActividadSearch("");
-                                                    }}
-                                                    className={`px-3 py-2 text-xs cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors ${current.actividad_id === s.id ? "bg-orange-50 text-orange-700 font-medium" : "text-gray-700"
-                                                        }`}
-                                                >
-                                                    {s.nombre}
-                                                </li>
-                                            ))
-                                        )}
-                                    </ul>
-                                    {!actividadSearch && allSubtareas.length > 5 && (
-                                        <p className="px-3 py-1.5 text-[10px] text-gray-400 border-t border-gray-100">
-                                            Mostrando 5 de {allSubtareas.length}. Busca para ver más.
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                        <ActividadDropdown
+                            actividadRef={actividadRef}
+                            actividadOpen={actividadOpen}
+                            actividadSearch={actividadSearch}
+                            filteredSubtareas={filteredSubtareas}
+                            allSubtareas={allSubtareas}
+                            currentActividadId={current.actividad_id}
+                            currentFechaLimite={current.fecha_limite}
+                            onOpen={openDropdown}
+                            onSearch={setActividadSearch}
+                            onSelect={handleSelectActividad}
+                        />
                     </div>
 
+                    {/* Severidad + Responsable */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Severidad <span className="text-red-500">*</span>
                             </label>
-                            <div className="flex gap-2">
-                                {(["critico", "grave", "leve"] as const).map((sev) => {
-                                    const cfg = SEVERIDAD_CONFIG[sev];
-                                    const selected = current.severidad === sev;
-                                    return (
-                                        <button
-                                            key={sev}
-                                            type="button"
-                                            onClick={() => update(activeIndex, "severidad", sev)}
-                                            className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-lg border-2 transition-all text-xs font-medium ${selected
-                                                ? `border-current ${cfg.text} bg-gray-50 ring-2 ${cfg.ring} ring-offset-1`
-                                                : "border-gray-200 text-gray-500 hover:border-gray-300"
-                                                }`}
-                                        >
-                                            <span className={`w-3.5 h-3.5 rounded-full ${cfg.color}`} />
-                                            {cfg.label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                            <SeveridadSelector
+                                value={current.severidad}
+                                onChange={(sev) => update(activeIndex, "severidad", sev)}
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
@@ -342,38 +181,16 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Fecha límite — restringida al rango de la actividad */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Fecha límite</label>
-                        <input
-                            type="date"
-                            value={current.fecha_limite}
-                            min={minDate}
-                            max={maxDate}
-                            disabled={fechaDisabled}
-                            onChange={handleDateChange}
-                            className={`w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none transition-colors ${
-                                fechaDisabled
-                                    ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed pointer-events-none"
-                                    : "border-gray-200 focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                            }`}
-                        />
-                        {fechaDisabled ? (
-                            <p className="mt-1 text-xs text-gray-400 italic">Selecciona una actividad primero</p>
-                        ) : (minDate || maxDate) ? (
-                            <p className="mt-1 text-xs text-gray-400">
-                                Rango permitido:{" "}
-                                {minDate
-                                    ? new Date(minDate).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
-                                    : "—"}
-                                {" → "}
-                                {maxDate
-                                    ? new Date(maxDate).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
-                                    : "—"}
-                            </p>
-                        ) : null}
-                    </div>
+                    {/* Fecha límite */}
+                    <FechaLimiteField
+                        value={current.fecha_limite}
+                        minDate={minDate}
+                        maxDate={maxDate}
+                        disabled={fechaDisabled}
+                        onChange={handleDateChange}
+                    />
 
+                    {/* Agregar otro hallazgo */}
                     {findings.length === 1 && (
                         <button
                             onClick={addFinding}
@@ -411,6 +228,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                         Crear Hallazgo{findings.length > 1 ? `s (${findings.length})` : ""}
                     </button>
                 </div>
+
             </div>
         </div>
     );
