@@ -83,9 +83,9 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={onNavigateToSettings}
                 >
                   <div className="w-12 h-12 rounded-full border-2 border-[#1A202C]/20 flex items-center justify-center overflow-hidden bg-white/10 shadow-sm">
-                    {user.profile_photo_path ? (
+                    {user.profile_photo_path || (user as any).profile_photo_url ? (
                       <img
-                        src={`http://localhost:8000/storage/${user.profile_photo_path}`}
+                        src={(user as any).profile_photo_url || `${(process.env.REACT_APP_API_URL || "http://localhost:8000/api").replace("/api", "")}/storage/${user.profile_photo_path}`}
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />
