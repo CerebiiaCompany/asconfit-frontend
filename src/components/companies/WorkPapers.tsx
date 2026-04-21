@@ -148,6 +148,13 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
                     alt={doc.nombre_original}
                     className="w-full h-full object-cover"
                   />
+                ) : doc.extension.toLowerCase() === 'pdf' ? (
+                  <iframe
+                    src={`${doc.url}#toolbar=0&navpanes=0&scrollbar=0&page=1`}
+                    title={doc.nombre_original}
+                    className="w-full h-full pointer-events-none"
+                    style={{ border: 'none' }}
+                  />
                 ) : (
                   <span className="text-orange-400 font-bold tracking-widest text-xs uppercase">
                     {doc.extension}
