@@ -19,13 +19,13 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     id: "auditorias",
     path: "/auditorias",
     label: "Auditorias",
-    icon: "/search.png",
+    icon: "/Search.png",
   },
   {
     id: "mis-tareas",
     path: "/mis-tareas",
     label: "Mis Tareas",
-    icon: "/search.png",
+    icon: "/Search.png",
   },
   {
     id: "empresas",
@@ -37,7 +37,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     id: "hallazgos",
     path: "/hallazgos",
     label: "Hallazgos",
-    icon: "/search.png",
+    icon: "/Hallazgos.png",
   },
   {
     id: "ai-analysis",
