@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { findingService, Finding } from "../services/findingService";
 import { empresaService, Empresa } from "../services/empresaService";
 
@@ -8,37 +8,99 @@ const SEV_CONFIG = {
     leve: { label: "Leve", dot: "bg-green-500", badge: "bg-green-100 text-green-700" },
 };
 
+// ── Reusable checkbox dropdown ──────────────────────────────────────────────
+interface CheckboxDropdownProps {
+    label: string;
+    placeholder: string;
+    options: { value: string; label: string }[];
+    selected: string[];
+    onChange: (values: string[]) => void;
+}
+
+function CheckboxDropdown({ label, placeholder, options, selected, onChange }: CheckboxDropdownProps) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const toggle = (val: string) =>
+        onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val]);
+
+    const displayText =
+        selected.length === 0
+            ? placeholder
+            : selected.length === 1
+                ? options.find(o => o.value === selected[0])?.label ?? selected[0]
+                : `${selected.length} seleccionados`;
+
+    return (
+        <div ref={ref} className="flex flex-col gap-1 min-w-[180px] relative">
+            <label className="text-xs text-gray-500">{label}</label>
+            <button
+                type="button"
+                onClick={() => setOpen(o => !o)}
+                className="flex items-center justify-between px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-orange-300"
+            >
+                <span className="truncate">{displayText}</span>
+                <svg
+                    className={`w-4 h-4 ml-2 text-gray-400 transition-transform shrink-0 ${open ? "rotate-180" : ""}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            {open && (
+                <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg min-w-full py-1">
+                    {selected.length > 0 && (
+                        <button
+                            type="button"
+                            onClick={() => onChange([])}
+                            className="w-full text-left px-3 py-1.5 text-xs text-orange-500 hover:bg-orange-50 border-b border-gray-100"
+                        >
+                            Limpiar selección
+                        </button>
+                    )}
+                    {options.map(opt => (
+                        <label key={opt.value} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-gray-50">
+                            <input
+                                type="checkbox"
+                                checked={selected.includes(opt.value)}
+                                onChange={() => toggle(opt.value)}
+                                className="w-4 h-4 rounded border-gray-300 accent-orange-500 cursor-pointer"
+                            />
+                            <span className="text-sm text-gray-700">{opt.label}</span>
+                        </label>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 function DonutChart({ critico, grave, leve }: { critico: number; grave: number; leve: number }) {
     const total = critico + grave + leve;
     if (total === 0) return <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Sin datos</div>;
 
-    const r = 48;
-    const cx = 64;
-    const cy = 64;
+    const r = 48, cx = 64, cy = 64;
     const circumference = 2 * Math.PI * r;
-
     const slices = [
         { value: critico, color: "#ef4444" },
         { value: grave, color: "#facc15" },
         { value: leve, color: "#22c55e" },
     ];
-
     let offset = 0;
     const paths = slices.map((s, i) => {
-        const pct = s.value / total;
-        const dash = pct * circumference;
-        const gap = circumference - dash;
+        const dash = (s.value / total) * circumference;
         const el = (
-            <circle
-                key={i}
-                cx={cx} cy={cy} r={r}
-                fill="none"
-                stroke={s.color}
-                strokeWidth={20}
-                strokeDasharray={`${dash} ${gap}`}
-                strokeDashoffset={-offset}
-                style={{ transform: "rotate(-90deg)", transformOrigin: `${cx}px ${cy}px` }}
-            />
+            <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth={20}
+                strokeDasharray={`${dash} ${circumference - dash}`} strokeDashoffset={-offset}
+                style={{ transform: "rotate(-90deg)", transformOrigin: `${cx}px ${cy}px` }} />
         );
         offset += dash;
         return el;
@@ -67,10 +129,7 @@ function BarChart({ data }: { data: { label: string; value: number }[] }) {
                 <div key={i} className="flex items-center gap-2 text-xs">
                     <span className="w-36 truncate text-gray-600 text-right shrink-0">{d.label}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div
-                            className="h-4 rounded-full bg-orange-400 transition-all"
-                            style={{ width: `${(d.value / max) * 100}%` }}
-                        />
+                        <div className="h-4 rounded-full bg-orange-400 transition-all" style={{ width: `${(d.value / max) * 100}%` }} />
                     </div>
                     <span className="w-4 text-gray-500 shrink-0">{d.value}</span>
                 </div>
@@ -83,8 +142,9 @@ export const Findings: React.FC = () => {
     const [findings, setFindings] = useState<Finding[]>([]);
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [loading, setLoading] = useState(true);
-    const [empresaFilter, setEmpresaFilter] = useState<string>("all");
-    const [sevFilter, setSevFilter] = useState<string>("all");
+    const [empresaFilter, setEmpresaFilter] = useState<string[]>([]);
+    const [sevFilter, setSevFilter] = useState<string[]>([]);
+    const [tipoAuditoriaFilter, setTipoAuditoriaFilter] = useState<string[]>([]);
 
     useEffect(() => {
         Promise.all([findingService.getAll(), empresaService.getAll()])
@@ -92,21 +152,30 @@ export const Findings: React.FC = () => {
             .finally(() => setLoading(false));
     }, []);
 
+    const tiposAuditoria = useMemo(() => {
+        const set = new Set<string>();
+        findings.forEach(f => { if (f.auditoria?.tipo_auditoria) set.add(f.auditoria.tipo_auditoria); });
+        return Array.from(set).sort();
+    }, [findings]);
+
     const filtered = useMemo(() => {
         return findings.filter(f => {
-            if (empresaFilter !== "all") {
-                const empId = f.auditoria?.empresa?.id?.toString();
-                if (empId !== empresaFilter) return false;
+            if (empresaFilter.length > 0) {
+                const empId = f.auditoria?.empresa?.id?.toString() ?? "";
+                if (!empresaFilter.includes(empId)) return false;
             }
-            if (sevFilter !== "all" && f.severidad !== sevFilter) return false;
+            if (sevFilter.length > 0 && !sevFilter.includes(f.severidad)) return false;
+            if (tipoAuditoriaFilter.length > 0) {
+                const tipo = f.auditoria?.tipo_auditoria ?? "";
+                if (!tipoAuditoriaFilter.includes(tipo)) return false;
+            }
             return true;
         });
-    }, [findings, empresaFilter, sevFilter]);
+    }, [findings, empresaFilter, sevFilter, tipoAuditoriaFilter]);
 
     const abiertos = filtered.filter(f => !f.fecha_limite || new Date(f.fecha_limite) >= new Date()).length;
     const enProceso = filtered.filter(f => f.responsable && f.fecha_limite).length;
     const cerrados = filtered.length - abiertos;
-
     const criticos = filtered.filter(f => f.severidad === "critico").length;
     const graves = filtered.filter(f => f.severidad === "grave").length;
     const leves = filtered.filter(f => f.severidad === "leve").length;
@@ -136,32 +205,33 @@ export const Findings: React.FC = () => {
                     <span className="text-sm font-medium text-gray-700">Filtrar por Empresa y Auditoría</span>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    <div className="flex flex-col gap-1 min-w-[220px]">
-                        <label className="text-xs text-gray-500">Empresa</label>
-                        <select
-                            value={empresaFilter}
-                            onChange={e => setEmpresaFilter(e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        >
-                            <option value="all">Todas las empresas</option>
-                            {empresas.map(e => (
-                                <option key={e.id} value={e.id?.toString()}>{e.razon_social}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-1 min-w-[160px]">
-                        <label className="text-xs text-gray-500">Severidad</label>
-                        <select
-                            value={sevFilter}
-                            onChange={e => setSevFilter(e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        >
-                            <option value="all">Todas</option>
-                            <option value="critico">Crítico</option>
-                            <option value="grave">Grave</option>
-                            <option value="leve">Leve</option>
-                        </select>
-                    </div>
+                    <CheckboxDropdown
+                        label="Empresa"
+                        placeholder="Todas las empresas"
+                        options={empresas.map(e => ({ value: e.id?.toString() ?? "", label: e.razon_social }))}
+                        selected={empresaFilter}
+                        onChange={setEmpresaFilter}
+                    />
+                    <CheckboxDropdown
+                        label="Severidad"
+                        placeholder="Todas"
+                        options={[
+                            { value: "critico", label: "Crítico" },
+                            { value: "grave", label: "Grave" },
+                            { value: "leve", label: "Leve" },
+                        ]}
+                        selected={sevFilter}
+                        onChange={setSevFilter}
+                    />
+                    {tiposAuditoria.length > 0 && (
+                        <CheckboxDropdown
+                            label="Tipo de Auditoría"
+                            placeholder="Todos los tipos"
+                            options={tiposAuditoria.map(t => ({ value: t, label: t }))}
+                            selected={tipoAuditoriaFilter}
+                            onChange={setTipoAuditoriaFilter}
+                        />
+                    )}
                 </div>
             </div>
 
