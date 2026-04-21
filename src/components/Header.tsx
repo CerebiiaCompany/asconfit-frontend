@@ -3,6 +3,7 @@ import { UserDropdown } from "./UserDropdown";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { useNotificationContext } from "../contexts/NotificationContext";
 
+import { storageUrl } from "../utils/storageUrl";
 import { User } from "../services/authService";
 import { UserRole } from "../config/menuConfig";
 
@@ -83,9 +84,9 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={onNavigateToSettings}
                 >
                   <div className="w-12 h-12 rounded-full border-2 border-[#1A202C]/20 flex items-center justify-center overflow-hidden bg-white/10 shadow-sm">
-                    {user.profile_photo_url ? (
+                    {storageUrl(user.profile_photo_url ?? user.profile_photo_path) ? (
                       <img
-                        src={user.profile_photo_url}
+                        src={storageUrl(user.profile_photo_url ?? user.profile_photo_path)!}
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />

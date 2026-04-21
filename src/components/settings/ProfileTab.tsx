@@ -1,5 +1,6 @@
 import React from "react";
 import { Alert } from "../common/Alert";
+import { storageUrl } from "../../utils/storageUrl";
 
 interface ProfileTabProps {
   user: any;
@@ -62,7 +63,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
     }
   };
 
-  const photoUrl = user.profile_photo_url ?? null;
+  const photoUrl = storageUrl(user.profile_photo_url ?? user.profile_photo_path);
 
   // Split name for display in View mode
   const nameParts = (name || user.name || "").trim().split(" ");
