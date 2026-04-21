@@ -13,6 +13,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [docToDelete, setDocToDelete] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
 
@@ -39,15 +40,11 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadFile = async (file: File) => {
     if (file.size > 15 * 1024 * 1024) {
       addToast("El archivo no puede exceder los 15 MB", "warning");
       return;
     }
-
     try {
       setLoading(true);
       const newDoc = await documentoService.uploadDocumento(carpetaId, file);
@@ -58,10 +55,32 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
       addToast(error.response?.data?.message || "Error al subir el archivo", "error");
     } finally {
       setLoading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
   };
 
   const handleDeleteRequest = (docId: number, e: React.MouseEvent) => {
@@ -91,7 +110,19 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
   );
 
   return (
-    <div className="bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200 p-6 relative min-h-[500px]">
+    <div
+      className={`bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border p-6 relative min-h-[500px] transition-colors ${isDragging ? 'border-orange-400 bg-orange-50' : 'border-gray-200'}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-20 rounded-b-xl rounded-tr-xl border-2 border-dashed border-orange-400 bg-orange-50/80 flex flex-col items-center justify-center pointer-events-none">
+          <Upload className="w-12 h-12 text-orange-400 mb-3" />
+          <p className="text-orange-500 font-bold text-lg">Suelta el archivo aquí</p>
+        </div>
+      )}
 
       {/* Search & Actions Bar */}
       <div className="flex justify-between items-center mb-8 gap-4">
