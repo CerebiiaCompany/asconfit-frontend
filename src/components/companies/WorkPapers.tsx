@@ -86,13 +86,13 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
     }
   };
 
-  const filteredDocs = documentos.filter(doc => 
+  const filteredDocs = documentos.filter(doc =>
     doc.nombre_original.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200 p-6 relative min-h-[500px]">
-      
+
       {/* Search & Actions Bar */}
       <div className="flex justify-between items-center mb-8 gap-4">
         <div className="flex flex-1 gap-2 max-w-[600px]">
@@ -124,13 +124,13 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
 
       {/* States: Loading or Empty or Grid */}
       {loading && documentos.length === 0 ? (
-         <div className="text-center py-20 text-gray-500 font-bold">Cargando documentos de la carpeta...</div>
+        <div className="text-center py-20 text-gray-500 font-bold">Cargando documentos de la carpeta...</div>
       ) : filteredDocs.length === 0 ? (
-         <div className="text-center py-20 text-gray-400 flex flex-col items-center">
-            <FileText className="w-12 h-12 mb-3 text-gray-300" />
-            <p>La carpeta está vacía.</p>
-            <p className="text-sm">Usa el botón de abajo para subir el primer archivo.</p>
-         </div>
+        <div className="text-center py-20 text-gray-400 flex flex-col items-center">
+          <FileText className="w-12 h-12 mb-3 text-gray-300" />
+          <p>La carpeta está vacía.</p>
+          <p className="text-sm">Usa el botón de abajo para subir el primer archivo.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {filteredDocs.map((doc) => (
@@ -141,23 +141,31 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
               rel="noopener noreferrer"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col h-56 group relative"
             >
-              <div className="flex-1 bg-white border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)] rounded-sm mb-4 flex items-center justify-center relative hover:bg-gray-50 transition-colors cursor-pointer mx-2 mt-2 group-hover:bg-orange-50">
-                <span className="text-orange-400 font-bold tracking-widest text-xs uppercase">
-                  {doc.extension}
-                </span>
-                
+              <div className="flex-1 bg-white border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)] rounded-sm mb-4 flex items-center justify-center relative hover:bg-gray-50 transition-colors cursor-pointer mx-2 mt-2 group-hover:bg-orange-50 overflow-hidden">
+                {['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(doc.extension.toLowerCase()) ? (
+                  <img
+                    src={doc.url}
+                    alt={doc.nombre_original}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-orange-400 font-bold tracking-widest text-xs uppercase">
+                    {doc.extension}
+                  </span>
+                )}
+
                 {/* Hover Action Blur */}
                 <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-200">
-                   <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg" title="Ver documento">
-                      <Eye className="w-5 h-5" />
-                   </div>
-                   <button 
-                     onClick={(e) => handleDeleteRequest(doc.id, e)} 
-                     className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-red-600 transition-colors"
-                     title="Mover a papelera"
-                   >
-                      <Trash2 className="w-5 h-5" />
-                   </button>
+                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg" title="Ver documento">
+                    <Eye className="w-5 h-5" />
+                  </div>
+                  <button
+                    onClick={(e) => handleDeleteRequest(doc.id, e)}
+                    className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-red-600 transition-colors"
+                    title="Mover a papelera"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
               <div className="flex items-start gap-2 px-1 mb-1">
@@ -176,16 +184,16 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
       )}
 
       {/* Hidden File Input */}
-      <input 
-         type="file" 
-         ref={fileInputRef} 
-         onChange={handleFileChange} 
-         className="hidden" 
-         accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
       />
 
       {/* Floating Subir archivo Button */}
-      <button 
+      <button
         onClick={handleFileClick}
         disabled={loading}
         className={`absolute bottom-6 right-6 text-white px-5 py-2.5 rounded shadow flex items-center gap-2 text-sm font-bold transition-colors ${loading ? 'bg-orange-300 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'}`}
@@ -195,7 +203,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId }) => {
       </button>
 
       {/* Beautiful Tailwind CSS Modal for Deletion Confirmation */}
-      <DeleteConfirmModal 
+      <DeleteConfirmModal
         isOpen={docToDelete !== null}
         onClose={() => setDocToDelete(null)}
         onConfirm={confirmDelete}
