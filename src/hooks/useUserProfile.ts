@@ -15,7 +15,7 @@ export const useUserProfile = (initialUser: User) => {
     const [country, setCountry] = useState(initialUser.country || '');
     const [city, setCity] = useState(initialUser.city || '');
     const [department, setDepartment] = useState(initialUser.department || '');
-    
+
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileMessage, setProfileMessage] = useState<Message | null>(null);
     const { addToast } = useToast();
@@ -26,8 +26,8 @@ export const useUserProfile = (initialUser: User) => {
         setProfileMessage(null);
 
         try {
-            const response = await authService.updateProfile({ 
-                name, 
+            const response = await authService.updateProfile({
+                name,
                 email,
                 phone,
                 document_type: documentType,
@@ -58,8 +58,10 @@ export const useUserProfile = (initialUser: User) => {
         setProfileLoading(true);
         try {
             const response = await authService.updatePhoto(file);
-            setUser(response.user);
-            setGlobalUser(response.user); // Sincronizar con el estado global
+            // Usar photo_url directamente del backend (incluye APP_URL correcto)
+            const updatedUser = { ...response.user, profile_photo_url: response.photo_url };
+            setUser(updatedUser as any);
+            setGlobalUser(updatedUser as any);
             addToast(response.message, 'success');
         } catch (error: any) {
             const errorText = error.response?.data?.message || error.message || 'Error al subir la foto';

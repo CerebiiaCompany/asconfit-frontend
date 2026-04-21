@@ -62,9 +62,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
     }
   };
 
-  const photoUrl = user.profile_photo_path
-    ? `http://localhost:8000/storage/${user.profile_photo_path}`
-    : null;
+  const apiBase = (process.env.REACT_APP_API_URL || "http://localhost:8000/api").replace("/api", "");
+  const photoUrl = (user as any).profile_photo_url
+    || (user.profile_photo_path ? `${apiBase}/storage/${user.profile_photo_path}` : null);
 
   // Split name for display in View mode
   const nameParts = (name || user.name || "").trim().split(" ");
