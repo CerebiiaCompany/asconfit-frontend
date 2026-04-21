@@ -18,6 +18,7 @@ export interface User {
   city?: string;
   department?: string;
   profile_photo_path?: string;
+  profile_photo_url?: string;
 }
 
 export interface AuthResponse {

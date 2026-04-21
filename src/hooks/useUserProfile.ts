@@ -58,10 +58,8 @@ export const useUserProfile = (initialUser: User) => {
         setProfileLoading(true);
         try {
             const response = await authService.updatePhoto(file);
-            // Usar photo_url directamente del backend (incluye APP_URL correcto)
-            const updatedUser = { ...response.user, profile_photo_url: response.photo_url };
-            setUser(updatedUser as any);
-            setGlobalUser(updatedUser as any);
+            setUser(response.user);
+            setGlobalUser(response.user);
             addToast(response.message, 'success');
         } catch (error: any) {
             const errorText = error.response?.data?.message || error.message || 'Error al subir la foto';
