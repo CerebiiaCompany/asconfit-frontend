@@ -17,7 +17,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         <div className={`relative ${className}`}>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <img
-                    src="/Search.png"
+                    src="/Search_black.png"
                     alt="Search"
                     className="h-5 w-5 text-gray-400"
                 />
