@@ -6,28 +6,47 @@ export function useFindingsPage() {
     const [findings, setFindings] = useState<Finding[]>([]);
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [loading, setLoading] = useState(true);
+    // "all" = todas seleccionadas por defecto (se inicializa tras cargar)
     const [empresaFilter, setEmpresaFilter] = useState<string[]>([]);
     const [sevFilter, setSevFilter] = useState<string[]>([]);
     const [tipoAuditoriaFilter, setTipoAuditoriaFilter] = useState<string[]>([]);
 
     useEffect(() => {
         Promise.all([findingService.getAll(), empresaService.getAll()])
-            .then(([f, e]) => { setFindings(f); setEmpresas(e); })
+            .then(([f, e]) => {
+                setFindings(f);
+                setEmpresas(e);
+                // Por defecto todas las empresas seleccionadas
+                setEmpresaFilter(e.map(emp => emp.id?.toString() ?? ""));
+            })
             .finally(() => setLoading(false));
     }, []);
 
+    // Tipos de auditoría disponibles según las empresas seleccionadas
     const tiposAuditoria = useMemo(() => {
+        if (empresaFilter.length === 0) return [];
         const set = new Set<string>();
-        findings.forEach(f => { if (f.auditoria?.tipo_auditoria) set.add(f.auditoria.tipo_auditoria); });
+        findings.forEach(f => {
+            const empId = f.auditoria?.empresa?.id?.toString() ?? "";
+            if (empresaFilter.includes(empId) && f.auditoria?.tipo_auditoria) {
+                set.add(f.auditoria.tipo_auditoria);
+            }
+        });
         return Array.from(set).sort();
-    }, [findings]);
+    }, [findings, empresaFilter]);
+
+    // Cuando cambian los tipos disponibles, limpiar selección de tipos que ya no aplican
+    useEffect(() => {
+        setTipoAuditoriaFilter(prev => prev.filter(t => tiposAuditoria.includes(t)));
+    }, [tiposAuditoria]);
 
     const filtered = useMemo(() => {
+        // Sin empresas seleccionadas → sin resultados
+        if (empresaFilter.length === 0) return [];
+
         return findings.filter(f => {
-            if (empresaFilter.length > 0) {
-                const empId = f.auditoria?.empresa?.id?.toString() ?? "";
-                if (!empresaFilter.includes(empId)) return false;
-            }
+            const empId = f.auditoria?.empresa?.id?.toString() ?? "";
+            if (!empresaFilter.includes(empId)) return false;
             if (sevFilter.length > 0 && !sevFilter.includes(f.severidad)) return false;
             if (tipoAuditoriaFilter.length > 0) {
                 const tipo = f.auditoria?.tipo_auditoria ?? "";

@@ -48,7 +48,14 @@ export function FindingsFilters({
                     selected={sevFilter}
                     onChange={onSevChange}
                 />
-                {tiposAuditoria.length > 0 && (
+                {empresaFilter.length === 0 ? (
+                    <div className="flex flex-col gap-1 min-w-[180px]">
+                        <label className="text-xs text-gray-500">Tipo de Auditoría</label>
+                        <div className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-400 bg-gray-50">
+                            Selecciona una empresa
+                        </div>
+                    </div>
+                ) : tiposAuditoria.length > 0 ? (
                     <CheckboxDropdown
                         label="Tipo de Auditoría"
                         placeholder="Todos los tipos"
@@ -56,7 +63,7 @@ export function FindingsFilters({
                         selected={tipoAuditoriaFilter}
                         onChange={onTipoChange}
                     />
-                )}
+                ) : null}
             </div>
         </div>
     );
