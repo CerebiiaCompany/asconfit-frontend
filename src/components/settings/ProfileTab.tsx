@@ -72,12 +72,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
   if (!isEditing) {
     return (
-      <div className="p-8 space-y-8 max-w-5xl">
+      <div className="p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-5xl">
         <h2 className="text-xl font-bold text-[#3B3B6D] mb-4">Mi Perfil</h2>
 
         {/* Profile Card / Photo Section */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm flex items-start space-x-10 relative">
-          <div className="w-44 h-56 bg-white border border-gray-200 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 relative">
+          <div className="w-32 h-40 sm:w-44 sm:h-56 bg-white border border-gray-200 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">
             {photoUrl ? (
               <img
                 src={photoUrl}
@@ -101,8 +101,8 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             )}
           </div>
 
-          <div className="flex flex-col space-y-6 flex-grow pt-2">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col space-y-4 flex-grow w-full sm:w-auto sm:pt-2 items-center sm:items-start text-center sm:text-left">
+            <div className="flex items-center">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -112,7 +112,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               />
               <button
                 onClick={onPhotoClick}
-                className="bg-[#F97316] hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl flex items-center font-bold text-sm shadow-md transition-all"
+                className="bg-[#F97316] hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl flex items-center font-bold text-sm shadow-md transition-all"
               >
                 Subir nueva foto
                 <svg
@@ -140,14 +140,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
         </div>
 
         {/* Personal Details Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm relative">
-          <div className="flex justify-between items-center mb-10">
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-sm relative">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-8">
             <h3 className="text-xl font-bold text-gray-800">
               Información Personal
             </h3>
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-[#F97316] hover:bg-orange-600 text-white px-5 py-2 rounded-lg flex items-center text-sm font-bold shadow-sm transition-all"
+              className="bg-[#F97316] hover:bg-orange-600 text-white px-5 py-2 rounded-lg flex items-center justify-center sm:justify-start text-sm font-bold shadow-sm transition-all sm:w-auto w-full ml-auto"
             >
               Editar
               <svg
@@ -160,7 +160,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-y-8 gap-x-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
             <div className="col-span-2">
               <p className="text-xs text-gray-300 font-semibold mb-1">Cargo</p>
               <p className="text-lg font-bold text-[#4B4B4B]">
