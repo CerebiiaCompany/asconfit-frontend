@@ -29,7 +29,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "empresas",
-    path: "/empresas",
+    path: "/empresas/ver",
     label: "Empresas",
     icon: "/building.png",
   },
