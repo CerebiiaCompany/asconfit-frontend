@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { notificacionService, Notificacion } from '../services/notificacionService';
+import { useAuth } from './AuthContext';
 
 export interface Notification {
     id: string;
@@ -67,7 +68,8 @@ const convertToNotification = (notif: Notificacion): Notification => ({
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
     const loadNotifications = async () => {
         try {
@@ -80,13 +82,17 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
     };
 
+    // Cargar inmediatamente cuando el usuario inicia sesión, y cada 30s después
     useEffect(() => {
-        loadNotifications();
+        if (!user) {
+            setNotifications([]);
+            return;
+        }
 
-        // Recargar notificaciones cada 30 segundos
+        loadNotifications();
         const interval = setInterval(loadNotifications, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [user]);
 
     const handleMarkAsRead = async (id: string) => {
         try {
