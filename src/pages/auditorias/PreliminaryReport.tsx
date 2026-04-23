@@ -1,23 +1,39 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ReportTaskList } from "../../components/auditorias/preliminary-report/ReportTaskList";
 import { ReportPdfUpload } from "../../components/auditorias/preliminary-report/ReportPdfUpload";
+import { auditoriaService } from "../../services/auditoriaService";
+import { storageUrl } from "../../utils/storageUrl";
 
 export const PreliminaryReport: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { auditoria, loading } = useAuditoriaDetalle(id);
+
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [uploadSuccess, setUploadSuccess] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Cargar informe existente al entrar — usa storageUrl para construir URL correcta según entorno
+    useEffect(() => {
+        if (!id) return;
+        auditoriaService.getInformePreliminar(id).then((data) => {
+            if (data.path) setPdfUrl(storageUrl(data.path));
+        }).catch(() => { });
+    }, [id]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || file.type !== "application/pdf") return;
         setPdfFile(file);
         setPdfUrl(URL.createObjectURL(file));
+        setUploadSuccess(false);
+        setUploadError(null);
     };
 
     const handleDrop = (e: React.DragEvent) => {
@@ -26,6 +42,24 @@ export const PreliminaryReport: React.FC = () => {
         if (!file || file.type !== "application/pdf") return;
         setPdfFile(file);
         setPdfUrl(URL.createObjectURL(file));
+        setUploadSuccess(false);
+        setUploadError(null);
+    };
+
+    const handleUpload = async () => {
+        if (!pdfFile || !id) return;
+        setUploading(true);
+        setUploadError(null);
+        try {
+            const { path } = await auditoriaService.uploadInformePreliminar(id, pdfFile);
+            setPdfUrl(storageUrl(path));
+            setPdfFile(null);
+            setUploadSuccess(true);
+        } catch {
+            setUploadError("Error al subir el informe. Intenta de nuevo.");
+        } finally {
+            setUploading(false);
+        }
     };
 
     if (loading) return <LoadingState message="Cargando auditoría..." />;
@@ -58,17 +92,19 @@ export const PreliminaryReport: React.FC = () => {
 
             {/* Two-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left: task list */}
                 <ReportTaskList auditoria={auditoria} />
-
-                {/* Right: PDF upload + preview */}
                 <ReportPdfUpload
                     pdfFile={pdfFile}
                     pdfUrl={pdfUrl}
                     fileInputRef={fileInputRef}
                     onFileChange={handleFileChange}
                     onDrop={handleDrop}
-                    onClear={() => { setPdfFile(null); setPdfUrl(null); }}
+                    onClear={() => { setPdfFile(null); setPdfUrl(null); setUploadSuccess(false); }}
+                    onUpload={handleUpload}
+                    uploading={uploading}
+                    uploadError={uploadError}
+                    uploadSuccess={uploadSuccess}
+                    isSaved={!pdfFile && !!pdfUrl}
                 />
             </div>
         </div>

@@ -89,4 +89,23 @@ export const auditoriaService = {
     );
     return response.data;
   },
+
+  async uploadInformePreliminar(auditoriaId: string, file: File) {
+    const formData = new FormData();
+    formData.append("informe", file);
+    const response = await axios.post(
+      `${API_URL}/auditorias/${auditoriaId}/informe-preliminar`,
+      formData,
+      { headers: { ...getAuthHeader(), "Content-Type": "multipart/form-data" } }
+    );
+    return response.data as { url: string; path: string };
+  },
+
+  async getInformePreliminar(auditoriaId: string) {
+    const response = await axios.get(
+      `${API_URL}/auditorias/${auditoriaId}/informe-preliminar`,
+      { headers: getAuthHeader() }
+    );
+    return response.data as { url: string | null; path: string | null };
+  },
 };
