@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Search, 
-  PlusCircle, 
-  FileText, 
+import {
+  Search,
+  PlusCircle,
+  FileText,
   SlidersHorizontal,
   ChevronLeft,
   Eye
@@ -14,7 +14,7 @@ import { useToast } from "../../contexts/ToastContext";
 export const ViewCompanies: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,32 +41,29 @@ export const ViewCompanies: React.FC = () => {
   };
 
   // Filtrado simple por NIT o Razón social
-  const filteredEmpresas = empresas.filter(emp => 
-    emp.razon_social.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredEmpresas = empresas.filter(emp =>
+    emp.razon_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
     emp.nit.includes(searchTerm)
   );
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto font-sans bg-white min-h-[calc(100vh-64px)] rounded-lg">
       {/* Breadcrumb */}
-      <div className="mb-6">
-        <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-          Empresas <span className="text-gray-400 font-normal">&gt;</span> Ver empresas
-        </h2>
-      </div>
+
 
       {/* Top Actions Line */}
       <div className="flex justify-between items-center mb-6">
-        <button 
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition-colors text-[15px]"
-        >
-          <ChevronLeft className="w-5 h-5 text-orange-500 stroke-[3]" />
-          Atrás
-        </button>
-        
+        <div className="mb-6">
+          <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">
+            Empresas
+          </h1>
+          <p className="text-slate-500 text-sm mt-2 font-normal">
+            Administra de forma segura la información y documentos
+          </p>
+        </div>
+
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={handleNewEmpresa}
             className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded-md hover:bg-orange-50 transition-colors font-medium text-sm"
           >
@@ -104,35 +101,35 @@ export const ViewCompanies: React.FC = () => {
       {/* Grid Container */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {loading ? (
-           <div className="col-span-full text-center py-10 text-gray-500 font-bold">Cargando empresas...</div>
+          <div className="col-span-full text-center py-10 text-gray-500 font-bold">Cargando empresas...</div>
         ) : filteredEmpresas.length === 0 ? (
-           <div className="col-span-full text-center py-10 text-gray-500 font-bold">No hay empresas registradas.</div>
+          <div className="col-span-full text-center py-10 text-gray-500 font-bold">No hay empresas registradas.</div>
         ) : filteredEmpresas.map((empresa) => (
           <div key={empresa.id} className="bg-white rounded-lg border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex flex-col h-full hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow">
             <h3 className="text-[15px] font-bold text-gray-800 mb-4 tracking-tight line-clamp-2">{empresa.razon_social}</h3>
-            
+
             <div className="space-y-4 mb-6 flex-grow">
               <div>
                 <div className="text-[11px] font-semibold text-gray-400 mb-0.5">Nit:</div>
                 <div className="text-[12px] font-semibold text-gray-600">{empresa.nit}</div>
               </div>
-              
+
               <div>
                 <div className="text-[11px] font-semibold text-gray-400 mb-0.5">Representante legal</div>
                 <div className="text-[12px] font-semibold text-gray-600 truncate">{empresa.representante_legal}</div>
               </div>
-              
+
               <div>
                 <div className="text-[11px] font-semibold text-gray-400 mb-0.5">Correo</div>
                 <div className="text-[12px] font-semibold text-gray-600 truncate">{empresa.correo_empresarial || empresa.correo_personal}</div>
               </div>
-              
+
               <div className="flex justify-between items-end">
                 <div>
                   <div className="text-[11px] font-semibold text-gray-400 mb-0.5">Teléfono</div>
                   <div className="text-[12px] font-semibold text-gray-600">{empresa.telefono_empresarial || empresa.telefono_personal}</div>
                 </div>
-                
+
                 <div className="text-right">
                   <div className="text-[9px] font-bold text-gray-400 italic mb-0.5">Fecha Registro</div>
                   <div className="text-[10px] font-bold text-gray-400">
@@ -141,16 +138,16 @@ export const ViewCompanies: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex gap-2 mt-auto">
-              <button 
+              <button
                 onClick={() => navigate(`/empresas?id=${empresa.id}`)}
                 className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-orange-400 rounded-md text-orange-500 hover:bg-orange-50 transition-colors"
                 title="Ver detalles"
               >
                 <Eye className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 onClick={() => navigate(`/empresas/crear?id=${empresa.id}`)}
                 className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm"
               >
