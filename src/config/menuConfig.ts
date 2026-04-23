@@ -78,7 +78,7 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "papelera",
     "perfil",
   ],
-  auditor: ["dashboard", "hallazgos", "auditorias", "ai-analysis", "empresas", "perfil"],
+  auditor: ["dashboard", "hallazgos", "auditorias", "ai-analysis", "mis-tareas", "empresas", "perfil"],
   delegado: ["dashboard", "mis-tareas", "perfil"],
 };
 
@@ -117,7 +117,8 @@ export const getMenuItemsByPermissions = (permissions: string[]): MenuItem[] => 
 
 // Función para verificar si un usuario puede acceder a una ruta
 export const canAccessRoute = (path: string, role: UserRole): boolean => {
-  // Normalizar el rol a minúsculas
+  // Normalizar el rol a minúsculas, con guard por si llega undefined/null
+  if (!role) return false;
   const normalizedRole = role.toLowerCase() as UserRole;
 
   // Buscar el ID del menú correspondiente a la ruta
