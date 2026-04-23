@@ -17,6 +17,7 @@ export interface Carpeta {
     empresa_id: number;
     nombre: string;
     is_default: boolean;
+    is_private: boolean;
     created_at?: string;
 }
 
@@ -46,14 +47,19 @@ export const documentoService = {
         const response = await axios.get(`${API_URL}/empresas/${empresaId}/carpetas`, getAuthHeaders());
         return response.data;
     },
-    
+
     createCarpeta: async (empresaId: number, nombre: string): Promise<Carpeta> => {
         const response = await axios.post(`${API_URL}/carpetas`, { empresa_id: empresaId, nombre }, getAuthHeaders());
         return response.data.carpeta;
     },
-    
+
     deleteCarpeta: async (carpetaId: number): Promise<void> => {
         await axios.delete(`${API_URL}/carpetas/${carpetaId}`, getAuthHeaders());
+    },
+
+    toggleCarpetaPrivate: async (carpetaId: number): Promise<{ is_private: boolean }> => {
+        const response = await axios.patch(`${API_URL}/carpetas/${carpetaId}/toggle-private`, {}, getAuthHeaders());
+        return response.data;
     },
 
     // Documentos
@@ -69,14 +75,14 @@ export const documentoService = {
         const formData = new FormData();
         formData.append('carpeta_id', carpetaId.toString());
         formData.append('archivo', file);
-        
+
         const response = await axios.post(`${API_URL}/documentos`, formData, {
             headers: {
                 ...getAuthHeaders().headers,
                 'Content-Type': 'multipart/form-data',
             }
         });
-        
+
         const doc = response.data.documento;
         return {
             ...doc,

@@ -5,12 +5,15 @@ import { CompanyInfo } from "../../components/companies/CompanyInfo";
 import { CompanyTabs } from "../../components/companies/CompanyTabs";
 import { WorkPapers } from "../../components/companies/WorkPapers";
 import { empresaService, Empresa as EmpresaModel } from "../../services/empresaService";
+import { documentoService, Carpeta } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const Companies: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { userRole } = useAuth();
 
   const searchParams = new URLSearchParams(location.search);
   const idValue = searchParams.get("id");
@@ -18,27 +21,32 @@ export const Companies: React.FC = () => {
 
   const [empresaState, setEmpresaState] = useState<EmpresaModel | null>(null);
   const [loading, setLoading] = useState(!!empresaId);
-  const [activeCarpetaId, setActiveCarpetaId] = useState<number | null>(null);
+  const [activeCarpeta, setActiveCarpeta] = useState<Carpeta | null>(null);
+
+  const isAdmin = userRole === "admin";
 
   useEffect(() => {
     if (empresaId) {
       empresaService.getById(empresaId)
-        .then(data => {
-          setEmpresaState(data);
-        })
+        .then(data => setEmpresaState(data))
         .catch(err => {
           console.error(err);
           addToast("Error al cargar la información de la empresa", "error");
         })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      // Si entra a /empresas sin ID, se considera el Dashboard genérico, 
-      // pero podríamos redirigir a la lista si no hay empresa seleccionada.
-      // navigate("/empresas/ver");
+        .finally(() => setLoading(false));
     }
   }, [empresaId]);
+
+  const handleTogglePrivate = async () => {
+    if (!activeCarpeta) return;
+    try {
+      const result = await documentoService.toggleCarpetaPrivate(activeCarpeta.id);
+      setActiveCarpeta(prev => prev ? { ...prev, is_private: result.is_private } : prev);
+      addToast(result.is_private ? "Carpeta marcada como privada" : "Carpeta marcada como pública", "success");
+    } catch (error) {
+      addToast("Error al cambiar la privacidad de la carpeta", "error");
+    }
+  };
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto font-sans min-h-screen">
@@ -51,13 +59,20 @@ export const Companies: React.FC = () => {
       ) : empresaState ? (
         <>
           <CompanyInfo initialData={empresaState} />
-          <CompanyTabs 
-            empresaId={empresaState.id!} 
-            activeCarpetaId={activeCarpetaId}
-            setActiveCarpetaId={setActiveCarpetaId}
+          <CompanyTabs
+            empresaId={empresaState.id!}
+            activeCarpetaId={activeCarpeta?.id ?? null}
+            setActiveCarpeta={setActiveCarpeta}
+            isAdmin={isAdmin}
+            activeCarpetaData={activeCarpeta}
           />
-          {activeCarpetaId ? (
-            <WorkPapers carpetaId={activeCarpetaId} />
+          {activeCarpeta ? (
+            <WorkPapers
+              carpetaId={activeCarpeta.id}
+              isPrivate={activeCarpeta.is_private}
+              isAdmin={isAdmin}
+              onTogglePrivate={handleTogglePrivate}
+            />
           ) : (
             <div className="py-20 text-center text-gray-400 font-medium bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200">
               Cargando interfaz de documentos...
@@ -67,7 +82,7 @@ export const Companies: React.FC = () => {
       ) : (
         <div className="py-20 text-center text-gray-400">
           <p className="mb-4">No se ha seleccionado ninguna empresa.</p>
-          <button 
+          <button
             onClick={() => navigate("/empresas/ver")}
             className="text-orange-500 font-bold hover:underline"
           >
