@@ -32,9 +32,9 @@ export const ActividadDropdown: React.FC<ActividadDropdownProps> = ({
         <button
             type="button"
             onClick={onOpen}
-            className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-left"
+            className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400 text-left"
         >
-            <span className={currentActividadId ? "text-gray-800" : "text-gray-400"}>
+            <span className={currentActividadId ? "text-gray-600" : "text-gray-400"}>
                 {currentActividadId
                     ? allSubtareas.find((s) => s.id === currentActividadId)?.nombre ?? "Seleccionar"
                     : "Seleccionar actividad"}
@@ -64,11 +64,10 @@ export const ActividadDropdown: React.FC<ActividadDropdownProps> = ({
                             <li
                                 key={s.id}
                                 onClick={() => onSelect(s)}
-                                className={`px-3 py-2 text-xs cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors ${
-                                    currentActividadId === s.id
+                                className={`px-3 py-2 text-xs cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors ${currentActividadId === s.id
                                         ? "bg-orange-50 text-orange-700 font-medium"
                                         : "text-gray-700"
-                                }`}
+                                    }`}
                             >
                                 {s.nombre}
                             </li>

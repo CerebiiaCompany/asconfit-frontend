@@ -2,9 +2,7 @@ import React from "react";
 import { Subtarea } from "../../../types/auditoria";
 import { CrearFindingModalProps } from "../../../types/finding.types";
 import { useFindings } from "../../../hooks/useFindings";
-import { useActividadDropdown } from "../../../hooks/useActividadDropdown";
 import { FindingTabs } from "./FindingTabs";
-import { ActividadDropdown } from "../auditorias/ActividadDropdown";
 import { SeveridadSelector } from "./SeveridadSelector";
 import { FechaLimiteField } from "./FechaLimiteField";
 
@@ -31,16 +29,6 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
         (cat) => cat.subtareas ?? []
     );
 
-    const {
-        actividadSearch,
-        setActividadSearch,
-        actividadOpen,
-        actividadRef,
-        filteredSubtareas,
-        openDropdown,
-        closeDropdown,
-    } = useActividadDropdown(allSubtareas);
-
     const empresaNombre =
         auditoria.empresa?.razon_social || auditoria.razon_social || `Auditoría #${auditoria.id}`;
 
@@ -59,18 +47,6 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
             (maxDate && val > maxDate);
         if (outOfRange) return;
         update(activeIndex, "fecha_limite", val);
-    };
-
-    const handleSelectActividad = (s: Subtarea) => {
-        const newMin = s.fecha_solicitud ? s.fecha_solicitud.slice(0, 10) : "";
-        const newMax = s.tiempo_entrega ? s.tiempo_entrega.slice(0, 10) : "";
-        const curFecha = current.fecha_limite;
-        if (curFecha) {
-            const outOfRange = (newMin && curFecha < newMin) || (newMax && curFecha > newMax);
-            if (outOfRange) update(activeIndex, "fecha_limite", "");
-        }
-        update(activeIndex, "actividad_id", s.id);
-        closeDropdown();
     };
 
     return (
@@ -141,18 +117,16 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                                 {empresaNombre}
                             </div>
                         </div>
-                        <ActividadDropdown
-                            actividadRef={actividadRef}
-                            actividadOpen={actividadOpen}
-                            actividadSearch={actividadSearch}
-                            filteredSubtareas={filteredSubtareas}
-                            allSubtareas={allSubtareas}
-                            currentActividadId={current.actividad_id}
-                            currentFechaLimite={current.fecha_limite}
-                            onOpen={openDropdown}
-                            onSearch={setActividadSearch}
-                            onSelect={handleSelectActividad}
-                        />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Actividad <span className="text-red-500">*</span>
+                            </label>
+                            <div className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-600 truncate">
+                                {current.actividad_id
+                                    ? allSubtareas.find((s) => s.id === current.actividad_id)?.nombre ?? "—"
+                                    : "—"}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Severidad + Responsable */}
