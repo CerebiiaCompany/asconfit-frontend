@@ -52,8 +52,8 @@ export const ViewCompanies: React.FC = () => {
 
 
       {/* Top Actions Line */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div>
           <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">
             Empresas
           </h1>
@@ -62,15 +62,15 @@ export const ViewCompanies: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <button
             onClick={handleNewEmpresa}
-            className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded-md hover:bg-orange-50 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-2 border border-orange-400 text-gray-700 rounded-md hover:bg-orange-50 transition-colors font-medium text-sm"
           >
             <PlusCircle className="w-4 h-4 text-orange-400" />
             Crear empresa
           </button>
-          <button className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-bold text-sm shadow-sm">
+          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-bold text-sm shadow-sm">
             <FileText className="w-4 h-4" />
             Ver empresas
           </button>
@@ -81,8 +81,8 @@ export const ViewCompanies: React.FC = () => {
       <hr className="border-gray-200 mb-8" />
 
       {/* Search and Filters */}
-      <div className="flex gap-4 mb-8">
-        <div className="relative w-full max-w-[400px]">
+      <div className="flex gap-3 mb-8">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -92,7 +92,7 @@ export const ViewCompanies: React.FC = () => {
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 bg-white"
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors">
+        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors flex-shrink-0">
           <SlidersHorizontal className="w-4 h-4 text-orange-500" />
           Filtro
         </button>
