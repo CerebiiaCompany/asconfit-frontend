@@ -58,7 +58,7 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4">
-                <h2 className="text-white font-semibold text-base">Estado de Requerimientos</h2>
+                <h2 className="text-white font-semibold text-base">Informe Preliminar</h2>
                 <p className="text-orange-100 text-xs mt-0.5">
                     {aprobadas} de {totalSubtareas} aprobados · {pendientes} pendientes
                 </p>
