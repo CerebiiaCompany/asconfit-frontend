@@ -91,7 +91,7 @@ export const MisTareas: React.FC = () => {
             )}
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               {auditoriaSeleccionada === null
-                ? "Mis Auditorías"
+                ? "Mis Tareas"
                 : "Tareas de la Auditoría"}
             </h1>
           </div>
