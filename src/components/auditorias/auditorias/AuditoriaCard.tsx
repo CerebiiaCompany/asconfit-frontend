@@ -213,7 +213,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             onClick={() => onViewComplete(auditoria.id)}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
-            Ver auditoría completa
+            Ver auditoría
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -304,7 +304,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             onClick={() => onViewComplete(auditoria.id)}
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
           >
-            Ver auditoría completa
+            Ver auditoría
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
