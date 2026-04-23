@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  <div className="flex flex-col">
+                  <div className="hidden md:flex flex-col">
                     <span className="text-[#1A202C] font-medium text-lg leading-none mb-0.5 lowercase">
                       {user.name}
                     </span>
