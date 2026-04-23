@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Auditoria } from "../../../types/auditoria";
 
 interface AuditoriaCardProps {
@@ -10,6 +11,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
   auditoria,
   onViewComplete,
 }) => {
+  const navigate = useNavigate();
   // Formatear fecha
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "Planeación";
@@ -199,6 +201,15 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
         {/* Buttons */}
         <div className="flex gap-2">
           <button
+            onClick={() => navigate(`/auditorias/${auditoria.id}/informe-preliminar`)}
+            className="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Crear Informe
+          </button>
+          <button
             onClick={() => onViewComplete(auditoria.id)}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
@@ -280,6 +291,15 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
 
         {/* Buttons */}
         <div className="mt-4 flex justify-end gap-2">
+          <button
+            onClick={() => navigate(`/auditorias/${auditoria.id}/informe-preliminar`)}
+            className="border border-gray-300 text-gray-600 hover:bg-gray-50 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Crear Informe
+          </button>
           <button
             onClick={() => onViewComplete(auditoria.id)}
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"

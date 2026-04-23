@@ -14,6 +14,7 @@ import { ViewCompanies } from "./pages/Companies/ViewCompanies";
 import { Auditorias } from "./pages/auditorias/Auditorias";
 import { NuevaAuditoria } from "./pages/auditorias/NuevaAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
+import { PreliminaryReport } from "./pages/auditorias/PreliminaryReport";
 import { MisTareas } from "./pages/MisTareas";
 import { TareaDetalle } from "./pages/TareaDetalle";
 import { Perfil } from "./pages/Perfil";
@@ -143,6 +144,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <AuditoriaDetalle />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/auditorias/:id/informe-preliminar"
+                    element={
+                      <RoleBasedRoute>
+                        <PreliminaryReport />
                       </RoleBasedRoute>
                     }
                   />

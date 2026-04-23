@@ -89,6 +89,7 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/auditorias": "auditorias",
   "/auditorias/nueva": "auditorias",
   "/auditorias/:id": "auditorias",
+  "/auditorias/:id/informe-preliminar": "auditorias",
   "/ai-analysis": "ai-analysis",
   "/mis-tareas": "mis-tareas",
   "/mis-tareas/:id": "mis-tareas",
