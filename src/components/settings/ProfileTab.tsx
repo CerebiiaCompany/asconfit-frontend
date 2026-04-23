@@ -65,10 +65,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
   const photoUrl = storageUrl(user.profile_photo_url ?? user.profile_photo_path);
 
-  // Split name for display in View mode
-  const nameParts = (name || user.name || "").trim().split(" ");
-  const firstName = nameParts[0] || "";
-  const lastName = nameParts.slice(1).join(" ") || "";
+  const fullName = (name || user.name || "").trim();
 
   if (!isEditing) {
     return (
@@ -169,18 +166,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               </p>
             </div>
 
-            <div>
+            <div className="col-span-2">
               <p className="text-xs text-gray-300 font-semibold mb-1">
-                Nombres
+                Nombre Completo
               </p>
-              <p className="text-lg font-bold text-[#4B4B4B]">{firstName}</p>
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-300 font-semibold mb-1">
-                Apellidos
-              </p>
-              <p className="text-lg font-bold text-[#4B4B4B]">{lastName}</p>
+              <p className="text-lg font-bold text-[#4B4B4B]">{fullName || "---"}</p>
             </div>
 
             <div>
