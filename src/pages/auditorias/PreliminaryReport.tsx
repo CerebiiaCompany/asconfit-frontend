@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ReportTaskList } from "../../components/auditorias/preliminary-report/ReportTaskList";
-import { ReportPdfUpload } from "../../components/auditorias/preliminary-report/ReportPdfUpload";
 import { auditoriaService } from "../../services/auditoriaService";
 import { storageUrl } from "../../utils/storageUrl";
+import { ReportTaskList } from "../../components/auditorias/preliminary-report/ReportTaskList";
+import { ReportPdfUpload } from "../../components/auditorias/preliminary-report/ReportPdfUpload";
 
 export const PreliminaryReport: React.FC = () => {
     const navigate = useNavigate();
