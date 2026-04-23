@@ -16,7 +16,6 @@ export interface Carpeta {
     id: number;
     empresa_id: number;
     nombre: string;
-    is_default: boolean;
     is_private: boolean;
     created_at?: string;
 }

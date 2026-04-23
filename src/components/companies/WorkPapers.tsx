@@ -146,22 +146,24 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, isPrivate, is
           </button>
         </div>
 
-        <div className="flex bg-white border border-gray-200 rounded overflow-hidden shadow-sm">
-          <button
-            onClick={isAdmin ? onTogglePrivate : undefined}
-            title={isAdmin ? (isPrivate ? "Carpeta privada (solo admins) — click para hacer pública" : "Carpeta pública — click para hacer privada") : "Solo los admins pueden cambiar la privacidad"}
-            className={`px-4 py-2 flex items-center justify-center transition-colors ${isPrivate ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white text-gray-400 hover:bg-gray-50'} ${!isAdmin ? 'cursor-default' : ''}`}
-          >
-            <Lock className="w-4 h-4" />
-          </button>
-          <button
-            onClick={isAdmin ? onTogglePrivate : undefined}
-            title={isAdmin ? (isPrivate ? "Carpeta privada (solo admins) — click para hacer pública" : "Carpeta pública — click para hacer privada") : undefined}
-            className={`px-4 py-2 flex items-center justify-center border-l border-gray-200 transition-colors ${!isPrivate ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white text-gray-500 hover:bg-gray-50'} ${!isAdmin ? 'cursor-default' : ''}`}
-          >
-            <Users className="w-4 h-4" />
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex bg-white border border-gray-200 rounded overflow-hidden shadow-sm">
+            <button
+              onClick={onTogglePrivate}
+              title={isPrivate ? "Carpeta privada — click para hacer pública" : "Carpeta pública — click para hacer privada"}
+              className={`px-4 py-2 flex items-center justify-center transition-colors ${isPrivate ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
+            >
+              <Lock className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onTogglePrivate}
+              title={isPrivate ? "Carpeta privada — click para hacer pública" : "Carpeta pública — click para hacer privada"}
+              className={`px-4 py-2 flex items-center justify-center border-l border-gray-200 transition-colors ${!isPrivate ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+            >
+              <Users className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* States: Loading or Empty or Grid */}
