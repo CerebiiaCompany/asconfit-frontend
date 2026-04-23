@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ShieldOff } from "lucide-react";
 import { CompanyHeader } from "../../components/companies/CompanyHeader";
 import { CompanyInfo } from "../../components/companies/CompanyInfo";
 import { CompanyTabs } from "../../components/companies/CompanyTabs";
@@ -22,6 +23,7 @@ export const Companies: React.FC = () => {
   const [empresaState, setEmpresaState] = useState<EmpresaModel | null>(null);
   const [loading, setLoading] = useState(!!empresaId);
   const [activeCarpeta, setActiveCarpeta] = useState<Carpeta | null>(null);
+  const [sinAcceso, setSinAcceso] = useState(false);
 
   const isAdmin = userRole === "admin";
 
@@ -63,10 +65,17 @@ export const Companies: React.FC = () => {
             empresaId={empresaState.id!}
             activeCarpetaId={activeCarpeta?.id ?? null}
             setActiveCarpeta={setActiveCarpeta}
+            onNoCarpetas={() => setSinAcceso(true)}
             isAdmin={isAdmin}
             activeCarpetaData={activeCarpeta}
           />
-          {activeCarpeta ? (
+          {sinAcceso ? (
+            <div className="py-20 text-center bg-[#f0f2f5] rounded-b-xl rounded-tr-xl border border-gray-200 flex flex-col items-center gap-3">
+              <ShieldOff className="w-12 h-12 text-gray-300" />
+              <p className="text-gray-500 font-semibold">Sin acceso a los documentos</p>
+              <p className="text-gray-400 text-sm">No tienes permisos para ver las carpetas de esta empresa.</p>
+            </div>
+          ) : activeCarpeta ? (
             <WorkPapers
               carpetaId={activeCarpeta.id}
               isPrivate={activeCarpeta.is_private}

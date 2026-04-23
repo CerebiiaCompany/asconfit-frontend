@@ -7,11 +7,12 @@ interface CompanyTabsProps {
   empresaId: number;
   activeCarpetaId: number | null;
   setActiveCarpeta: (carpeta: Carpeta) => void;
+  onNoCarpetas?: () => void;
   isAdmin: boolean;
   activeCarpetaData?: Carpeta | null;
 }
 
-export const CompanyTabs: React.FC<CompanyTabsProps> = ({ empresaId, activeCarpetaId, setActiveCarpeta, isAdmin, activeCarpetaData }) => {
+export const CompanyTabs: React.FC<CompanyTabsProps> = ({ empresaId, activeCarpetaId, setActiveCarpeta, onNoCarpetas, isAdmin, activeCarpetaData }) => {
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const { addToast } = useToast();
 
@@ -32,6 +33,8 @@ export const CompanyTabs: React.FC<CompanyTabsProps> = ({ empresaId, activeCarpe
       setCarpetas(data);
       if (data.length > 0) {
         setActiveCarpeta(data[0]);
+      } else {
+        onNoCarpetas?.();
       }
     } catch (error) {
       console.error(error);
@@ -80,13 +83,15 @@ export const CompanyTabs: React.FC<CompanyTabsProps> = ({ empresaId, activeCarpe
         );
       })}
 
-      <button
-        onClick={handleCreateCarpeta}
-        title="Crear nueva carpeta"
-        className="bg-white border border-orange-200 text-orange-400 px-4 py-2.5 rounded shadow-sm hover:bg-gray-50 transition-colors flex items-center justify-center flex-shrink-0"
-      >
-        <Plus className="w-5 h-5" />
-      </button>
+      {(isAdmin || carpetas.length > 0) && (
+        <button
+          onClick={handleCreateCarpeta}
+          title="Crear nueva carpeta"
+          className="bg-white border border-orange-200 text-orange-400 px-4 py-2.5 rounded shadow-sm hover:bg-gray-50 transition-colors flex items-center justify-center flex-shrink-0"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 };
