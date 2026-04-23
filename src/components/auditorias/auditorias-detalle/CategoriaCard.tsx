@@ -3,6 +3,7 @@ import { SubtareaTable } from './SubtareaTable';
 
 interface CategoriaCardProps {
     categoria: any;
+    auditoria: any;
     uploadingSubtareaId: number | null;
     fileInputRefs: React.MutableRefObject<{ [key: number]: HTMLInputElement | null }>;
     onFileSelect: (subtareaId: number) => void;
@@ -16,6 +17,7 @@ interface CategoriaCardProps {
 
 export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     categoria,
+    auditoria,
     uploadingSubtareaId,
     fileInputRefs,
     onFileSelect,
@@ -44,6 +46,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                 {categoria.subtareas && categoria.subtareas.length > 0 ? (
                     <SubtareaTable
                         subtareas={categoria.subtareas}
+                        auditoria={auditoria}
                         uploadingSubtareaId={uploadingSubtareaId}
                         fileInputRefs={fileInputRefs}
                         onFileSelect={onFileSelect}

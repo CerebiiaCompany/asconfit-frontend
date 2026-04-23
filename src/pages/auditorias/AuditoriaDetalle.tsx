@@ -142,6 +142,7 @@ export const AuditoriaDetalle: React.FC = () => {
               <CategoriaCard
                 key={categoria.id}
                 categoria={categoria}
+                auditoria={auditoria}
                 uploadingSubtareaId={uploadingSubtareaId}
                 fileInputRefs={fileInputRefs}
                 onFileSelect={handleFileSelect}

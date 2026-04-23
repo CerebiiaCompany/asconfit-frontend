@@ -12,6 +12,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
     auditoria,
     onClose,
     onSave,
+    initialActividadId,
 }) => {
     const {
         findings,
@@ -24,7 +25,7 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
         addFinding,
         removeFinding,
         handleSave,
-    } = useFindings(auditoria, onClose, onSave);
+    } = useFindings(auditoria, onClose, onSave, initialActividadId);
 
     const allSubtareas: Subtarea[] = (auditoria.categorias ?? []).flatMap(
         (cat) => cat.subtareas ?? []

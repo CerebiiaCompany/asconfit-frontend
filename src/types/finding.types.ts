@@ -13,12 +13,13 @@ export interface CrearFindingModalProps {
     auditoria: Auditoria;
     onClose: () => void;
     onSave?: (findings: Finding[]) => void;
+    initialActividadId?: number | null;
 }
 
 export const SEVERIDAD_CONFIG = {
     critico: { label: "Crítico", color: "bg-red-500", ring: "ring-red-500", text: "text-red-600" },
-    grave:   { label: "Grave",   color: "bg-yellow-400", ring: "ring-yellow-400", text: "text-yellow-600" },
-    leve:    { label: "Leve",    color: "bg-green-500", ring: "ring-green-500", text: "text-green-600" },
+    grave: { label: "Grave", color: "bg-yellow-400", ring: "ring-yellow-400", text: "text-yellow-600" },
+    leve: { label: "Leve", color: "bg-green-500", ring: "ring-green-500", text: "text-green-600" },
 } as const;
 
 export const emptyFinding = (): Finding => ({

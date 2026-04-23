@@ -3,8 +3,8 @@ import { findingService } from "../services/findingService";
 import { Auditoria } from "../types/auditoria";
 import { Finding, emptyFinding } from "../types/finding.types";
 
-export function useFindings(auditoria: Auditoria, onClose: () => void, onSave?: (findings: Finding[]) => void) {
-    const [findings, setFindings] = useState<Finding[]>([emptyFinding()]);
+export function useFindings(auditoria: Auditoria, onClose: () => void, onSave?: (findings: Finding[]) => void, initialActividadId?: number | null) {
+    const [findings, setFindings] = useState<Finding[]>([{ ...emptyFinding(), actividad_id: initialActividadId ?? null }]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);

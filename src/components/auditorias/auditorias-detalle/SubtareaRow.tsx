@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { PriorityBadge } from "../PriorityBadge";
 import { EstadoInformacionBadge } from "../EstadoInformacionBadge";
 import { FileUploadCell } from "./FileUploadCell";
 import { FormatoBadge } from "../FormatoBadge";
+import { CrearFindingModal } from "../Findings/CrearFindingModal";
 
 interface SubtareaRowProps {
   subtarea: any;
+  auditoria: any;
   isUploading: boolean;
   fileInputRef: (el: HTMLInputElement | null) => void;
   onFileSelect: (subtareaId: number) => void;
@@ -22,6 +24,7 @@ interface SubtareaRowProps {
 
 export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   subtarea,
+  auditoria,
   isUploading,
   fileInputRef,
   onFileSelect,
@@ -32,6 +35,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   isUpdatingEstado,
   userRole,
 }) => {
+  const [showFindingModal, setShowFindingModal] = useState(false);
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onEstadoChange(subtarea.id, e.target.value);
   };
@@ -102,6 +106,26 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
       <td className="px-2 py-3 whitespace-nowrap">
         <FormatoBadge formato={subtarea.formato_archivo} />
       </td>
+      <td className="px-2 py-3 whitespace-nowrap">
+        <button
+          onClick={() => setShowFindingModal(true)}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors"
+          title="Crear hallazgo para esta actividad"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          Hallazgo
+        </button>
+      </td>
+
+      {showFindingModal && (
+        <CrearFindingModal
+          auditoria={auditoria}
+          initialActividadId={subtarea.id}
+          onClose={() => setShowFindingModal(false)}
+        />
+      )}
     </tr>
   );
 };
