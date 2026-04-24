@@ -25,7 +25,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     id: "mis-tareas",
     path: "/mis-tareas",
     label: "Mis Tareas",
-    icon: "/Search.png",
+    icon: "/mytask.png",
   },
   {
     id: "empresas",
