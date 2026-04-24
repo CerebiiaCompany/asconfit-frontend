@@ -1,152 +1,36 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React from 'react';
 import { Sparkles, Brain, AlertTriangle, Rocket, LayoutGrid } from 'lucide-react';
 import { useEmpresas } from '../hooks/useEmpresas';
-import { useAuditorias } from '../hooks/useAuditorias';
-import { auditoriaService } from '../services/auditoriaService';
+import { useAIAnalysis } from '../hooks/useAIAnalysis';
+import { StyledDropdown } from '../components/AIAnalysis/StyledDropdown';
+import { PredictiveAlert } from '../types/aiAnalysis';
 
-interface PredictiveAlert {
-    id: number;
-    level: 'CRITICA' | 'ALTA' | 'MEDIA';
-    title: string;
-    description: string;
-    area: string;
-    probability: string;
-}
+const getAlertColor = (level: string) => {
+    switch (level) {
+        case 'CRITICA': return 'bg-red-50 text-red-700 border-red-100';
+        case 'ALTA': return 'bg-amber-50 text-amber-700 border-amber-100';
+        case 'MEDIA': return 'bg-orange-50 text-orange-700 border-orange-100';
+        default: return 'bg-gray-50 text-gray-700 border-gray-100';
+    }
+};
 
-// ── Dropdown genérico estilo hallazgos ─────────────────────────────────────
-interface DropdownProps {
-    label: string;
-    placeholder: string;
-    value: string;
-    options: { value: string; label: string }[];
-    onChange: (val: string) => void;
-    disabled?: boolean;
-}
+const getBadgeColor = (level: string) => {
+    switch (level) {
+        case 'CRITICA': return 'bg-red-100 text-red-600';
+        case 'ALTA': return 'bg-amber-100 text-amber-600';
+        case 'MEDIA': return 'bg-orange-100 text-orange-600';
+        default: return 'bg-gray-100 text-gray-600';
+    }
+};
 
-function StyledDropdown({ label, placeholder, value, options, onChange, disabled }: DropdownProps) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    const displayText = value
-        ? options.find(o => o.value === value)?.label ?? value
-        : placeholder;
-
-    return (
-        <div ref={ref} className="flex flex-col gap-1 relative">
-            <label className="text-sm font-medium text-gray-600">{label}</label>
-            <button
-                type="button"
-                disabled={disabled}
-                onClick={() => !disabled && setOpen(o => !o)}
-                className={`flex items-center justify-between px-4 py-2.5 border rounded-lg text-sm bg-white focus:outline-none transition-all
-                    ${disabled
-                        ? 'border-gray-100 bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : open
-                            ? 'border-orange-400 ring-2 ring-orange-400/20 text-gray-700 cursor-pointer'
-                            : 'border-gray-200 text-gray-700 hover:border-orange-300 cursor-pointer'
-                    }`}
-            >
-                <span className="truncate">{displayText}</span>
-                <svg
-                    className={`w-4 h-4 ml-2 text-gray-400 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            {open && (
-                <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg min-w-full py-1">
-                    {value && (
-                        <button
-                            type="button"
-                            onClick={() => { onChange(''); setOpen(false); }}
-                            className="w-full text-left px-3 py-1.5 text-xs text-orange-500 hover:bg-orange-50 border-b border-gray-100"
-                        >
-                            Limpiar selección
-                        </button>
-                    )}
-                    {options.map(opt => (
-                        <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => { onChange(opt.value); setOpen(false); }}
-                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors
-                                ${opt.value === value ? 'text-orange-500 font-medium bg-orange-50/50' : 'text-gray-700'}`}
-                        >
-                            {opt.label}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-// ── Página principal ───────────────────────────────────────────────────────
 const AIAnalysis: React.FC = () => {
     const { empresas } = useEmpresas();
-    const { auditorias } = useAuditorias();
-    const [selectedCompany, setSelectedCompany] = useState('');
-    const [selectedType, setSelectedType] = useState('');
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [showResults, setShowResults] = useState(false);
-    const [analysisData, setAnalysisData] = useState<{ resumen: string, alertas: PredictiveAlert[] } | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    const availableTypes = useMemo(() => {
-        if (!selectedCompany) return [];
-        const companyAudits = auditorias.filter(a => String(a.empresa_id) === selectedCompany);
-        const types = companyAudits.map(a => a.tipo_auditoria).filter((t): t is string => !!t);
-        return Array.from(new Set(types));
-    }, [selectedCompany, auditorias]);
-
-    const handleCompanyChange = (val: string) => {
-        setSelectedCompany(val);
-        setSelectedType('');
-        setShowResults(false);
-        setAnalysisData(null);
-    };
-
-    const handleExecuteAnalysis = async () => {
-        if (!selectedCompany || !selectedType) return;
-        setIsAnalyzing(true);
-        setError(null);
-        try {
-            const data = await auditoriaService.analizarIA(selectedCompany, selectedType);
-            setAnalysisData(data);
-            setShowResults(true);
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'No se pudo completar el análisis en este momento.');
-        } finally {
-            setIsAnalyzing(false);
-        }
-    };
-
-    const getAlertColor = (level: string) => {
-        switch (level) {
-            case 'CRITICA': return 'bg-red-50 text-red-700 border-red-100';
-            case 'ALTA': return 'bg-amber-50 text-amber-700 border-amber-100';
-            case 'MEDIA': return 'bg-orange-50 text-orange-700 border-orange-100';
-            default: return 'bg-gray-50 text-gray-700 border-gray-100';
-        }
-    };
-
-    const getBadgeColor = (level: string) => {
-        switch (level) {
-            case 'CRITICA': return 'bg-red-100 text-red-600';
-            case 'ALTA': return 'bg-amber-100 text-amber-600';
-            case 'MEDIA': return 'bg-orange-100 text-orange-600';
-            default: return 'bg-gray-100 text-gray-600';
-        }
-    };
+    const {
+        selectedCompany, selectedType, setSelectedType,
+        handleCompanyChange, availableTypes,
+        isAnalyzing, showResults, analysisData, error,
+        executeAnalysis,
+    } = useAIAnalysis();
 
     const empresaOptions = (empresas ?? []).map((e: any) => ({ value: String(e.id), label: e.razon_social }));
     const typeOptions = availableTypes.map(t => ({ value: t, label: t }));
@@ -165,7 +49,7 @@ const AIAnalysis: React.FC = () => {
                     </p>
                 </div>
                 <button
-                    onClick={handleExecuteAnalysis}
+                    onClick={executeAnalysis}
                     disabled={isAnalyzing || !selectedCompany || !selectedType}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all shadow-sm
                         ${isAnalyzing || !selectedCompany || !selectedType
@@ -185,7 +69,6 @@ const AIAnalysis: React.FC = () => {
                     </div>
                     Seleccionar Empresa y Auditorías
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
                     <StyledDropdown
                         label="Empresa"
@@ -213,6 +96,7 @@ const AIAnalysis: React.FC = () => {
                 </div>
             )}
 
+            {/* Results */}
             {showResults && !isAnalyzing && analysisData && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
@@ -231,7 +115,7 @@ const AIAnalysis: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {analysisData.alertas.map((alert) => (
+                        {analysisData.alertas.map((alert: PredictiveAlert) => (
                             <div key={alert.id} className={`border rounded-xl p-5 transition-all hover:shadow-md ${getAlertColor(alert.level)}`}>
                                 <div className="flex justify-between items-start mb-3">
                                     <div className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${getBadgeColor(alert.level)}`}>
