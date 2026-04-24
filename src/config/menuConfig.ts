@@ -37,7 +37,7 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     id: "hallazgos",
     path: "/hallazgos",
     label: "Hallazgos",
-    icon: "/Hallazgos.png",
+    icon: "/fiddings.png",
   },
   {
     id: "ai-analysis",
