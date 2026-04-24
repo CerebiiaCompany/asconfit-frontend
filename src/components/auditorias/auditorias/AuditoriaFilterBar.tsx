@@ -15,7 +15,9 @@ interface AuditoriaFilterBarProps {
 
 const ESTADO_LABELS: Record<string, string> = {
   pendiente: "Pendiente",
-  check: "Check",
+  en_progreso: "En Progreso",
+  completada: "Completada",
+  aprobado: "Aprobado",
 };
 
 export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
@@ -67,11 +69,10 @@ export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowFilters((prev) => !prev)}
-            className={`relative flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-all duration-150 ${
-              showFilters || hasActiveFilters
-                ? "border-orange-400 bg-orange-50 text-orange-600 shadow-sm"
-                : "border-gray-300 hover:bg-gray-50 text-gray-700"
-            }`}
+            className={`relative flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-all duration-150 ${showFilters || hasActiveFilters
+              ? "border-orange-400 bg-orange-50 text-orange-600 shadow-sm"
+              : "border-gray-300 hover:bg-gray-50 text-gray-700"
+              }`}
           >
             <svg
               className="w-5 h-5 shrink-0"
@@ -149,7 +150,7 @@ export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
                           type="date"
                           value={fechaDesde}
                           onChange={(e) => onFechaDesdeChange(e.target.value)}
-                        className="flex-1 bg-transparent focus:outline-none text-gray-700 min-w-0 w-0"
+                          className="flex-1 bg-transparent focus:outline-none text-gray-700 min-w-0 w-0"
                         />
                       </div>
                     </div>
@@ -165,7 +166,7 @@ export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
                           type="date"
                           value={fechaHasta}
                           onChange={(e) => onFechaHastaChange(e.target.value)}
-                        className="flex-1 bg-transparent focus:outline-none text-gray-700 min-w-0 w-0"
+                          className="flex-1 bg-transparent focus:outline-none text-gray-700 min-w-0 w-0"
                         />
                       </div>
                     </div>
@@ -179,7 +180,7 @@ export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
                     Proceso
                   </p>
                   <div className="flex flex-col gap-1.5">
-                    {(["", "pendiente", "check"] as const).map(
+                    {(["", "pendiente", "en_progreso", "completada", "aprobado"] as const).map(
                       (val) => {
                         const label = val === "" ? "Todos" : ESTADO_LABELS[val];
                         const isSelected = estadoFilter === val;
@@ -187,19 +188,17 @@ export const AuditoriaFilterBar: React.FC<AuditoriaFilterBarProps> = ({
                           <button
                             key={val}
                             onClick={() => onEstadoFilterChange(val)}
-                            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left ${
-                              isSelected
-                                ? "bg-orange-50 text-orange-700 font-medium"
-                                : "hover:bg-gray-50 text-gray-600"
-                            }`}
+                            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left ${isSelected
+                              ? "bg-orange-50 text-orange-700 font-medium"
+                              : "hover:bg-gray-50 text-gray-600"
+                              }`}
                           >
                             {/* Radio circle */}
                             <span
-                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                isSelected
-                                  ? "border-orange-500"
-                                  : "border-gray-300"
-                              }`}
+                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected
+                                ? "border-orange-500"
+                                : "border-gray-300"
+                                }`}
                             >
                               {isSelected && (
                                 <span className="w-2 h-2 rounded-full bg-orange-500" />
