@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { documentoService, Documento } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
+import { SearchInput } from "../SearchInput";
 
 export const PapeleraList: React.FC = () => {
   const [documentos, setDocumentos] = useState<Documento[]>([]);
@@ -86,25 +87,12 @@ export const PapeleraList: React.FC = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 mt-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         {/* Buscador */}
-        <div className="relative w-full sm:w-80">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              className="h-5 w-5 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-[#FF9411] focus:border-[#FF9411] sm:text-sm text-gray-700"
-            placeholder="Buscar por nombre, empresa..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Buscar por nombre, empresa..."
+          className="w-full sm:w-80"
+        />
 
         {/* Acciones */}
         <div className="flex gap-2 sm:gap-4">
