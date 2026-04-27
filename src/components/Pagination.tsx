@@ -47,11 +47,10 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         key={page}
         onClick={() => onPageChange(page)}
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mx-1 transition-colors ${
-          page === currentPage
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mx-1 transition-colors ${page === currentPage
             ? "bg-primary-orange text-white"
             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-        }`}
+          }`}
       >
         {page}
       </button>
@@ -100,14 +99,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
       {/* Right: generate report button */}
       <div>
-        <button
-          type="button"
-          onClick={onGenerateReport}
-          className="bg-primary-orange text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!onGenerateReport}
-        >
-          Generar Informe
-        </button>
+
       </div>
     </div>
   );
