@@ -41,7 +41,7 @@ export const TareaCard: React.FC<TareaCardProps> = ({
             case 'revision':
                 return { label: 'En revisión', color: 'text-yellow-600', bg: 'bg-yellow-50', borderColor: 'border-yellow-200' };
             default:
-                return { label: 'Pendiente', color: 'text-gray-500', bg: 'bg-gray-50', borderColor: 'border-gray-200' };
+                return { label: 'Pendiente', color: 'text-orange-600', bg: 'bg-orange-50', borderColor: 'border-orange-200' };
         }
     };
 
@@ -57,9 +57,9 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                     </svg>
                     <span className="font-medium text-blue-600">{tarea.categoriaNombre}</span>
                 </div>
-                
+
                 {/* Badge de estado */}
-                <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.borderColor}`}>
+                <div className={`px-2 py-0.5 rounded text-xs font-semibold border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.borderColor}`}>
                     {statusConfig.label}
                 </div>
             </div>
@@ -106,7 +106,7 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         uploading={uploading}
                         disabled={isUploadDisabled}
                     />
-                    
+
                     {/* Mensaje de ayuda basado en el estado */}
                     {isUploadDisabled && tarea.estadoInformacion === 'aprobado' && (
                         <span className="text-[10px] text-green-600 font-medium">Información aprobada</span>
