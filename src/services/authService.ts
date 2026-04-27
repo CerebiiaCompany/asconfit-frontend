@@ -19,6 +19,8 @@ export interface User {
   department?: string;
   profile_photo_path?: string;
   profile_photo_url?: string;
+  cv_path?: string;
+  cv_url?: string;
 }
 
 export interface AuthResponse {
@@ -102,6 +104,17 @@ class AuthService {
 
   async updatePassword(data: UpdatePasswordData): Promise<{ message: string }> {
     return api.put<{ message: string }>("/password", data);
+  }
+
+  async uploadCV(
+    file: File,
+  ): Promise<{ message: string; user: User; cv_url: string }> {
+    const formData = new FormData();
+    formData.append("cv", file);
+    return api.post<{ message: string; user: User; cv_url: string }>(
+      "/profile/cv",
+      formData,
+    );
   }
 
   setToken(token: string): void {

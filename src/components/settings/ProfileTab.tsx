@@ -24,6 +24,7 @@ interface ProfileTabProps {
   profileMessage: { type: "success" | "error"; text: string } | null;
   handleProfileUpdate: (e: React.FormEvent) => Promise<boolean>;
   handlePhotoUpload: (file: File) => void;
+  handleCVUpload?: (file: File) => void;
 }
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({
@@ -48,9 +49,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   profileMessage,
   handleProfileUpdate,
   handlePhotoUpload,
+  handleCVUpload,
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const cvInputRef = React.useRef<HTMLInputElement>(null);
 
   const onPhotoClick = () => {
     fileInputRef.current?.click();
@@ -60,6 +63,17 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       handlePhotoUpload(file);
+    }
+  };
+
+  const onCVClick = () => {
+    cvInputRef.current?.click();
+  };
+
+  const onCVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && handleCVUpload) {
+      handleCVUpload(file);
     }
   };
 
@@ -134,6 +148,63 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               <p className="text-lg font-bold text-gray-700">{user.email}</p>
             </div>
           </div>
+        </div>
+
+        {/* CV Section */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+          <h3 className="text-xl font-bold text-gray-800 mb-6">Hoja de Vida</h3>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <input
+              type="file"
+              ref={cvInputRef}
+              onChange={onCVChange}
+              accept=".pdf"
+              className="hidden"
+            />
+            {user.cv_path || user.cv_url ? (
+              <>
+                <a
+                  href={storageUrl(user.cv_url ?? user.cv_path) ?? '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-medium text-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  Ver Hoja de Vida
+                </a>
+                <button
+                  onClick={onCVClick}
+                  className="px-5 py-2.5 bg-[#F97316] text-white rounded-xl hover:bg-orange-600 transition-all font-medium text-sm"
+                >
+                  Actualizar PDF
+                </button>
+
+              </>
+            ) : (
+              <button
+                onClick={onCVClick}
+                className="bg-[#F97316] hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl flex items-center font-bold text-sm shadow-md transition-all"
+              >
+                Subir Hoja de Vida (PDF)
+                <svg
+                  className="ml-2 w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-gray-400 mt-3">Formato PDF, máximo 5MB</p>
         </div>
 
         {/* Personal Details Card */}

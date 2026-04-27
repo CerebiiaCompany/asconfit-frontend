@@ -69,6 +69,21 @@ export const useUserProfile = (initialUser: User) => {
         }
     };
 
+    const handleCVUpload = async (file: File) => {
+        setProfileLoading(true);
+        try {
+            const response = await authService.uploadCV(file);
+            setUser(response.user);
+            setGlobalUser(response.user);
+            addToast(response.message, 'success');
+        } catch (error: any) {
+            const errorText = error.response?.data?.message || error.message || 'Error al subir la hoja de vida';
+            addToast(errorText, 'error');
+        } finally {
+            setProfileLoading(false);
+        }
+    };
+
     return {
         user,
         name, setName,
@@ -82,6 +97,7 @@ export const useUserProfile = (initialUser: User) => {
         profileLoading,
         profileMessage,
         handleProfileUpdate,
-        handlePhotoUpload
+        handlePhotoUpload,
+        handleCVUpload
     };
 };

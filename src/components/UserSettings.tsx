@@ -25,6 +25,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
     profileMessage,
     handleProfileUpdate,
     handlePhotoUpload,
+    handleCVUpload,
   } = useUserProfile(initialUser);
 
   const {
@@ -47,21 +48,19 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
           <nav className="space-y-4">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${
-                activeTab === "profile"
-                  ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
-                  : "bg-transparent text-gray-400 hover:text-gray-600"
-              }`}
+              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${activeTab === "profile"
+                ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
+                : "bg-transparent text-gray-400 hover:text-gray-600"
+                }`}
             >
               Cuenta
             </button>
             <button
               onClick={() => setActiveTab("password")}
-              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${
-                activeTab === "password"
-                  ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
-                  : "bg-transparent text-gray-400 hover:text-gray-600"
-              }`}
+              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${activeTab === "password"
+                ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
+                : "bg-transparent text-gray-400 hover:text-gray-600"
+                }`}
             >
               Cambiar Clave
             </button>
@@ -93,6 +92,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
               profileMessage={profileMessage}
               handleProfileUpdate={handleProfileUpdate}
               handlePhotoUpload={handlePhotoUpload}
+              handleCVUpload={handleCVUpload}
             />
           ) : (
             <PasswordTab
