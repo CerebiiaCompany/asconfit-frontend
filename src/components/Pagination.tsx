@@ -48,8 +48,8 @@ export const Pagination: React.FC<PaginationProps> = ({
         key={page}
         onClick={() => onPageChange(page)}
         className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mx-1 transition-colors ${page === currentPage
-            ? "bg-primary-orange text-white"
-            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+          ? "bg-primary-orange text-white"
+          : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
           }`}
       >
         {page}
@@ -75,7 +75,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             </option>
           ))}
         </select>
-        <span>auditorias por página</span>
+        <span>auditorías por página</span>
       </div>
 
       {/* Center: page numbers */}
