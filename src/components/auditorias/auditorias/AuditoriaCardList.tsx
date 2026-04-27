@@ -5,11 +5,13 @@ import { AuditoriaCard } from "./AuditoriaCard";
 interface AuditoriaCardListProps {
   auditorias: Auditoria[];
   onViewAuditoria: (id: number) => void;
+  onDeleteAuditoria?: (id: number) => void;
 }
 
 export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
   auditorias,
   onViewAuditoria,
+  onDeleteAuditoria,
 }) => {
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -41,6 +43,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
           key={auditoria.id}
           auditoria={auditoria}
           onViewComplete={onViewAuditoria}
+          onDelete={onDeleteAuditoria}
         />
       ))}
     </div>

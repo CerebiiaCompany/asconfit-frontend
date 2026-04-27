@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useAuditorias } from "../../hooks/useAuditorias";
+import { auditoriaService } from "../../services/auditoriaService";
 import { AuditoriaFilterBar } from "../../components/auditorias/auditorias/AuditoriaFilterBar";
 import { AuditoriaEmptyState } from "../../components/auditorias/auditorias/AuditoriaEmptyState";
 import { AuditoriaCardList } from "../../components/auditorias/auditorias/AuditoriaCardList";
@@ -70,6 +71,21 @@ export const Auditorias: React.FC = () => {
     navigate(`/auditorias/${id}`);
   };
 
+  const handleDeleteAuditoria = async (id: number) => {
+    if (!window.confirm('¿Estás seguro de mover esta auditoría a la papelera? Podrás restaurarla dentro de 30 días.')) {
+      return;
+    }
+
+    try {
+      await auditoriaService.deleteAuditoria(id.toString());
+      // Recargar auditorías
+      window.location.reload();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al mover la auditoría a la papelera');
+    }
+  };
+
   const handleLogout = async () => {
     // La lógica de logout ahora está en AppLayout
     navigate("/login");
@@ -78,60 +94,61 @@ export const Auditorias: React.FC = () => {
   return (
     <div className="py-4 px-3 sm:px-6 lg:px-8">
       <div className="sm:px-0">
-          {/* Page Title */}
-          <h1 className="mt-6 text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
-            Auditorías
-          </h1>
+        {/* Page Title */}
+        <h1 className="mt-6 text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
+          Auditorías
+        </h1>
 
-          {/* Filter Bar */}
-          <AuditoriaFilterBar
-            searchTerm={searchTerm}
-            onSearchChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
-            onNewAuditoria={handleNewAuditoria}
-            fechaDesde={fechaDesde}
-            onFechaDesdeChange={(v) => { setFechaDesde(v); setCurrentPage(1); }}
-            fechaHasta={fechaHasta}
-            onFechaHastaChange={(v) => { setFechaHasta(v); setCurrentPage(1); }}
-            estadoFilter={estadoFilter}
-            onEstadoFilterChange={(v) => { setEstadoFilter(v); setCurrentPage(1); }}
-          />
+        {/* Filter Bar */}
+        <AuditoriaFilterBar
+          searchTerm={searchTerm}
+          onSearchChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
+          onNewAuditoria={handleNewAuditoria}
+          fechaDesde={fechaDesde}
+          onFechaDesdeChange={(v) => { setFechaDesde(v); setCurrentPage(1); }}
+          fechaHasta={fechaHasta}
+          onFechaHastaChange={(v) => { setFechaHasta(v); setCurrentPage(1); }}
+          estadoFilter={estadoFilter}
+          onEstadoFilterChange={(v) => { setEstadoFilter(v); setCurrentPage(1); }}
+        />
 
-          {/* Auditorías List */}
-          {loading ? (
-            <div className="py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-              <p className="mt-4 text-center text-gray-600">Cargando auditorías...</p>
-            </div>
-          ) : filteredAuditorias.length === 0 ? (
-            auditorias.length === 0 ? (
-              <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
-            ) : (
-              <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                <p className="text-gray-500">
-                  No se encontraron auditorías que coincidan con la búsqueda
-                </p>
-              </div>
-            )
+        {/* Auditorías List */}
+        {loading ? (
+          <div className="py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-4 text-center text-gray-600">Cargando auditorías...</p>
+          </div>
+        ) : filteredAuditorias.length === 0 ? (
+          auditorias.length === 0 ? (
+            <AuditoriaEmptyState onNewAuditoria={handleNewAuditoria} />
           ) : (
-            <>
-              <AuditoriaCardList
-                auditorias={paginatedAuditorias}
-                onViewAuditoria={handleViewAuditoria}
-              />
-              <Pagination
-                totalItems={totalItems}
-                pageSize={pageSize}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-                onGenerateReport={() => {
-                  // TODO: Implementar lógica real de generación de informe
-                  console.log("Generar informe de auditorías visibles");
-                }}
-              />
-            </>
-          )}
-        </div>
+            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+              <p className="text-gray-500">
+                No se encontraron auditorías que coincidan con la búsqueda
+              </p>
+            </div>
+          )
+        ) : (
+          <>
+            <AuditoriaCardList
+              auditorias={paginatedAuditorias}
+              onViewAuditoria={handleViewAuditoria}
+              onDeleteAuditoria={handleDeleteAuditoria}
+            />
+            <Pagination
+              totalItems={totalItems}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              onGenerateReport={() => {
+                // TODO: Implementar lógica real de generación de informe
+                console.log("Generar informe de auditorías visibles");
+              }}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };

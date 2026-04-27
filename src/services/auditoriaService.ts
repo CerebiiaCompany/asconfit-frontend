@@ -108,4 +108,28 @@ export const auditoriaService = {
     );
     return response.data as { url: string | null; path: string | null };
   },
+
+  async getPapelera() {
+    const response = await axios.get(`${API_URL}/auditorias/papelera/list`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
+  async restoreAuditoria(id: number) {
+    const response = await axios.post(
+      `${API_URL}/auditorias/${id}/restore`,
+      {},
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
+
+  async forceDeleteAuditoria(id: number) {
+    const response = await axios.delete(
+      `${API_URL}/auditorias/${id}/force`,
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
 };
