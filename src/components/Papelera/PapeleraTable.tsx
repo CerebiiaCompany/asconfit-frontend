@@ -17,15 +17,30 @@ export const PapeleraTable: React.FC<PapeleraTableProps> = ({
             <thead className="sticky top-0 bg-white z-10">
                 <tr>
                     <th className="px-6 py-4 text-left border-t border-b border-gray-200 w-24">
-                        <div className="flex items-center gap-1">
+                        <label className="flex items-center gap-2 cursor-pointer group">
                             <input
                                 type="checkbox"
-                                className="w-4 h-4 text-[#FF9411] border-gray-300 rounded focus:ring-[#FF9411] cursor-pointer"
+                                className="sr-only peer"
                                 onChange={e => onSelectAll(e.target.checked)}
                                 checked={docs.length > 0 && selectedIds.length === docs.length}
                             />
-                            <span className="ml-2 text-sm font-medium text-gray-600">Todos</span>
-                        </div>
+                            <div className={`w-5 h-5 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${docs.length > 0 && selectedIds.length === docs.length
+                                ? 'bg-orange-500 border-orange-500'
+                                : 'bg-white border-gray-300 group-hover:border-orange-400'
+                                }`}>
+                                {docs.length > 0 && selectedIds.length === docs.length && (
+                                    <svg
+                                        className="w-3 h-3 text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                )}
+                            </div>
+                            <span className="text-sm font-medium text-gray-600">Todos</span>
+                        </label>
                     </th>
                     {['Nombre', 'Empresa', 'Ubicación original', 'Fecha de eliminación'].map(h => (
                         <th key={h} className="px-6 py-4 text-left border-t border-b border-gray-200">
@@ -44,12 +59,29 @@ export const PapeleraTable: React.FC<PapeleraTableProps> = ({
                 {docs.map(item => (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-5 whitespace-nowrap">
-                            <input
-                                type="checkbox"
-                                className="w-4 h-4 text-[#FF9411] border-gray-300 rounded focus:ring-[#FF9411] cursor-pointer"
-                                checked={selectedIds.includes(item.id)}
-                                onChange={() => onSelect(item.id)}
-                            />
+                            <label className="cursor-pointer group inline-block">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={selectedIds.includes(item.id)}
+                                    onChange={() => onSelect(item.id)}
+                                />
+                                <div className={`w-5 h-5 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${selectedIds.includes(item.id)
+                                        ? 'bg-orange-500 border-orange-500'
+                                        : 'bg-white border-gray-300 group-hover:border-orange-400'
+                                    }`}>
+                                    {selectedIds.includes(item.id) && (
+                                        <svg
+                                            className="w-3 h-3 text-white"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </label>
                         </td>
                         <td className="px-6 py-5 whitespace-nowrap">
                             <span className="text-[15px] font-bold text-gray-900 flex items-center gap-3">
