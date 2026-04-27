@@ -77,52 +77,52 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative z-50" ref={dropdownRef}>
             <span className="text-sm text-gray-600 flex-shrink-0">Empresa</span>
             <div className="relative w-full sm:w-48 lg:w-64">
-               <SearchInput
-                 value={searchEmpresa}
-                 onChange={(val) => {
-                   onSearchEmpresaChange(val);
-                   setShowDropdown(true);
-                 }}
-                 placeholder="Buscar por nombre o NIT..."
-                 className="w-full"
-               />
-               
-               {/* Dropdown de Empresas */}
-               {showDropdown && searchEmpresa.trim().length > 0 && (
-                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-72 overflow-y-auto left-0">
-                   {filteredEmpresas.length > 0 ? (
-                     filteredEmpresas.map((emp) => (
-                       <div
-                         key={emp.id}
-                         onClick={() => {
-                             onSearchEmpresaChange("");
-                             setShowDropdown(false);
-                             onSelectEmpresa(emp);
-                         }}
-                         className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors text-left"
-                       >
-                         <div className="bg-orange-100 p-2 rounded-lg">
-                            <Building2 className="w-5 h-5 text-orange-600" />
-                         </div>
-                         <div className="flex flex-col">
-                           <span className="font-semibold text-gray-800 text-sm leading-tight break-words">{emp.razon_social}</span>
-                           <span className="text-xs text-gray-500 mt-0.5 font-medium">NIT: {emp.nit}</span>
-                         </div>
-                       </div>
-                     ))
-                   ) : (
-                     <div className="px-4 py-4 text-sm text-gray-500 text-center flex flex-col items-center">
-                       <Search className="w-5 h-5 text-gray-300 mb-2" />
-                       <span>Ninguna empresa coincide.</span>
-                     </div>
-                   )}
-                 </div>
-               )}
+              <SearchInput
+                value={searchEmpresa}
+                onChange={(val) => {
+                  onSearchEmpresaChange(val);
+                  setShowDropdown(true);
+                }}
+                placeholder="Buscar por nombre o NIT..."
+                className="w-full"
+              />
+
+              {/* Dropdown de Empresas */}
+              {showDropdown && searchEmpresa.trim().length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-72 overflow-y-auto left-0">
+                  {filteredEmpresas.length > 0 ? (
+                    filteredEmpresas.map((emp) => (
+                      <div
+                        key={emp.id}
+                        onClick={() => {
+                          onSearchEmpresaChange("");
+                          setShowDropdown(false);
+                          onSelectEmpresa(emp);
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors text-left"
+                      >
+                        <div className="bg-orange-100 p-2 rounded-lg">
+                          <Building2 className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-800 text-sm leading-tight break-words">{emp.razon_social}</span>
+                          <span className="text-xs text-gray-500 mt-0.5 font-medium">NIT: {emp.nit}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-4 text-sm text-gray-500 text-center flex flex-col items-center">
+                      <Search className="w-5 h-5 text-gray-300 mb-2" />
+                      <span>Ninguna empresa coincide.</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <span className="text-sm text-gray-600 flex-shrink-0">
-              Visita de:
+              Fecha de visita
             </span>
             <SearchInput
               value={searchConcepto}

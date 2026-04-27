@@ -161,7 +161,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             {/* Fecha y Estado */}
             <div className="flex gap-4">
               <div>
-                <div className="text-xs text-gray-500">Visita de:</div>
+                <div className="text-xs text-gray-500">Fecha de visita</div>
                 <div className="text-sm font-medium text-gray-900">
                   {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
                 </div>
@@ -259,7 +259,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
 
           {/* Visita de */}
           <div className="col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Visita de:</div>
+            <div className="text-xs text-gray-500 mb-1">Fecha de visita</div>
             <div className="text-sm font-medium text-gray-900">
               {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
             </div>

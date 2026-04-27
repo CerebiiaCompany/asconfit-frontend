@@ -24,7 +24,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
           Razón social - Tipo
         </div>
         <div className="col-span-2 text-xs font-medium text-gray-500 uppercase">
-          Visita de:
+          Fecha de visita
         </div>
         <div className="col-span-2 text-xs font-medium text-gray-500 uppercase">
           Corte
