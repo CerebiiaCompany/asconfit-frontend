@@ -17,12 +17,80 @@ export const TareaCard: React.FC<TareaCardProps> = ({
 }) => {
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return null;
-        const parts = dateStr.split('T')[0].split('-');
-        if (parts.length === 3) {
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+        try {
+            // Manejar formato ISO con zona horaria
+            let date: Date;
+            if (dateStr.includes("T")) {
+                // Formato ISO: 2026-04-28T00:00:00.000000Z
+                date = new Date(dateStr);
+            } else {
+                // Formato simple: 2026-04-28
+                date = new Date(dateStr + "T00:00:00");
+            }
+
+            if (isNaN(date.getTime())) return dateStr;
+
+            const day = date.getUTCDate();
+            const monthNames = [
+                "ene", "feb", "mar", "abr", "may", "jun",
+                "jul", "ago", "sep", "oct", "nov", "dic"
+            ];
+            const month = monthNames[date.getUTCMonth()];
+            const year = date.getUTCFullYear();
+
+            return `${day} ${month} ${year}`;
+        } catch {
+            return dateStr;
         }
-        return dateStr;
     };
+
+    // Calcular días hasta el vencimiento
+    const getDaysUntilDue = (fechaEntrega: string | null) => {
+        if (!fechaEntrega) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const dueDate = new Date(fechaEntrega.split('T')[0]);
+        dueDate.setHours(0, 0, 0, 0);
+        const diffTime = dueDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    };
+
+    // Obtener badge de urgencia
+    const getUrgencyBadge = (fechaEntrega: string | null, estadoInformacion: string | null) => {
+        // No mostrar badge si ya está aprobado
+        if (estadoInformacion === 'aprobado') return null;
+
+        const daysUntilDue = getDaysUntilDue(fechaEntrega);
+        if (daysUntilDue === null) return null;
+
+        if (daysUntilDue < 0) {
+            return {
+                label: 'Vencida',
+                color: 'text-red-700',
+                bg: 'bg-red-100',
+                borderColor: 'border-red-300'
+            };
+        } else if (daysUntilDue === 0) {
+            return {
+                label: 'Vence hoy',
+                color: 'text-orange-700',
+                bg: 'bg-orange-100',
+                borderColor: 'border-orange-300'
+            };
+        } else if (daysUntilDue <= 2) {
+            return {
+                label: `Vence en ${daysUntilDue} ${daysUntilDue === 1 ? 'día' : 'días'}`,
+                color: 'text-yellow-700',
+                bg: 'bg-yellow-100',
+                borderColor: 'border-yellow-300'
+            };
+        }
+        return null;
+    };
+
+    const urgencyBadge = getUrgencyBadge(tarea.fechaEntrega, tarea.estadoInformacion);
 
     // Lógica para deshabilitar el botón
     // Se deshabilita si está en revisión o ya fue aprobado.
@@ -84,9 +152,16 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                                 </p>
                             )}
                             {tarea.fechaEntrega && (
-                                <p className="text-sm text-gray-600">
-                                    <span className="font-medium text-gray-700">Entrega:</span> {formatDate(tarea.fechaEntrega)}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-sm text-gray-600">
+                                        <span className="font-medium text-gray-700">Entrega:</span> {formatDate(tarea.fechaEntrega)}
+                                    </p>
+                                    {urgencyBadge && (
+                                        <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${urgencyBadge.bg} ${urgencyBadge.color} ${urgencyBadge.borderColor}`}>
+                                            {urgencyBadge.label}
+                                        </span>
+                                    )}
+                                </div>
                             )}
                         </div>
                         {tarea.observaciones && (
