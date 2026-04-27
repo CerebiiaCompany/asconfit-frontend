@@ -22,7 +22,7 @@ export const Findings: React.FC = () => {
         <div className="py-4 px-3 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Hallazgos</h1>
+                    <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">Hallazgos</h1>
                     <p className="text-sm text-gray-400 mt-0.5">Gestión y seguimiento de hallazgos de auditoría</p>
                 </div>
             </div>
