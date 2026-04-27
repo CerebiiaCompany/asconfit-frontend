@@ -187,7 +187,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-xs text-gray-500">Check</span>
+                  <span className="text-xs text-gray-500">Completado</span>
                   <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -284,7 +284,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
-                <span className="text-xs text-gray-500">Check</span>
+                <span className="text-xs text-gray-500">Completado</span>
                 <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
               </div>
               <div className="flex items-center gap-1.5">
