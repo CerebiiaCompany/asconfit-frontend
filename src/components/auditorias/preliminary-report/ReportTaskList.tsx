@@ -66,7 +66,7 @@ const generarConclusion = (auditoria: Auditoria): string => {
         if (sinEntregar > 0) texto += `${sinEntregar === 1 ? "El requerimiento se encuentra" : `Los ${sinEntregar} requerimientos se encuentran`} pendiente${sinEntregar === 1 ? "" : "s"} de entrega. `;
         if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
 
-        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega de ${pendientes === 1 ? "el requerimiento pendiente" : "los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
+        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega ${pendientes === 1 ? "del requerimiento pendiente" : "de los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
     } else {
         texto += `se evidencia un avance del ${pct}% en la entrega y aprobación de ${total === 1 ? "el requerimiento solicitado" : `los ${total} requerimientos solicitados`}. `;
 
@@ -76,7 +76,7 @@ const generarConclusion = (auditoria: Auditoria): string => {
         if (sinEntregar > 0) texto += `${sinEntregar} ${sinEntregar === 1 ? "requerimiento no ha sido entregado" : "requerimientos no han sido entregados"} a la fecha de elaboración de este informe. `;
         if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
 
-        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega de ${pendientes === 1 ? "el requerimiento pendiente" : "los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
+        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega ${pendientes === 1 ? "del requerimiento pendiente" : "de los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
 
         if (rechazadas > 0) {
             texto += ` Así mismo, se solicita revisar y corregir los documentos rechazados conforme a las observaciones realizadas por el auditor.`;
