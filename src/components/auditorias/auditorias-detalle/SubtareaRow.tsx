@@ -43,13 +43,39 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "-";
     try {
-      // Si es formato ISO, tomamos solo la parte de la fecha
+      // Manejar formato ISO con zona horaria
+      let date: Date;
       if (dateString.includes("T")) {
-        return dateString.split("T")[0];
+        // Formato ISO: 2025-11-17T00:00:00.000000Z
+        date = new Date(dateString);
+      } else {
+        // Formato simple: 2025-11-17
+        date = new Date(dateString + "T00:00:00");
       }
-      return dateString;
+
+      if (isNaN(date.getTime())) return "-";
+
+      const day = date.getUTCDate();
+      const monthNames = [
+        "ene",
+        "feb",
+        "mar",
+        "abr",
+        "may",
+        "jun",
+        "jul",
+        "ago",
+        "sep",
+        "oct",
+        "nov",
+        "dic",
+      ];
+      const month = monthNames[date.getUTCMonth()];
+      const year = date.getUTCFullYear();
+
+      return `${day} ${month} ${year}`;
     } catch {
-      return dateString || "-";
+      return "-";
     }
   };
 
@@ -113,7 +139,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
           title="Crear hallazgo para esta actividad"
         >
           <img src="/fiddings.png" alt="Hallazgo" className="w-6 h-6 object-cover invert flex-shrink-0" style={{ objectPosition: 'center' }} />
-          Hallazgo
+          Marcar Hallazgo
         </button>
       </td>
 

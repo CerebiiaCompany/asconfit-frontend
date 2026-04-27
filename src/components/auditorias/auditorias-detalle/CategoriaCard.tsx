@@ -34,9 +34,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                 <h4 className="text-xl font-bold text-white">{categoria.nombre}</h4>
                 {categoria.delegado && (
                     <div className="flex items-center text-white bg-white/20 px-3 py-1 rounded-full text-sm">
-                        <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+
                         Delegado: <span className="font-semibold ml-1.5">{categoria.delegado.name}</span>
                     </div>
                 )}
