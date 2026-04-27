@@ -5,6 +5,7 @@ import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
 import { PapeleraToolbar } from './PapeleraToolbar';
 import { PapeleraTable } from './PapeleraTable';
 import { PapeleraCards } from './PapeleraCards';
+import { SearchInput } from '../SearchInput';
 
 interface AuditoriaTrashed {
   id: number;
@@ -163,28 +164,33 @@ export const PapeleraList: React.FC = () => {
       ) : (
         <>
           {/* Toolbar para auditorías */}
-          <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <input
-              type="text"
-              placeholder="Buscar auditorías..."
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+            <SearchInput
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              onChange={setSearchTerm}
+              placeholder="Buscar por nombre, empresa..."
+              className="w-full sm:w-80"
             />
-            <div className="flex gap-2">
-              <button
-                onClick={handleRestoreAuditoria}
-                disabled={selectedAuditoriaIds.length === 0 || loadingAuditorias}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Restaurar ({selectedAuditoriaIds.length})
-              </button>
+            <div className="flex gap-2 sm:gap-4">
               <button
                 onClick={() => setShowConfirmAuditorias(true)}
                 disabled={selectedAuditoriaIds.length === 0 || loadingAuditorias}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-2 border border-red-500 text-red-600 bg-white rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
-                Eliminar permanentemente
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span className="font-medium">Destruir ({selectedAuditoriaIds.length})</span>
+              </button>
+              <button
+                onClick={handleRestoreAuditoria}
+                disabled={selectedAuditoriaIds.length === 0 || loadingAuditorias}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-2 bg-[#FF9411] text-white rounded-lg hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                <span className="font-semibold">Restaurar ({selectedAuditoriaIds.length})</span>
               </button>
             </div>
           </div>
