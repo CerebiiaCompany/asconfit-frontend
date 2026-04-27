@@ -8,17 +8,20 @@ import { AuditoriaEmptyState } from "../../components/auditorias/auditorias/Audi
 import { AuditoriaCardList } from "../../components/auditorias/auditorias/AuditoriaCardList";
 import { Pagination } from "../../components/Pagination";
 import { LoadingState } from "../../components/common/LoadingState";
+import { Modal } from "../../components/Modal";
 
 export const Auditorias: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
   const [searchTerm, setSearchTerm] = useState("");
-  const { auditorias, loading } = useAuditorias();
+  const { auditorias, loading, refetch } = useAuditorias();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [auditoriaToDelete, setAuditoriaToDelete] = useState<number | null>(null);
 
   // Filtrar auditorías según búsqueda, fecha de visita y proceso
   const filteredAuditorias = auditorias.filter((auditoria) => {
@@ -72,14 +75,19 @@ export const Auditorias: React.FC = () => {
   };
 
   const handleDeleteAuditoria = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de mover esta auditoría a la papelera? Podrás restaurarla dentro de 30 días.')) {
-      return;
-    }
+    setAuditoriaToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!auditoriaToDelete) return;
 
     try {
-      await auditoriaService.deleteAuditoria(id.toString());
-      // Recargar auditorías
-      window.location.reload();
+      await auditoriaService.deleteAuditoria(auditoriaToDelete.toString());
+      setShowDeleteModal(false);
+      setAuditoriaToDelete(null);
+      // Refrescar la lista de auditorías sin recargar la página
+      await refetch();
     } catch (error) {
       console.error('Error:', error);
       alert('Error al mover la auditoría a la papelera');
@@ -149,6 +157,19 @@ export const Auditorias: React.FC = () => {
           </>
         )}
       </div>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setAuditoriaToDelete(null);
+        }}
+        title="Mover a Papelera"
+        message="¿Estás seguro de mover esta auditoría a la papelera? Podrás restaurarla dentro de 30 días."
+        type="warning"
+        confirmText="Mover a Papelera"
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };
