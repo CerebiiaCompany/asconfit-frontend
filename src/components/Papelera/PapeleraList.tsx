@@ -216,18 +216,36 @@ export const PapeleraList: React.FC = () => {
               {filteredAuditorias.map((auditoria) => (
                 <div key={auditoria.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedAuditoriaIds.includes(auditoria.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedAuditoriaIds([...selectedAuditoriaIds, auditoria.id]);
-                        } else {
-                          setSelectedAuditoriaIds(selectedAuditoriaIds.filter(id => id !== auditoria.id));
-                        }
-                      }}
-                      className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500 focus:ring-2"
-                    />
+                    {/* Checkbox personalizado */}
+                    <label className="relative flex items-center cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={selectedAuditoriaIds.includes(auditoria.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedAuditoriaIds([...selectedAuditoriaIds, auditoria.id]);
+                          } else {
+                            setSelectedAuditoriaIds(selectedAuditoriaIds.filter(id => id !== auditoria.id));
+                          }
+                        }}
+                        className="sr-only peer"
+                      />
+                      <div className={`w-6 h-6 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${selectedAuditoriaIds.includes(auditoria.id)
+                          ? 'bg-orange-500 border-orange-500'
+                          : 'bg-white border-gray-300 group-hover:border-orange-400'
+                        }`}>
+                        {selectedAuditoriaIds.includes(auditoria.id) && (
+                          <svg
+                            className="w-4 h-4 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </label>
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Información de la empresa */}
                       <div className="md:col-span-2">
