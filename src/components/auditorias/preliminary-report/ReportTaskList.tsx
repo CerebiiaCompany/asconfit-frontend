@@ -116,7 +116,7 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
                 </p>
             </div>
 
-            <div className="px-6 py-5 overflow-y-auto max-h-[calc(100vh-220px)] space-y-5 text-sm text-gray-700 leading-relaxed">
+            <div className="px-6 py-5 space-y-5 text-sm text-gray-700 leading-relaxed">
 
                 {/* Párrafo introductorio */}
                 <p>
