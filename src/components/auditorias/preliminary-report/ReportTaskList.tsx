@@ -60,6 +60,13 @@ const generarConclusion = (auditoria: Auditoria): string => {
 
     if (pct === 100) {
         texto += `se concluye que la totalidad de ${total === 1 ? "el requerimiento ha sido entregado y aprobado" : `los ${total} requerimientos han sido entregados y aprobados`} satisfactoriamente, lo que refleja un alto nivel de cumplimiento y colaboración por parte de la entidad auditada.`;
+    } else if (pct === 0) {
+        texto += `a la fecha de este informe, ninguno de los requerimientos solicitados ha sido entregado. El avance general es del 0%. `;
+
+        if (sinEntregar > 0) texto += `${sinEntregar === 1 ? "El requerimiento se encuentra" : `Los ${sinEntregar} requerimientos se encuentran`} pendiente${sinEntregar === 1 ? "" : "s"} de entrega. `;
+        if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
+
+        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega de ${pendientes === 1 ? "el requerimiento pendiente" : "los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
     } else {
         texto += `se evidencia un avance del ${pct}% en la entrega y aprobación de ${total === 1 ? "el requerimiento solicitado" : `los ${total} requerimientos solicitados`}. `;
 
@@ -153,9 +160,9 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
                             ).length;
                             if (pendientes === 0) return `Todos los requerimientos han sido recibidos y aprobados satisfactoriamente.`;
                             const partes: string[] = [];
-                            if (sinEntregar > 0) partes.push(`${sinEntregar} ${sinEntregar === 1 ? "requerimiento sin entregar" : "requerimientos sin entregar"}`);
+                            if (sinEntregar > 0) partes.push(`${sinEntregar} ${sinEntregar === 1 ? "requerimiento continúa pendiente de entrega" : "requerimientos continúan pendientes de entrega"}`);
                             if (enEspera > 0) partes.push(`${enEspera} ${enEspera === 1 ? "archivo enviado en espera de respuesta" : "archivos enviados en espera de respuesta"}`);
-                            return `Al momento de la elaboración de este informe, ${partes.join(" y ")}.`;
+                            return `Al cierre de este informe, ${partes.join(" y ")}.`;
                         })()}
                     </p>
                 )}
