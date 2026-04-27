@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
+import { storageUrl } from "../../utils/storageUrl";
 
 interface UserRoleAssignmentProps {
   users: User[];
@@ -95,6 +96,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                   Asignar Rol
                 </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Hoja de Vida
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -140,6 +144,33 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {user.cv_path || user.cv_url ? (
+                      <a
+                        href={storageUrl(user.cv_url ?? user.cv_path) ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver CV
+                      </a>
+                    ) : (
+                      <button
+                        disabled
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-50 text-sm font-medium"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Sin CV
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

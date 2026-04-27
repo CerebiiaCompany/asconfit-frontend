@@ -19,6 +19,8 @@ export interface User {
     description?: string;
     descripcion?: string;
   };
+  cv_path?: string;
+  cv_url?: string;
 }
 
 export const userService = {
