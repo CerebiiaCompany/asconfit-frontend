@@ -15,6 +15,11 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     acceptedFileTypes,
     uploading = false
 }) => {
+    // Wrapper para manejar el archivo con nombre personalizado
+    const handleFileSelect = (file: File, customName?: string) => {
+        onFileUpload(file);
+    };
+
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return null;
 
@@ -175,7 +180,7 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                 {/* Botón de subir archivo con lógica de estado */}
                 <div className="flex flex-col items-end gap-2">
                     <FileUploadButton
-                        onFileSelect={onFileUpload}
+                        onFileSelect={handleFileSelect}
                         acceptedFileTypes={acceptedFileTypes}
                         hasFile={!!tarea.archivoNombre}
                         uploading={uploading}

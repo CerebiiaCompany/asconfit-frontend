@@ -62,7 +62,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [] }) => {
         const day = i + 1;
         const dayEvents = eventsMap[day] || [];
         const hasEvent = dayEvents.length > 0;
-        
+
         // Use the first event's color or default
         const dotColor = dayEvents[0]?.color || 'bg-orange-500';
 
@@ -73,7 +73,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [] }) => {
                         <div className={`${dotColor} text-white w-6 h-6 flex items-center justify-center rounded-full shadow-sm z-10 transition-transform hover:scale-110 cursor-pointer`}>
                             {day}
                         </div>
-                        
+
                         {/* Premium Tooltip */}
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-gray-800/90 backdrop-blur-md text-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none min-w-[140px]">
                             <div className="flex items-center gap-2 mb-1">
@@ -102,7 +102,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [] }) => {
         );
     });
 
-    const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const weekDays = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
 
     return (
         <div className="border border-gray-200 rounded-xl shadow-sm p-4 w-[280px] bg-white">
@@ -115,7 +115,7 @@ export const Calendar: React.FC<CalendarProps> = ({ events = [] }) => {
                     <ChevronRight size={16} />
                 </button>
             </div>
-            
+
             <div className="grid grid-cols-7 gap-1 text-center mb-2">
                 {weekDays.map(day => (
                     <span key={day} className="text-[9px] font-bold text-gray-400 tracking-wider font-sans">{day}</span>

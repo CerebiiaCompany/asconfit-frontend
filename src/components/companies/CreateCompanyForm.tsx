@@ -180,7 +180,7 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
         {/* Nit & Tipo de sociedad */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Nit</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">NIT</label>
             <input type="text" name="nit" value={f.nit} onChange={handleChange} onBlur={handleBlur}
               placeholder="0000000000-0" className={inputClass(er.nit)} />
             <ErrMsg msg={er.nit} />
@@ -317,9 +317,19 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
           </div>
         </div>
 
-        <div className="pt-2">
-          <button type="submit" disabled={loading}
-            className={`w-full font-bold py-3 rounded text-sm transition-colors shadow-sm text-white ${loading ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#f97316] hover:bg-[#ea580c]'}`}>
+        <div className="pt-2 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/empresas')}
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-8 py-3 font-bold rounded text-sm transition-colors shadow-sm text-white ${loading ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#f97316] hover:bg-[#ea580c]'}`}
+          >
             {loading ? (isEdit ? 'Actualizando...' : 'Guardando...') : (isEdit ? 'Actualizar' : 'Guardar')}
           </button>
         </div>

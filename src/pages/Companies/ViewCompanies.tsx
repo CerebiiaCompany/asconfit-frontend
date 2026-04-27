@@ -46,6 +46,28 @@ export const ViewCompanies: React.FC = () => {
     emp.nit.includes(searchTerm)
   );
 
+  // Formatear fecha en formato legible
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return 'N/A';
+
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'N/A';
+
+      const day = date.getDate();
+      const monthNames = [
+        "ene", "feb", "mar", "abr", "may", "jun",
+        "jul", "ago", "sep", "oct", "nov", "dic"
+      ];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+
+      return `${day} ${month} ${year}`;
+    } catch {
+      return 'N/A';
+    }
+  };
+
   return (
     <div className="p-6 max-w-[1400px] mx-auto font-sans bg-white min-h-[calc(100vh-64px)] rounded-lg">
       {/* Breadcrumb */}
@@ -133,7 +155,7 @@ export const ViewCompanies: React.FC = () => {
                 <div className="text-right">
                   <div className="text-[9px] font-bold text-gray-400 italic mb-0.5">Fecha Registro</div>
                   <div className="text-[10px] font-bold text-gray-400">
-                    {empresa.created_at ? new Date(empresa.created_at).toLocaleDateString("es-CO") : 'N/A'}
+                    {formatDate(empresa.created_at)}
                   </div>
                 </div>
               </div>
