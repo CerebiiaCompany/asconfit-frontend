@@ -18,6 +18,7 @@ interface AuditoriaTrashed {
   fecha_corte?: string;
   estado: string;
   deleted_at: string;
+  tipo_auditoria?: string;
 }
 
 export const PapeleraList: React.FC = () => {
@@ -211,9 +212,9 @@ export const PapeleraList: React.FC = () => {
               <p className="text-gray-500">No hay auditorías en la papelera</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredAuditorias.map((auditoria) => (
-                <div key={auditoria.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                <div key={auditoria.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-4">
                     <input
                       type="checkbox"
@@ -225,28 +226,55 @@ export const PapeleraList: React.FC = () => {
                           setSelectedAuditoriaIds(selectedAuditoriaIds.filter(id => id !== auditoria.id));
                         }
                       }}
-                      className="mt-1 w-5 h-5 text-orange-500 focus:ring-orange-500"
+                      className="mt-1 w-5 h-5 text-orange-500 rounded focus:ring-orange-500 focus:ring-2"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {auditoria.empresa?.razon_social || 'Sin empresa'}
-                          </h3>
-                          <p className="text-sm text-gray-500">NIT: {auditoria.empresa?.nit || '-'}</p>
-                          <p className="text-sm text-gray-500">
-                            Fecha: {auditoria.fecha_inicial ? new Date(auditoria.fecha_inicial).toLocaleDateString() : '-'}
-                          </p>
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Información de la empresa */}
+                      <div className="md:col-span-2">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {auditoria.empresa?.razon_social || 'Sin empresa'}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <span className="text-gray-500">NIT:</span>
+                            <span className="ml-2 font-medium text-gray-700">{auditoria.empresa?.nit || '-'}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Fecha:</span>
+                            <span className="ml-2 font-medium text-gray-700">
+                              {auditoria.fecha_inicial ? new Date(auditoria.fecha_inicial).toLocaleDateString('es-ES', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric'
+                              }) : '-'}
+                            </span>
+                          </div>
+                          {auditoria.tipo_auditoria && (
+                            <div className="col-span-2">
+                              <span className="text-gray-500">Tipo:</span>
+                              <span className="ml-2 font-medium text-gray-700">{auditoria.tipo_auditoria}</span>
+                            </div>
+                          )}
                         </div>
+                      </div>
+
+                      {/* Badge de días restantes */}
+                      <div className="flex items-start justify-end">
                         <div className="text-right">
-                          <span className={`inline-block px-2 py-1 text-xs rounded ${getDaysRemaining(auditoria.deleted_at) > 15
+                          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm ${getDaysRemaining(auditoria.deleted_at) > 15
                             ? 'bg-green-100 text-green-800'
                             : getDaysRemaining(auditoria.deleted_at) > 7
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-red-100 text-red-800'
                             }`}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                             {getDaysRemaining(auditoria.deleted_at)} días restantes
-                          </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Eliminada: {new Date(auditoria.deleted_at).toLocaleDateString('es-ES')}
+                          </p>
                         </div>
                       </div>
                     </div>
