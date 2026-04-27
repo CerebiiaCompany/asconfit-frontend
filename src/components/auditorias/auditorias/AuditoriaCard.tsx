@@ -116,10 +116,16 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
   const getEstadoBadge = (estado: Auditoria["estado"]) => {
     const badges: Record<string, string> = {
       pendiente: "text-red-500",
+      en_progreso: "text-yellow-600",
+      completada: "text-green-600",
+      aprobado: "text-blue-600",
       check: "text-green-600",
     };
     const labels: Record<string, string> = {
       pendiente: "Pendiente",
+      en_progreso: "En Progreso",
+      completada: "Completada",
+      aprobado: "Aprobado",
       check: "Check",
     };
     return (
