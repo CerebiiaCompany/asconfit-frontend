@@ -54,13 +54,14 @@ const generarConclusion = (auditoria: Auditoria): string => {
     ).length;
 
     const pct = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
+    const pendientes = total - aprobadas;
 
     let texto = `Con base en la revisión del estado de los requerimientos solicitados en el marco de la ${tipo} practicada a ${empresa}, `;
 
     if (pct === 100) {
-        texto += `se concluye que la totalidad de los ${total} requerimientos han sido entregados y aprobados satisfactoriamente, lo que refleja un alto nivel de cumplimiento y colaboración por parte de la entidad auditada.`;
+        texto += `se concluye que la totalidad de ${total === 1 ? "el requerimiento ha sido entregado y aprobado" : `los ${total} requerimientos han sido entregados y aprobados`} satisfactoriamente, lo que refleja un alto nivel de cumplimiento y colaboración por parte de la entidad auditada.`;
     } else {
-        texto += `se evidencia un avance del ${pct}% en la entrega y aprobación de los ${total} requerimientos solicitados. `;
+        texto += `se evidencia un avance del ${pct}% en la entrega y aprobación de ${total === 1 ? "el requerimiento solicitado" : `los ${total} requerimientos solicitados`}. `;
 
         if (aprobadas > 0) texto += `Un total de ${aprobadas} ${aprobadas === 1 ? "requerimiento fue aprobado" : "requerimientos fueron aprobados"} correctamente. `;
         if (enEspera > 0) texto += `${enEspera} ${enEspera === 1 ? "requerimiento se encuentra" : "requerimientos se encuentran"} en proceso de revisión, pendiente${enEspera === 1 ? "" : "s"} de respuesta por parte del equipo auditor. `;
@@ -68,7 +69,7 @@ const generarConclusion = (auditoria: Auditoria): string => {
         if (sinEntregar > 0) texto += `${sinEntregar} ${sinEntregar === 1 ? "requerimiento no ha sido entregado" : "requerimientos no han sido entregados"} a la fecha de elaboración de este informe. `;
         if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
 
-        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega de los requerimientos pendientes a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
+        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega de ${pendientes === 1 ? "el requerimiento pendiente" : "los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
 
         if (rechazadas > 0) {
             texto += ` Así mismo, se solicita revisar y corregir los documentos rechazados conforme a las observaciones realizadas por el auditor.`;
@@ -116,7 +117,7 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
                     <span className="font-medium">{empresaNombre}</span>
                     {fechaInicio ? `, con fecha de inicio el ${fechaInicio}` : ""}
                     {fechaCorte ? ` y fecha de corte el ${fechaCorte}` : ""}
-                    , se solicitaron un total de <span className="font-medium">{totalSubtareas} requerimientos</span> distribuidos
+                    , se solicitaron un total de <span className="font-medium">{totalSubtareas} {totalSubtareas === 1 ? "requerimiento" : "requerimientos"}</span> distribuidos
                     en {categorias.length} {categorias.length === 1 ? "categoría" : "categorías"}.
                     A continuación se presenta el estado actual de cada uno:
                 </p>
@@ -150,7 +151,7 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
                             const sinEntregar = subtareas.filter(s =>
                                 (s.estado_informacion === "pendiente" || !s.estado_informacion) && !s.archivo_nombre
                             ).length;
-                            if (pendientes === 0) return "Todos los requerimientos han sido recibidos y aprobados satisfactoriamente.";
+                            if (pendientes === 0) return `Todos los requerimientos han sido recibidos y aprobados satisfactoriamente.`;
                             const partes: string[] = [];
                             if (sinEntregar > 0) partes.push(`${sinEntregar} ${sinEntregar === 1 ? "requerimiento sin entregar" : "requerimientos sin entregar"}`);
                             if (enEspera > 0) partes.push(`${enEspera} ${enEspera === 1 ? "archivo enviado en espera de respuesta" : "archivos enviados en espera de respuesta"}`);
