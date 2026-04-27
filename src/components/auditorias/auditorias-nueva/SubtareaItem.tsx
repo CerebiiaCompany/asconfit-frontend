@@ -68,7 +68,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
         </div>
         <div>
           <label className="block text-sm text-gray-600 mb-2">
-            Tiempo entrega
+            Fecha de entrega
           </label>
           <DatePicker
             value={subtarea.tiempoEntrega}
@@ -114,7 +114,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
         </div>
         <div className="flex-1">
           <span className="text-sm text-gray-600 block mb-2">
-            {subtarea.archivoNombre || "Sin archivo"}
+            {subtarea.archivoNombre || "Sin adjunto"}
           </span>
           <button
             type="button"

@@ -44,7 +44,7 @@ export const FileUploadCell: React.FC<FileUploadCellProps> = ({
             ) : (
                 <div className="flex items-center gap-1 text-gray-400">
 
-                    <span className="text-xs">Sin archivo</span>
+                    <span className="text-xs">Sin adjunto</span>
                 </div>
             )}
             <input

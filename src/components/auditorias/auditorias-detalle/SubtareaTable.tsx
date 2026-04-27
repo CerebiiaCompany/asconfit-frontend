@@ -43,7 +43,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             Fecha Solicitud
                         </th>
                         <th className="px-2 py-3 text-left text-xs font-medium text-gray-500  tracking-wider w-24">
-                            Tiempo Entrega
+                            Fecha de entrega
                         </th>
                         <th className="px-2 py-3 text-left text-xs font-medium text-gray-500  tracking-wider w-24">
                             Estado

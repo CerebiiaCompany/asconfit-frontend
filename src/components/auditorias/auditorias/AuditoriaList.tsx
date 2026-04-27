@@ -13,10 +13,16 @@ export const AuditoriaList: React.FC<AuditoriaListProps> = ({
   const getEstadoBadge = (estado: Auditoria["estado"]) => {
     const badges: Record<string, string> = {
       pendiente: "bg-red-100 text-red-700 border-red-200",
+      en_progreso: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      completada: "bg-green-100 text-green-800 border-green-200",
+      aprobado: "bg-green-100 text-green-800 border-green-200",
       check: "bg-green-100 text-green-800 border-green-200",
     };
     const labels: Record<string, string> = {
       pendiente: "Pendiente",
+      en_progreso: "En Progreso",
+      completada: "Completada",
+      aprobado: "Aprobado",
       check: "Check",
     };
     return (
