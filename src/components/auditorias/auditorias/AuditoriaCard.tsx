@@ -135,12 +135,6 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
       <div className="lg:hidden">
         <div className="flex items-start gap-3 mb-3">
           {/* Radio button */}
-          <input
-            type="radio"
-            name="auditoria-select"
-            className="w-5 h-5 mt-1 text-orange-500 focus:ring-orange-500"
-          />
-
           <div className="flex-1 space-y-2">
             {/* NIT y Razón Social */}
             <div>
@@ -238,13 +232,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
       <div className="hidden lg:block">
         <div className="grid grid-cols-12 gap-4 items-center">
           {/* Radio button */}
-          <div className="col-span-1 flex items-center justify-center">
-            <input
-              type="radio"
-              name="auditoria-select"
-              className="w-5 h-5 text-orange-500 focus:ring-orange-500"
-            />
-          </div>
+
 
           {/* NIT */}
           <div className="col-span-2">
