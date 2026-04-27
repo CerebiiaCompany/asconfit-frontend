@@ -6,7 +6,7 @@ import { PapeleraToolbar } from './PapeleraToolbar';
 import { PapeleraTable } from './PapeleraTable';
 import { PapeleraCards } from './PapeleraCards';
 import { SearchInput } from '../SearchInput';
-import { Modal } from '../Modal';
+import { useToast } from '../../contexts/ToastContext';
 
 interface AuditoriaTrashed {
   id: number;
@@ -27,8 +27,7 @@ export const PapeleraList: React.FC = () => {
   const [selectedAuditoriaIds, setSelectedAuditoriaIds] = useState<number[]>([]);
   const [showConfirmAuditorias, setShowConfirmAuditorias] = useState(false);
   const [activeTab, setActiveTab] = useState<'documentos' | 'auditorias'>('documentos');
-  const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
-  const [showRestoreError, setShowRestoreError] = useState(false);
+  const { addToast } = useToast();
 
   const {
     documentos, loading, selectedIds, showConfirm, setShowConfirm,
@@ -62,10 +61,10 @@ export const PapeleraList: React.FC = () => {
       }
       setSelectedAuditoriaIds([]);
       fetchAuditoriasPapelera();
-      setShowRestoreSuccess(true);
+      addToast('Auditorías restauradas exitosamente', 'success');
     } catch (error) {
       console.error('Error al restaurar auditorías:', error);
-      setShowRestoreError(true);
+      addToast('Error al restaurar auditorías', 'error');
     }
   };
 
@@ -79,9 +78,10 @@ export const PapeleraList: React.FC = () => {
       setSelectedAuditoriaIds([]);
       setShowConfirmAuditorias(false);
       fetchAuditoriasPapelera();
+      addToast('Auditorías eliminadas permanentemente', 'success');
     } catch (error) {
       console.error('Error al eliminar auditorías:', error);
-      setShowRestoreError(true);
+      addToast('Error al eliminar auditorías', 'error');
     }
   };
 
@@ -266,26 +266,6 @@ export const PapeleraList: React.FC = () => {
           />
         </>
       )}
-
-      {/* Modal de éxito al restaurar */}
-      <Modal
-        isOpen={showRestoreSuccess}
-        onClose={() => setShowRestoreSuccess(false)}
-        title="Auditorías Restauradas"
-        message="Las auditorías han sido restauradas exitosamente."
-        type="success"
-        confirmText="Aceptar"
-      />
-
-      {/* Modal de error */}
-      <Modal
-        isOpen={showRestoreError}
-        onClose={() => setShowRestoreError(false)}
-        title="Error"
-        message="Ocurrió un error al procesar la solicitud. Por favor, intenta nuevamente."
-        type="error"
-        confirmText="Aceptar"
-      />
     </div>
   );
 };
