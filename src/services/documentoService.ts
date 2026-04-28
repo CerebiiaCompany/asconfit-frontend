@@ -29,11 +29,16 @@ export interface Documento {
     extension: string;
     tamano: number;
     url: string;
+    ruta_carpeta?: string;
     created_at?: string;
     deleted_at?: string;
     carpeta?: {
         id: number;
         nombre: string;
+        parent?: {
+            id: number;
+            nombre: string;
+        } | null;
         empresa?: {
             id: number;
             razon_social: string;

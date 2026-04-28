@@ -67,8 +67,8 @@ export const PapeleraTable: React.FC<PapeleraTableProps> = ({
                                     onChange={() => onSelect(item.id)}
                                 />
                                 <div className={`w-5 h-5 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${selectedIds.includes(item.id)
-                                        ? 'bg-orange-500 border-orange-500'
-                                        : 'bg-white border-gray-300 group-hover:border-orange-400'
+                                    ? 'bg-orange-500 border-orange-500'
+                                    : 'bg-white border-gray-300 group-hover:border-orange-400'
                                     }`}>
                                     {selectedIds.includes(item.id) && (
                                         <svg
@@ -96,7 +96,7 @@ export const PapeleraTable: React.FC<PapeleraTableProps> = ({
                         </td>
                         <td className="px-6 py-5 whitespace-nowrap">
                             <span className="text-[15px] text-gray-600 font-medium bg-gray-100 px-3 py-1 rounded-full text-sm">
-                                {item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A'}
+                                {item.ruta_carpeta || (item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A')}
                             </span>
                         </td>
                         <td className="px-6 py-5 whitespace-nowrap">

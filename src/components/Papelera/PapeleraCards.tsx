@@ -56,8 +56,8 @@ export const PapeleraCards: React.FC<PapeleraCardsProps> = ({
                             onChange={() => onSelect(item.id)}
                         />
                         <div className={`w-6 h-6 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${selectedIds.includes(item.id)
-                                ? 'bg-orange-500 border-orange-500'
-                                : 'bg-white border-gray-300 group-hover:border-orange-400'
+                            ? 'bg-orange-500 border-orange-500'
+                            : 'bg-white border-gray-300 group-hover:border-orange-400'
                             }`}>
                             {selectedIds.includes(item.id) && (
                                 <svg
@@ -79,7 +79,9 @@ export const PapeleraCards: React.FC<PapeleraCardsProps> = ({
                             <span className="text-sm font-bold text-gray-900 truncate">{item.nombre_original}</span>
                         </div>
                         <p className="text-xs text-gray-500">{item.carpeta?.empresa?.razon_social || 'N/A'}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A'}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                            {item.ruta_carpeta || (item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A')}
+                        </p>
                         <p className="text-xs text-gray-400 mt-0.5">{item.deleted_at ? new Date(item.deleted_at).toLocaleString() : ''}</p>
                     </div>
                 </label>
