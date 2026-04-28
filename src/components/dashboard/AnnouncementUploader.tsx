@@ -25,6 +25,13 @@ export const AnnouncementUploader: React.FC = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Validar que la imagen sea más ancha que alta
+        const isValidDimensions = await validateImageDimensions(file);
+        if (!isValidDimensions) {
+            addToast('Por favor suba una imagen más ancha que alta', 'error');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('comunicado', file);
 
@@ -48,14 +55,29 @@ export const AnnouncementUploader: React.FC = () => {
         }
     };
 
+    const validateImageDimensions = (file: File): Promise<boolean> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                resolve(img.width > img.height);
+            };
+            img.onerror = () => {
+                resolve(false);
+            };
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
     return (
         <div className="bg-white rounded-2xl shadow-xl p-4 flex flex-col items-center justify-center h-full min-h-[350px] border border-gray-100 group relative overflow-hidden">
             {imageUrl ? (
-                <img
-                    src={imageUrl}
-                    alt="Comunicado"
-                    className="w-full h-full object-contain rounded-xl"
-                />
+                <div className="w-full h-[200px] rounded-xl overflow-hidden">
+                    <img
+                        src={imageUrl}
+                        alt="Comunicado"
+                        className="w-full h-full object-contain rounded-xl"
+                    />
+                </div>
             ) : (
                 <div className="bg-gray-100/50 rounded-xl w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200">
                     {isAdmin ? (
