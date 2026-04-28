@@ -8,7 +8,7 @@ export const ActivitySchedule: React.FC = () => {
     // Mapeo de colores "aleatorio pero consistente" basado en el ID de la auditoría
     const getAuditColor = (auditId: number) => {
         const palette = [
-            'bg-blue-600', 'bg-orange-500', 'bg-green-500', 'bg-purple-600', 
+            'bg-blue-600', 'bg-orange-500', 'bg-green-500', 'bg-purple-600',
             'bg-emerald-600', 'bg-rose-500', 'bg-amber-500', 'bg-indigo-600',
             'bg-cyan-600', 'bg-teal-600', 'bg-pink-600', 'bg-violet-600'
         ];
@@ -61,13 +61,15 @@ export const ActivitySchedule: React.FC = () => {
 
     // Obtener la actividad más próxima por cada auditoría única
     const nextActivityPerAudit = new Map<number, any>();
-    
+
     sortedAll.forEach(act => {
         const key = act.auditId;
-        const date = new Date(act.date);
+        // Parsear fecha sin zona horaria para evitar desfases
+        const dateParts = act.date.split('T')[0].split('-').map(Number);
+        const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
         date.setHours(0, 0, 0, 0);
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
 
         if (date.getTime() >= today.getTime() && !nextActivityPerAudit.has(key)) {
             nextActivityPerAudit.set(key, act);
@@ -87,7 +89,7 @@ export const ActivitySchedule: React.FC = () => {
     return (
         <div className="bg-white rounded-2xl shadow-xl p-6 h-full border border-gray-100 flex flex-col">
             <h3 className="text-xl font-semibold text-gray-800 text-center mb-6">Cronograma Actividades</h3>
-            
+
             <div className="flex flex-col lg:flex-row gap-6 flex-grow">
                 {/* Calendar Section */}
                 <div className="flex-1 flex justify-center items-start">
@@ -101,12 +103,12 @@ export const ActivitySchedule: React.FC = () => {
                             // Parsear fecha manualmente para evitar desfases de zona horaria
                             const dParts = act.date.split('T')[0].split('-').map(Number);
                             const dateObj = new Date(dParts[0], dParts[1] - 1, dParts[2]);
-                            
+
                             const day = dateObj.getDate();
                             const month = dateObj.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase();
 
                             return (
-                                <div 
+                                <div
                                     key={act.id}
                                     title={act.title}
                                     className={`${act.colorClass} text-white px-4 py-2.5 rounded-xl shadow-sm hover:opacity-90 transition-all hover:translate-x-1 cursor-pointer flex items-center gap-3 group`}
