@@ -12,8 +12,8 @@ interface PapeleraTableProps {
 export const PapeleraTable: React.FC<PapeleraTableProps> = ({
     docs, loading, selectedIds, onSelectAll, onSelect,
 }) => (
-    <div className="hidden sm:block overflow-x-auto overflow-y-auto max-h-[500px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-[#FF9411] [&::-webkit-scrollbar-thumb]:rounded-full pr-2">
-        <table className="min-w-full divide-y divide-gray-200">
+    <div className="hidden sm:block overflow-x-hidden overflow-y-auto max-h-[500px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-[#FF9411] [&::-webkit-scrollbar-thumb]:rounded-full pr-2">
+        <table className="w-full divide-y divide-gray-200 table-fixed">
             <thead className="sticky top-0 bg-white z-10">
                 <tr>
                     <th className="px-6 py-4 text-left border-t border-b border-gray-200 w-24">
@@ -94,10 +94,28 @@ export const PapeleraTable: React.FC<PapeleraTableProps> = ({
                         <td className="px-6 py-5 whitespace-nowrap">
                             <span className="text-[15px] text-gray-600 font-medium">{item.carpeta?.empresa?.razon_social || 'N/A'}</span>
                         </td>
-                        <td className="px-6 py-5 whitespace-nowrap">
-                            <span className="text-[15px] text-gray-600 font-medium bg-gray-100 px-3 py-1 rounded-full text-sm">
-                                {item.ruta_carpeta || (item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A')}
-                            </span>
+                        <td className="px-6 py-5 max-w-[180px]">
+                            {(() => {
+                                const ruta = item.ruta_carpeta || (item.carpeta?.nombre ? `/${item.carpeta.nombre}` : 'N/A');
+                                // Mostrar solo la última parte con "..." al inicio si es larga
+                                const partes = ruta.split(' / ');
+                                const ultima = partes[partes.length - 1];
+                                const truncada = partes.length > 1 ? `.../ ${ultima}` : ruta;
+                                return (
+                                    <div className="relative group/ruta inline-block max-w-full">
+                                        <span className="text-xs text-gray-600 font-medium bg-gray-100 px-3 py-1 rounded-full block truncate max-w-[160px]">
+                                            {truncada}
+                                        </span>
+                                        {partes.length > 1 && (
+                                            <div className="absolute bottom-full left-0 mb-1 hidden group-hover/ruta:block z-30 pointer-events-none">
+                                                <div className="bg-gray-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
+                                                    {ruta}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </td>
                         <td className="px-6 py-5 whitespace-nowrap">
                             <span className="text-[15px] text-gray-500 font-semibold block">
