@@ -78,6 +78,7 @@ export const Companies: React.FC = () => {
           ) : activeCarpeta ? (
             <WorkPapers
               carpetaId={activeCarpeta.id}
+              empresaId={empresaId!}
               isPrivate={activeCarpeta.is_private}
               isAdmin={isAdmin}
               onTogglePrivate={handleTogglePrivate}

@@ -15,6 +15,7 @@ const getAuthHeaders = () => {
 export interface Carpeta {
     id: number;
     empresa_id: number;
+    parent_id?: number | null;
     nombre: string;
     is_private: boolean;
     created_at?: string;
@@ -47,8 +48,8 @@ export const documentoService = {
         return response.data;
     },
 
-    createCarpeta: async (empresaId: number, nombre: string): Promise<Carpeta> => {
-        const response = await axios.post(`${API_URL}/carpetas`, { empresa_id: empresaId, nombre }, getAuthHeaders());
+    createCarpeta: async (empresaId: number, nombre: string, parentId?: number): Promise<Carpeta> => {
+        const response = await axios.post(`${API_URL}/carpetas`, { empresa_id: empresaId, nombre, parent_id: parentId ?? null }, getAuthHeaders());
         return response.data.carpeta;
     },
 
@@ -58,6 +59,11 @@ export const documentoService = {
 
     toggleCarpetaPrivate: async (carpetaId: number): Promise<{ is_private: boolean }> => {
         const response = await axios.patch(`${API_URL}/carpetas/${carpetaId}/toggle-private`, {}, getAuthHeaders());
+        return response.data;
+    },
+
+    getSubcarpetas: async (carpetaId: number): Promise<Carpeta[]> => {
+        const response = await axios.get(`${API_URL}/carpetas/${carpetaId}/subcarpetas`, getAuthHeaders());
         return response.data;
     },
 
