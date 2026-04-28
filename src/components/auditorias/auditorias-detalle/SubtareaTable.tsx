@@ -13,6 +13,7 @@ interface SubtareaTableProps {
     onEstadoChange: (subtareaId: number, estado: string) => void;
     updatingEstadoSubtareaId: number | null;
     userRole: string;
+    findingsCount?: Record<number, number>;
 }
 
 export const SubtareaTable: React.FC<SubtareaTableProps> = ({
@@ -26,7 +27,8 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     getAcceptedFileTypes,
     onEstadoChange,
     updatingEstadoSubtareaId,
-    userRole
+    userRole,
+    findingsCount = {},
 }) => {
     return (
         <div className="overflow-hidden">
@@ -74,6 +76,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             onEstadoChange={onEstadoChange}
                             isUpdatingEstado={updatingEstadoSubtareaId === subtarea.id}
                             userRole={userRole}
+                            findingsCount={findingsCount[subtarea.id] || 0}
                         />
                     ))}
                 </tbody>

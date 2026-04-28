@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auditoriaService } from "../../services/auditoriaService";
+import { findingService } from "../../services/findingService";
 import { Modal } from "../../components/Modal";
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
@@ -15,9 +16,26 @@ export const AuditoriaDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useUser(() => navigate("/login"));
   const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
+  const [findingsCount, setFindingsCount] = useState<Record<number, number>>({});
   const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<
     number | null
   >(null);
+
+  // Cargar conteo de findings por subtarea
+  useEffect(() => {
+    if (!id) return;
+    findingService.getByAuditoria(Number(id)).then((findings) => {
+      const counts: Record<number, number> = {};
+      findings.forEach((f) => {
+        // Intentar con actividad.id o actividad_id directamente
+        const actividadId = f.actividad?.id ?? (f as any).actividad_id;
+        if (actividadId) {
+          counts[actividadId] = (counts[actividadId] || 0) + 1;
+        }
+      });
+      setFindingsCount(counts);
+    }).catch(() => { });
+  }, [id]);
   const [modal, setModal] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -152,6 +170,7 @@ export const AuditoriaDetalle: React.FC = () => {
                 onEstadoChange={handleEstadoChange}
                 updatingEstadoSubtareaId={updatingEstadoSubtareaId}
                 userRole={user?.role?.nombre || "delegado"}
+                findingsCount={findingsCount}
               />
             ))}
           </div>

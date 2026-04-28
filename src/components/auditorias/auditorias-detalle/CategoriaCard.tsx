@@ -13,6 +13,7 @@ interface CategoriaCardProps {
     onEstadoChange: (subtareaId: number, estado: string) => void;
     updatingEstadoSubtareaId: number | null;
     userRole: string;
+    findingsCount?: Record<number, number>;
 }
 
 export const CategoriaCard: React.FC<CategoriaCardProps> = ({
@@ -26,7 +27,8 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     getAcceptedFileTypes,
     onEstadoChange,
     updatingEstadoSubtareaId,
-    userRole
+    userRole,
+    findingsCount = {},
 }) => {
     return (
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -54,6 +56,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                         onEstadoChange={onEstadoChange}
                         updatingEstadoSubtareaId={updatingEstadoSubtareaId}
                         userRole={userRole}
+                        findingsCount={findingsCount}
                     />
                 ) : (
                     <p className="text-center text-gray-500 py-8">

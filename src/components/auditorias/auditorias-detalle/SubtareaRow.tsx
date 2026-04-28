@@ -20,6 +20,7 @@ interface SubtareaRowProps {
   onEstadoChange: (subtareaId: number, estado: string) => void;
   isUpdatingEstado: boolean;
   userRole: string;
+  findingsCount?: number;
 }
 
 export const SubtareaRow: React.FC<SubtareaRowProps> = ({
@@ -34,6 +35,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   onEstadoChange,
   isUpdatingEstado,
   userRole,
+  findingsCount = 0,
 }) => {
   const [showFindingModal, setShowFindingModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -172,8 +174,12 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
           title="Crear hallazgo para esta actividad"
         >
-          <img src="/fiddings.png" alt="Hallazgo" className="w-6 h-6 object-cover invert flex-shrink-0" style={{ objectPosition: 'center' }} />
-          Marcar Hallazgo
+          {findingsCount > 0 && (
+            <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {findingsCount}
+            </span>
+          )}
+          Hallazgo
         </button>
       </td>
 
