@@ -326,12 +326,17 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
                 {['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(doc.extension.toLowerCase()) ? (
                   <img src={doc.url} alt={doc.nombre_original} className="w-full h-full object-cover" />
                 ) : doc.extension.toLowerCase() === 'pdf' ? (
-                  <iframe
-                    src={`${doc.url}#toolbar=0&navpanes=0&scrollbar=0&page=1`}
-                    title={doc.nombre_original}
+                  <object
+                    data={`${doc.url}#toolbar=0&navpanes=0&scrollbar=0&page=1`}
+                    type="application/pdf"
                     className="w-full h-full pointer-events-none"
                     style={{ border: 'none' }}
-                  />
+                  >
+                    <div className="flex flex-col items-center justify-center w-full h-full gap-2 text-gray-400">
+                      <span className="text-3xl">📄</span>
+                      <span className="text-xs font-medium">PDF</span>
+                    </div>
+                  </object>
                 ) : (
                   <span className="text-orange-400 font-bold tracking-widest text-xs uppercase">{doc.extension}</span>
                 )}
