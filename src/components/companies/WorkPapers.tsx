@@ -182,9 +182,11 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    await uploadFile(file);
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    for (const file of files) {
+      await uploadFile(file);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
@@ -192,9 +194,11 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    await uploadFile(file);
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (!files.length) return;
+    for (const file of files) {
+      await uploadFile(file);
+    }
   };
 
   const handleDeleteRequest = (docId: number, e: React.MouseEvent) => {
@@ -404,7 +408,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
       )}
 
       {/* Hidden File Input — acepta todos los tipos */}
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="*/*" />
+      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="*/*" multiple />
 
       {/* Floating Subir archivo Button */}
       <button
