@@ -28,7 +28,8 @@ export interface Documento {
     ruta_archivo: string;
     extension: string;
     tamano: number;
-    url: string;
+    url: string;        // URL del endpoint autenticado (para PDFs)
+    storageUrl: string; // URL directa del storage (para imágenes)
     ruta_carpeta?: string;
     created_at?: string;
     deleted_at?: string;
@@ -82,7 +83,8 @@ export const documentoService = {
         const response = await axios.get(`${API_URL}/carpetas/${carpetaId}/documentos`, getAuthHeaders());
         return response.data.map((doc: Documento) => ({
             ...doc,
-            url: `${API_URL}/documentos/${doc.id}/file`
+            url: `${API_URL}/documentos/${doc.id}/file`,
+            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
         }));
     },
 
@@ -101,7 +103,8 @@ export const documentoService = {
         const doc = response.data.documento;
         return {
             ...doc,
-            url: `${API_URL}/documentos/${doc.id}/file`
+            url: `${API_URL}/documentos/${doc.id}/file`,
+            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
         };
     },
 
@@ -114,7 +117,8 @@ export const documentoService = {
         const response = await axios.get(`${API_URL}/papelera/documentos`, getAuthHeaders());
         return response.data.map((doc: Documento) => ({
             ...doc,
-            url: `${API_URL}/documentos/${doc.id}/file`
+            url: `${API_URL}/documentos/${doc.id}/file`,
+            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
         }));
     },
 

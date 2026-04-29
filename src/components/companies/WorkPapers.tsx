@@ -354,14 +354,14 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
           {filteredDocs.map((doc) => (
             <a
               key={doc.id}
-              href={doc.url}
+              href={doc.storageUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col h-56 group relative"
             >
               <div className="flex-1 bg-white border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)] rounded-sm mb-4 flex items-center justify-center relative hover:bg-gray-50 transition-colors cursor-pointer mx-2 mt-2 group-hover:bg-orange-50 overflow-hidden">
                 {['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(doc.extension.toLowerCase()) ? (
-                  <img src={doc.url} alt={doc.nombre_original} className="w-full h-full object-cover" />
+                  <img src={doc.storageUrl} alt={doc.nombre_original} className="w-full h-full object-cover" />
                 ) : doc.extension.toLowerCase() === 'pdf' ? (
                   <PdfPreview url={doc.url} />
                 ) : (
