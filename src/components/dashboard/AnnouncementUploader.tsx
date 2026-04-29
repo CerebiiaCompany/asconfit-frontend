@@ -71,11 +71,11 @@ export const AnnouncementUploader: React.FC = () => {
     return (
         <div className="bg-white rounded-2xl shadow-xl p-4 flex flex-col items-center justify-center h-full min-h-[350px] border border-gray-100 group relative overflow-hidden">
             {imageUrl ? (
-                <div className="w-full h-[200px] rounded-xl overflow-hidden">
+                <div className="w-full flex-1 rounded-xl overflow-hidden">
                     <img
                         src={imageUrl}
                         alt="Comunicado"
-                        className="w-full h-full object-contain rounded-xl"
+                        className="w-full h-full object-cover rounded-xl"
                     />
                 </div>
             ) : (
