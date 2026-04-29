@@ -14,6 +14,7 @@ interface CategoriaCardProps {
     updatingEstadoSubtareaId: number | null;
     userRole: string;
     findingsCount?: Record<number, number>;
+    onFindingCreated?: (actividadId: number, count: number) => void;
 }
 
 export const CategoriaCard: React.FC<CategoriaCardProps> = ({
@@ -29,6 +30,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     updatingEstadoSubtareaId,
     userRole,
     findingsCount = {},
+    onFindingCreated,
 }) => {
     return (
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -57,6 +59,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                         updatingEstadoSubtareaId={updatingEstadoSubtareaId}
                         userRole={userRole}
                         findingsCount={findingsCount}
+                        onFindingCreated={onFindingCreated}
                     />
                 ) : (
                     <p className="text-center text-gray-500 py-8">

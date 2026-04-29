@@ -21,6 +21,7 @@ interface SubtareaRowProps {
   isUpdatingEstado: boolean;
   userRole: string;
   findingsCount?: number;
+  onFindingCreated?: (actividadId: number, count: number) => void;
 }
 
 export const SubtareaRow: React.FC<SubtareaRowProps> = ({
@@ -36,6 +37,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   isUpdatingEstado,
   userRole,
   findingsCount = 0,
+  onFindingCreated,
 }) => {
   const [showFindingModal, setShowFindingModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -188,6 +190,12 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
           auditoria={auditoria}
           initialActividadId={subtarea.id}
           onClose={() => setShowFindingModal(false)}
+          onSave={(savedFindings) => {
+            setShowFindingModal(false);
+            if (onFindingCreated) {
+              onFindingCreated(subtarea.id, findingsCount + savedFindings.length);
+            }
+          }}
         />
       )}
 

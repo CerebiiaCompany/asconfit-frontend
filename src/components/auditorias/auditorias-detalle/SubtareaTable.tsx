@@ -14,6 +14,7 @@ interface SubtareaTableProps {
     updatingEstadoSubtareaId: number | null;
     userRole: string;
     findingsCount?: Record<number, number>;
+    onFindingCreated?: (actividadId: number, count: number) => void;
 }
 
 export const SubtareaTable: React.FC<SubtareaTableProps> = ({
@@ -29,6 +30,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     updatingEstadoSubtareaId,
     userRole,
     findingsCount = {},
+    onFindingCreated,
 }) => {
     return (
         <div className="overflow-hidden">
@@ -77,6 +79,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             isUpdatingEstado={updatingEstadoSubtareaId === subtarea.id}
                             userRole={userRole}
                             findingsCount={findingsCount[subtarea.id] || 0}
+                            onFindingCreated={onFindingCreated}
                         />
                     ))}
                 </tbody>

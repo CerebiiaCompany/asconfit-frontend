@@ -27,7 +27,6 @@ export const AuditoriaDetalle: React.FC = () => {
     findingService.getByAuditoria(Number(id)).then((findings) => {
       const counts: Record<number, number> = {};
       findings.forEach((f) => {
-        // Intentar con actividad.id o actividad_id directamente
         const actividadId = f.actividad?.id ?? (f as any).actividad_id;
         if (actividadId) {
           counts[actividadId] = (counts[actividadId] || 0) + 1;
@@ -36,6 +35,7 @@ export const AuditoriaDetalle: React.FC = () => {
       setFindingsCount(counts);
     }).catch(() => { });
   }, [id]);
+
   const [modal, setModal] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -74,6 +74,10 @@ export const AuditoriaDetalle: React.FC = () => {
       });
     },
   });
+
+  const handleFindingCreated = (actividadId: number, newCount: number) => {
+    setFindingsCount(prev => ({ ...prev, [actividadId]: newCount }));
+  };
 
   const handleEstadoChange = async (subtareaId: number, estado: string) => {
     try {
@@ -171,6 +175,7 @@ export const AuditoriaDetalle: React.FC = () => {
                 updatingEstadoSubtareaId={updatingEstadoSubtareaId}
                 userRole={user?.role?.nombre || "delegado"}
                 findingsCount={findingsCount}
+                onFindingCreated={handleFindingCreated}
               />
             ))}
           </div>
