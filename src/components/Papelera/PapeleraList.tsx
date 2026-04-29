@@ -105,7 +105,7 @@ export const PapeleraList: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 mt-6 flex-1 overflow-y-auto">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 mt-6">
       {/* Tabs */}
       <div className="flex gap-4 mb-6 border-b border-gray-200">
         <button

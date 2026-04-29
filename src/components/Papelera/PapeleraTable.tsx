@@ -12,7 +12,7 @@ interface PapeleraTableProps {
 export const PapeleraTable: React.FC<PapeleraTableProps> = ({
     docs, loading, selectedIds, onSelectAll, onSelect,
 }) => (
-    <div className="hidden sm:block overflow-x-hidden overflow-y-auto max-h-[500px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-[#FF9411] [&::-webkit-scrollbar-thumb]:rounded-full pr-2">
+    <div className="hidden sm:block overflow-x-auto">
         <table className="w-full divide-y divide-gray-200 table-fixed">
             <thead className="sticky top-0 bg-white z-10">
                 <tr>
