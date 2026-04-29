@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Auditoria } from "../../../types/auditoria";
 import { findingService, Finding } from "../../../services/findingService";
 import { SEVERIDAD_CONFIG } from "../../../types/finding.types";
@@ -37,7 +37,7 @@ const estadoTexto = (s: any): string => {
     return `se encuentra pendiente de entrega${solicitud ? `, solicitada desde el ${solicitud}` : ""}.`;
 };
 
-const generarConclusion = (auditoria: Auditoria): string => {
+const generarConclusion = (auditoria: Auditoria, findings: Finding[]): string => {
     const empresa = auditoria.empresa?.razon_social || auditoria.razon_social || "la empresa";
     const tipo = auditoria.tipo_auditoria ?? "auditoría";
     const subtareas = (auditoria.categorias ?? []).flatMap(c => c.subtareas ?? []);
@@ -85,6 +85,26 @@ const generarConclusion = (auditoria: Auditoria): string => {
         }
     }
 
+    // Párrafo de hallazgos
+    if (findings.length > 0) {
+        const criticos = findings.filter(f => f.severidad === "critico").length;
+        const graves = findings.filter(f => f.severidad === "grave").length;
+        const leves = findings.filter(f => f.severidad === "leve").length;
+
+        const partesSev: string[] = [];
+        if (criticos > 0) partesSev.push(`${criticos} ${criticos === 1 ? "crítico" : "críticos"}`);
+        if (graves > 0) partesSev.push(`${graves} ${graves === 1 ? "grave" : "graves"}`);
+        if (leves > 0) partesSev.push(`${leves} ${leves === 1 ? "leve" : "leves"}`);
+
+        texto += `\n\nAdicionalmente, en el transcurso de la revisión se identificaron ${findings.length} ${findings.length === 1 ? "hallazgo" : "hallazgos"}`;
+        if (partesSev.length > 0) texto += `, de ${findings.length === 1 ? "los cuales" : "los cuales"} ${partesSev.join(", ")}`;
+        texto += `. Se recomienda atender ${findings.length === 1 ? "el hallazgo identificado" : "los hallazgos identificados"} con la prioridad que corresponda según su severidad, estableciendo planes de mejora y acciones correctivas dentro de los plazos acordados.`;
+
+        if (criticos > 0) {
+            texto += ` Los hallazgos críticos requieren atención inmediata dado el nivel de riesgo que representan para la organización.`;
+        }
+    }
+
     return texto;
 };
 
@@ -103,16 +123,13 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
     const aprobadas = categorias.flatMap(c => c.subtareas ?? []).filter(s => s.estado_informacion === "aprobado").length;
     const pendientes = totalSubtareas - aprobadas;
 
-    const [conclusion, setConclusion] = useState(() => generarConclusion(auditoria));
     const [findings, setFindings] = useState<Finding[]>([]);
 
     useEffect(() => {
         findingService.getByAuditoria(auditoria.id).then(setFindings).catch(() => { });
     }, [auditoria.id]);
 
-    const handleRegenerate = () => {
-        setConclusion(generarConclusion(auditoria));
-    };
+    const conclusion = useMemo(() => generarConclusion(auditoria, findings), [auditoria, findings]);
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
