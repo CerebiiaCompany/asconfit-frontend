@@ -77,7 +77,7 @@ export const ViewCompanies: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">
-            Empresas
+            Encargos
           </h1>
           <p className="text-slate-500 text-sm mt-2 font-normal">
             Administra de forma segura la información y documentos

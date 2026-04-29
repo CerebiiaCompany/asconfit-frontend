@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { useUser } from "../hooks/useUser";
 // import { useEmpresas } from "../hooks/useEmpresas";
-import { 
-  Search, 
-  PlusCircle, 
-  FileText, 
-  SlidersHorizontal, 
-  Lock, 
-  Users, 
-  Upload, 
-  ChevronLeft, 
+import {
+  Search,
+  PlusCircle,
+  FileText,
+  SlidersHorizontal,
+  Lock,
+  Users,
+  Upload,
+  ChevronLeft,
   ChevronRight,
   Plus
 } from "lucide-react";
@@ -28,12 +28,12 @@ export const EmpresaDetalle: React.FC = () => {
     <div className="p-6 max-w-[1200px] mx-auto font-sans min-h-screen">
       {/* Header Row */}
       <div className="mb-6">
-        <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">Empresas</h1>
+        <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">Encargos</h1>
         <p className="text-slate-500 text-sm mt-2 font-normal">
           Administra de forma segura la información y documentos
         </p>
       </div>
-      
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div className="relative w-full md:w-[450px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -45,9 +45,9 @@ export const EmpresaDetalle: React.FC = () => {
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
         </div>
-        
+
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <button 
+          <button
             onClick={handleNewEmpresa}
             className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded hover:bg-orange-50 transition-colors w-full md:w-auto justify-center text-sm font-medium"
           >
@@ -109,17 +109,17 @@ export const EmpresaDetalle: React.FC = () => {
               <div>7</div>
               <div>8</div>
               <div>9</div>
-              
+
               <div className="relative">
                 <div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto cursor-pointer shadow-sm">10</div>
                 {/* Tooltip pointing to 10 */}
                 <div className="absolute top-1/2 right-full mr-2 transform -translate-y-1/2 w-[160px] bg-gray-300/80 text-gray-800 p-1.5 rounded shadow-sm flex gap-1.5 items-center z-10 backdrop-blur-sm">
-                  <span className="font-bold text-xs bg-gray-400/30 px-1 py-0.5 rounded">10</span> 
+                  <span className="font-bold text-xs bg-gray-400/30 px-1 py-0.5 rounded">10</span>
                   <span className="text-[9px] font-semibold leading-tight text-left">Fecha limite para información general</span>
                   <div className="absolute right-[-4px] top-1/2 transform -translate-y-1/2 w-2 h-2 bg-gray-300/80 rotate-45 backdrop-blur-sm"></div>
                 </div>
               </div>
-              
+
               <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div>
               <div><div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto cursor-pointer shadow-sm">19</div></div>
               <div>20</div><div>21</div><div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div><div>29</div><div>30</div><div>31</div>
@@ -159,7 +159,7 @@ export const EmpresaDetalle: React.FC = () => {
               Filtro
             </button>
           </div>
-          
+
           <div className="flex bg-white border border-gray-200 rounded overflow-hidden">
             <button className="bg-orange-500 text-white px-4 py-2 flex items-center justify-center">
               <Lock className="w-4 h-4" />

@@ -47,7 +47,7 @@ export const CompanyHeader: React.FC = () => {
       {/* Header Row */}
       <div className="mb-6">
         <h1 className="text-[32px] font-bold text-slate-800 tracking-tight">
-          Empresas
+          Encargos
         </h1>
         <p className="text-slate-500 text-sm mt-2 font-normal">
           Administra de forma segura la información y documentos
@@ -77,14 +77,14 @@ export const CompanyHeader: React.FC = () => {
                   <div
                     key={emp.id}
                     onClick={() => {
-                        setSearchTerm("");
-                        setShowDropdown(false);
-                        navigate(`/empresas?id=${emp.id}`);
+                      setSearchTerm("");
+                      setShowDropdown(false);
+                      navigate(`/empresas?id=${emp.id}`);
                     }}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
                   >
                     <div className="bg-orange-100 p-2 rounded-lg">
-                       <Building2 className="w-5 h-5 text-orange-600" />
+                      <Building2 className="w-5 h-5 text-orange-600" />
                     </div>
                     <div className="flex flex-col">
                       <span className="font-semibold text-gray-800 text-sm leading-tight">{emp.razon_social}</span>

@@ -16,7 +16,7 @@ export const BreadcrumbTarea: React.FC<BreadcrumbTareaProps> = ({
           onClick={onNavigateBack}
           className="text-lg font-medium hover:text-gray-900 transition-colors"
         >
-          Mis Tareas
+          Mis Encargos
         </button>
         <svg
           className="h-5 w-5 text-orange-500"
