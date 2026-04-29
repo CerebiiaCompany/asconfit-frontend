@@ -22,6 +22,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/building.png",
   },
   {
+    id: "roles",
+    path: "/roles",
+    label: "Administración",
+    icon: "/adminstracion.png",
+  },
+  {
     id: "mis-tareas",
     path: "/mis-tareas",
     label: "Mis Encargos",
@@ -44,12 +50,6 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     path: "/ai-analysis",
     label: "Análisis IA",
     icon: "/ai-analysis.png",
-  },
-  {
-    id: "roles",
-    path: "/roles",
-    label: "Administración",
-    icon: "/adminstracion.png",
   },
   {
     id: "papelera",
