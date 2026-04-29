@@ -105,7 +105,7 @@ export const PapeleraList: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 mt-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-8 mt-6 flex-1 overflow-y-auto">
       {/* Tabs */}
       <div className="flex gap-4 mb-6 border-b border-gray-200">
         <button
@@ -231,8 +231,8 @@ export const PapeleraList: React.FC = () => {
                         className="sr-only peer"
                       />
                       <div className={`w-6 h-6 border-2 rounded-md transition-all duration-200 flex items-center justify-center ${selectedAuditoriaIds.includes(auditoria.id)
-                          ? 'bg-orange-500 border-orange-500'
-                          : 'bg-white border-gray-300 group-hover:border-orange-400'
+                        ? 'bg-orange-500 border-orange-500'
+                        : 'bg-white border-gray-300 group-hover:border-orange-400'
                         }`}>
                         {selectedAuditoriaIds.includes(auditoria.id) && (
                           <svg

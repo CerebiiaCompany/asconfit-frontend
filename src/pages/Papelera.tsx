@@ -3,7 +3,7 @@ import { PapeleraList } from '../components/Papelera/PapeleraList';
 
 export const Papelera: React.FC = () => {
     return (
-        <div className="p-8">
+        <div className="p-8 flex flex-col" style={{ minHeight: 'calc(100vh - 80px)' }}>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Papelera</h1>
             <PapeleraList />
         </div>
