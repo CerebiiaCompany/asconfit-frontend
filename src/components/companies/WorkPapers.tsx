@@ -3,6 +3,43 @@ import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye, 
 import { documentoService, Documento, Carpeta } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+// Carga el PDF como blob para evitar problemas de CORS con el worker de pdf.js
+function usePdfBlob(url: string) {
+  const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    let objectUrl: string;
+    const token = localStorage.getItem("auth_token");
+    fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+      .then((r) => r.blob())
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+      })
+      .catch(() => setBlobUrl(null));
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [url]);
+  return blobUrl;
+}
+
+function PdfPreview({ url }: { url: string }) {
+  const blobUrl = usePdfBlob(url);
+  if (!blobUrl) return <div className="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400"><FileText className="w-8 h-8" /><span className="text-xs">PDF</span></div>;
+  return (
+    <Document
+      file={blobUrl}
+      loading={<div className="flex items-center justify-center w-full h-full text-gray-300 text-xs">Cargando...</div>}
+      error={<div className="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400"><FileText className="w-8 h-8" /><span className="text-xs">PDF</span></div>}
+    >
+      <Page pageNumber={1} width={200} renderTextLayer={false} renderAnnotationLayer={false} />
+    </Document>
+  );
+}
 
 interface WorkPapersProps {
   carpetaId: number;
@@ -326,17 +363,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
                 {['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(doc.extension.toLowerCase()) ? (
                   <img src={doc.url} alt={doc.nombre_original} className="w-full h-full object-cover" />
                 ) : doc.extension.toLowerCase() === 'pdf' ? (
-                  <object
-                    data={`${doc.url}#toolbar=0&navpanes=0&scrollbar=0&page=1`}
-                    type="application/pdf"
-                    className="w-full h-full pointer-events-none"
-                    style={{ border: 'none' }}
-                  >
-                    <div className="flex flex-col items-center justify-center w-full h-full gap-2 text-gray-400">
-                      <span className="text-3xl">📄</span>
-                      <span className="text-xs font-medium">PDF</span>
-                    </div>
-                  </object>
+                  <PdfPreview url={doc.url} />
                 ) : (
                   <span className="text-orange-400 font-bold tracking-widest text-xs uppercase">{doc.extension}</span>
                 )}

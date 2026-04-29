@@ -82,7 +82,7 @@ export const documentoService = {
         const response = await axios.get(`${API_URL}/carpetas/${carpetaId}/documentos`, getAuthHeaders());
         return response.data.map((doc: Documento) => ({
             ...doc,
-            url: BASE_URL + doc.url
+            url: `${API_URL}/documentos/${doc.id}/file`
         }));
     },
 
@@ -101,7 +101,7 @@ export const documentoService = {
         const doc = response.data.documento;
         return {
             ...doc,
-            url: BASE_URL + doc.url
+            url: `${API_URL}/documentos/${doc.id}/file`
         };
     },
 
@@ -114,7 +114,7 @@ export const documentoService = {
         const response = await axios.get(`${API_URL}/papelera/documentos`, getAuthHeaders());
         return response.data.map((doc: Documento) => ({
             ...doc,
-            url: BASE_URL + doc.url
+            url: `${API_URL}/documentos/${doc.id}/file`
         }));
     },
 
