@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye, FolderPlus, Folder, ChevronRight } from "lucide-react";
+import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye, FolderPlus, Folder, ChevronRight, MoreVertical, Pencil } from "lucide-react";
 import { documentoService, Documento, Carpeta } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
@@ -24,8 +24,10 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [creatingFolder, setCreatingFolder] = useState(false);
+  const [folderMenu, setFolderMenu] = useState<number | null>(null);
+  const [renameModal, setRenameModal] = useState<{ id: number; nombre: string } | null>(null);
+  const [deleteFolderModal, setDeleteFolderModal] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const folderInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -35,7 +37,16 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
 
   useEffect(() => {
     loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCarpetaId]);
+
+  // Cerrar menú de carpeta al hacer clic fuera
+  useEffect(() => {
+    if (!folderMenu) return;
+    const close = () => setFolderMenu(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [folderMenu]);
 
   const loadAll = async () => {
     try {
@@ -83,6 +94,30 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
       addToast("Error al crear la subcarpeta", "error");
     } finally {
       setCreatingFolder(false);
+    }
+  };
+
+  const handleRenameFolder = async () => {
+    if (!renameModal || !renameModal.nombre.trim()) return;
+    try {
+      const updated = await documentoService.renameCarpeta(renameModal.id, renameModal.nombre.trim());
+      setSubcarpetas(prev => prev.map(s => s.id === updated.id ? updated : s));
+      addToast("Carpeta renombrada", "success");
+      setRenameModal(null);
+    } catch {
+      addToast("Error al renombrar la carpeta", "error");
+    }
+  };
+
+  const handleDeleteFolder = async () => {
+    if (!deleteFolderModal) return;
+    try {
+      await documentoService.deleteCarpeta(deleteFolderModal);
+      setSubcarpetas(prev => prev.filter(s => s.id !== deleteFolderModal));
+      addToast("Carpeta eliminada y documentos movidos a papelera", "success");
+      setDeleteFolderModal(null);
+    } catch {
+      addToast("Error al eliminar la carpeta", "error");
     }
   };
 
@@ -240,14 +275,42 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {/* Subcarpetas */}
           {subcarpetas.map((sub) => (
-            <button
-              key={sub.id}
-              onClick={() => navigateToSubcarpeta(sub)}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col items-center justify-center h-40 gap-3 hover:border-orange-300 hover:shadow-md transition-all group"
-            >
-              <Folder className="w-12 h-12 text-orange-400 group-hover:text-orange-500 transition-colors" />
-              <span className="text-xs font-semibold text-gray-700 text-center line-clamp-2">{sub.nombre}</span>
-            </button>
+            <div key={sub.id} className="relative group/folder">
+              <button
+                onClick={() => navigateToSubcarpeta(sub)}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col items-center justify-center h-40 w-full gap-3 hover:border-orange-300 hover:shadow-md transition-all group"
+              >
+                <Folder className="w-12 h-12 text-orange-400 group-hover:text-orange-500 transition-colors" />
+                <span className="text-xs font-semibold text-gray-700 text-center line-clamp-2">{sub.nombre}</span>
+              </button>
+              {/* Menú 3 puntos */}
+              <div className="absolute top-2 right-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setFolderMenu(folderMenu === sub.id ? null : sub.id); }}
+                  className="w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center opacity-0 group-hover/folder:opacity-100 hover:bg-gray-100 transition-all shadow-sm"
+                >
+                  <MoreVertical className="w-4 h-4 text-gray-500" />
+                </button>
+                {folderMenu === sub.id && (
+                  <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[140px] py-1">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setRenameModal({ id: sub.id, nombre: sub.nombre }); setFolderMenu(null); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <Pencil className="w-4 h-4 text-gray-400" />
+                      Renombrar
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteFolderModal(sub.id); setFolderMenu(null); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
 
           {/* Documentos */}
@@ -355,6 +418,44 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
         onClose={() => setDocToDelete(null)}
         onConfirm={confirmDelete}
         loading={loading}
+      />
+
+      {/* Modal renombrar carpeta */}
+      {renameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setRenameModal(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h2 className="text-base font-bold text-gray-800 mb-4">Renombrar carpeta</h2>
+            <input
+              autoFocus
+              type="text"
+              value={renameModal.nombre}
+              onChange={e => setRenameModal({ ...renameModal, nombre: e.target.value })}
+              onKeyDown={e => { if (e.key === 'Enter') handleRenameFolder(); if (e.key === 'Escape') setRenameModal(null); }}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 mb-5"
+            />
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setRenameModal(null)} className="px-5 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                Cancelar
+              </button>
+              <button
+                onClick={handleRenameFolder}
+                disabled={!renameModal.nombre.trim()}
+                className="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold disabled:opacity-50"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal eliminar carpeta */}
+      <DeleteConfirmModal
+        isOpen={deleteFolderModal !== null}
+        onClose={() => setDeleteFolderModal(null)}
+        onConfirm={handleDeleteFolder}
+        loading={false}
       />
     </div>
   );

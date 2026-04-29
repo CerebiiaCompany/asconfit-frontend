@@ -72,6 +72,11 @@ export const documentoService = {
         return response.data;
     },
 
+    renameCarpeta: async (carpetaId: number, nombre: string): Promise<Carpeta> => {
+        const response = await axios.patch(`${API_URL}/carpetas/${carpetaId}/rename`, { nombre }, getAuthHeaders());
+        return response.data.carpeta;
+    },
+
     // Documentos
     getDocumentosByCarpeta: async (carpetaId: number): Promise<Documento[]> => {
         const response = await axios.get(`${API_URL}/carpetas/${carpetaId}/documentos`, getAuthHeaders());
