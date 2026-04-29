@@ -42,6 +42,7 @@ export const CompanyTabs: React.FC<CompanyTabsProps> = ({
     };
   }, [tabMenu]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadCarpetas(); }, [empresaId]);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const CompanyTabs: React.FC<CompanyTabsProps> = ({
         prev.map(c => c.id === activeCarpetaData.id ? { ...c, is_private: activeCarpetaData.is_private } : c)
       );
     }
-  }, [activeCarpetaData?.is_private]);
+  }, [activeCarpetaData]);
 
   // Focus input when modal opens
   useEffect(() => {
