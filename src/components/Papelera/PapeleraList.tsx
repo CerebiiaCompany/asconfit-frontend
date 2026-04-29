@@ -130,24 +130,38 @@ export const PapeleraList: React.FC = () => {
 
       {activeTab === 'documentos' ? (
         <>
-          <PapeleraToolbar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedCount={selectedIds.length}
-            loading={loading}
-            onDestruir={() => setShowConfirm(true)}
-            onRestaurar={handleRestore}
-          />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+            <SearchInput
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Buscar por nombre, empresa..."
+              className="w-full sm:w-80"
+            />
+            <div className="flex gap-2 sm:gap-4">
+              <button
+                onClick={() => setShowConfirm(true)}
+                disabled={selectedIds.length === 0 || loading}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-2 border border-red-500 text-red-600 bg-white rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span className="font-medium">Destruir ({selectedIds.length})</span>
+              </button>
+              <button
+                onClick={handleRestore}
+                disabled={selectedIds.length === 0 || loading}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-2 bg-[#FF9411] text-white rounded-lg hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                <span className="font-semibold">Restaurar ({selectedIds.length})</span>
+              </button>
+            </div>
+          </div>
 
           <PapeleraTable
-            docs={filteredDocs}
-            loading={loading}
-            selectedIds={selectedIds}
-            onSelectAll={checked => handleSelectAll(checked, filteredDocs)}
-            onSelect={handleSelect}
-          />
-
-          <PapeleraCards
             docs={filteredDocs}
             loading={loading}
             selectedIds={selectedIds}
@@ -205,11 +219,11 @@ export const PapeleraList: React.FC = () => {
               <p className="mt-4 text-gray-600">Cargando auditorías...</p>
             </div>
           ) : filteredAuditorias.length === 0 ? (
-            <div className="py-12 text-center">
+            <div className="py-16 text-center">
               <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              <p className="text-gray-500">No hay auditorías en la papelera</p>
+              <p className="text-gray-400 font-medium">No hay auditorías en la papelera</p>
             </div>
           ) : (
             <div className="space-y-4">
