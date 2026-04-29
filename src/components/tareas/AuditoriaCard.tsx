@@ -39,10 +39,10 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({ auditoria, onClick
             </div>
             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                 <span className="text-sm text-gray-500">
-                    {auditoria.tareas.length} {auditoria.tareas.length === 1 ? 'tarea' : 'tareas'}
+                    {auditoria.tareas.length} {auditoria.tareas.length === 1 ? 'Encargo' : 'Encargos'}
                 </span>
                 <span className="text-xs text-orange-600 font-medium">
-                    Ver tareas →
+                    Ver encargos →
                 </span>
             </div>
         </div>
