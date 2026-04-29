@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Auditoria } from "../../../types/auditoria";
+import { findingService, Finding } from "../../../services/findingService";
+import { SEVERIDAD_CONFIG } from "../../../types/finding.types";
 
 const formatDate = (d?: string) => {
     if (!d) return null;
@@ -102,6 +104,11 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
     const pendientes = totalSubtareas - aprobadas;
 
     const [conclusion, setConclusion] = useState(() => generarConclusion(auditoria));
+    const [findings, setFindings] = useState<Finding[]>([]);
+
+    useEffect(() => {
+        findingService.getByAuditoria(auditoria.id).then(setFindings).catch(() => { });
+    }, [auditoria.id]);
 
     const handleRegenerate = () => {
         setConclusion(generarConclusion(auditoria));
@@ -165,6 +172,97 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
                             return `Al cierre de este informe, ${partes.join(" y ")}.`;
                         })()}
                     </p>
+                )}
+
+                {/* Hallazgos por categoría/actividad */}
+                {findings.length > 0 && (
+                    <div className="pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">
+                            Hallazgos Identificados
+                        </p>
+                        <p className="text-gray-700 leading-relaxed mb-4">
+                            Durante el desarrollo de la {tipoAuditoria} practicada a{" "}
+                            <span className="font-medium">{empresaNombre}</span>, se identificaron{" "}
+                            <span className="font-medium">{findings.length} {findings.length === 1 ? "hallazgo" : "hallazgos"}</span>{" "}
+                            distribuidos entre las actividades evaluadas, los cuales se detallan a continuación:
+                        </p>
+                        {categorias.map((cat, ci) => {
+                            const findingsCat = findings.filter(f =>
+                                (cat.subtareas ?? []).some(s => s.id === f.actividad_id)
+                            );
+                            if (findingsCat.length === 0) return null;
+                            return (
+                                <div key={cat.id ?? ci} className="mb-4">
+                                    <p className="font-semibold mb-1.5 uppercase tracking-wide text-xs text-orange-600">
+                                        {cat.nombre}
+                                    </p>
+                                    <div className="space-y-3 pl-1 border-l-2 border-orange-100">
+                                        {(cat.subtareas ?? []).map(s => {
+                                            const findingsSub = findingsCat.filter(f => f.actividad_id === s.id);
+                                            if (findingsSub.length === 0) return null;
+                                            return (
+                                                <div key={s.id} className="pl-3">
+                                                    <p className="font-medium text-gray-900 text-sm mb-1">{s.nombre}</p>
+                                                    <div className="space-y-2">
+                                                        {findingsSub.map((f, fi) => {
+                                                            const sev = SEVERIDAD_CONFIG[f.severidad as keyof typeof SEVERIDAD_CONFIG];
+                                                            return (
+                                                                <div key={f.id ?? fi} className="flex gap-2 items-start">
+                                                                    {sev && (
+                                                                        <span className={`mt-0.5 shrink-0 inline-block w-2 h-2 rounded-full ${sev.color}`} />
+                                                                    )}
+                                                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                                                        <span className="font-medium text-gray-800">{f.titulo}</span>
+                                                                        {f.descripcion ? ` — ${f.descripcion}` : ""}
+                                                                        {sev ? ` (${sev.label})` : ""}
+                                                                        {f.responsable ? `. Responsable: ${f.responsable}` : ""}
+                                                                        {f.fecha_limite ? `. Fecha límite: ${formatDate(f.fecha_limite)}` : ""}
+                                                                        .
+                                                                    </p>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {/* Hallazgos sin actividad asignada */}
+                        {(() => {
+                            const sinActividad = findings.filter(f => !f.actividad_id);
+                            if (sinActividad.length === 0) return null;
+                            return (
+                                <div className="mb-4">
+                                    <p className="font-semibold mb-1.5 uppercase tracking-wide text-xs text-orange-600">
+                                        Generales
+                                    </p>
+                                    <div className="space-y-2 pl-1 border-l-2 border-orange-100 pl-3">
+                                        {sinActividad.map((f, fi) => {
+                                            const sev = SEVERIDAD_CONFIG[f.severidad as keyof typeof SEVERIDAD_CONFIG];
+                                            return (
+                                                <div key={f.id ?? fi} className="flex gap-2 items-start pl-3">
+                                                    {sev && (
+                                                        <span className={`mt-0.5 shrink-0 inline-block w-2 h-2 rounded-full ${sev.color}`} />
+                                                    )}
+                                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                                        <span className="font-medium text-gray-800">{f.titulo}</span>
+                                                        {f.descripcion ? ` — ${f.descripcion}` : ""}
+                                                        {sev ? ` (${sev.label})` : ""}
+                                                        {f.responsable ? `. Responsable: ${f.responsable}` : ""}
+                                                        {f.fecha_limite ? `. Fecha límite: ${formatDate(f.fecha_limite)}` : ""}
+                                                        .
+                                                    </p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
                 )}
 
                 {/* Conclusión generada automáticamente */}
