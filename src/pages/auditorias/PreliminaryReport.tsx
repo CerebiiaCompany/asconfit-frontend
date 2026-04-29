@@ -1,66 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
 import { LoadingState } from "../../components/common/LoadingState";
-import { auditoriaService } from "../../services/auditoriaService";
-import { storageUrl } from "../../utils/storageUrl";
 import { ReportTaskList } from "../../components/auditorias/preliminary-report/ReportTaskList";
-import { ReportPdfUpload } from "../../components/auditorias/preliminary-report/ReportPdfUpload";
+import { ReportStats } from "../../components/auditorias/preliminary-report/ReportStats";
+import { ReportPdfSection } from "../../components/auditorias/preliminary-report/ReportPdfSection";
+import { findingService, Finding } from "../../services/findingService";
 
 export const PreliminaryReport: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { auditoria, loading } = useAuditoriaDetalle(id);
+    const [findings, setFindings] = useState<Finding[]>([]);
 
-    const [pdfFile, setPdfFile] = useState<File | null>(null);
-    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
-    const [uploadError, setUploadError] = useState<string | null>(null);
-    const [uploadSuccess, setUploadSuccess] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // Cargar informe existente al entrar — usa storageUrl para construir URL correcta según entorno
     useEffect(() => {
-        if (!id) return;
-        auditoriaService.getInformePreliminar(id).then((data) => {
-            if (data.path) setPdfUrl(storageUrl(data.path));
-        }).catch(() => { });
-    }, [id]);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file || file.type !== "application/pdf") return;
-        setPdfFile(file);
-        setPdfUrl(URL.createObjectURL(file));
-        setUploadSuccess(false);
-        setUploadError(null);
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files?.[0];
-        if (!file || file.type !== "application/pdf") return;
-        setPdfFile(file);
-        setPdfUrl(URL.createObjectURL(file));
-        setUploadSuccess(false);
-        setUploadError(null);
-    };
-
-    const handleUpload = async () => {
-        if (!pdfFile || !id) return;
-        setUploading(true);
-        setUploadError(null);
-        try {
-            const { path } = await auditoriaService.uploadInformePreliminar(id, pdfFile);
-            setPdfUrl(storageUrl(path));
-            setPdfFile(null);
-            setUploadSuccess(true);
-        } catch {
-            setUploadError("Error al subir el informe. Intenta de nuevo.");
-        } finally {
-            setUploading(false);
-        }
-    };
+        if (!auditoria?.id) return;
+        findingService.getByAuditoria(auditoria.id).then(setFindings).catch(() => { });
+    }, [auditoria?.id]);
 
     if (loading) return <LoadingState message="Cargando auditoría..." />;
     if (!auditoria) return (
@@ -90,22 +46,13 @@ export const PreliminaryReport: React.FC = () => {
                 </div>
             </div>
 
-            {/* Two-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ReportTaskList auditoria={auditoria} />
-                <ReportPdfUpload
-                    pdfFile={pdfFile}
-                    pdfUrl={pdfUrl}
-                    fileInputRef={fileInputRef}
-                    onFileChange={handleFileChange}
-                    onDrop={handleDrop}
-                    onClear={() => { setPdfFile(null); setPdfUrl(null); setUploadSuccess(false); }}
-                    onUpload={handleUpload}
-                    uploading={uploading}
-                    uploadError={uploadError}
-                    uploadSuccess={uploadSuccess}
-                    isSaved={!pdfFile && !!pdfUrl}
-                />
+                <ReportTaskList auditoria={auditoria} findings={findings} />
+                <ReportPdfSection auditoriaId={id!} />
+            </div>
+
+            <div className="mt-6">
+                <ReportStats auditoria={auditoria} findings={findings} />
             </div>
         </div>
     );

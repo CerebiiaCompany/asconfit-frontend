@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Auditoria } from "../../../types/auditoria";
 import { findingService, Finding } from "../../../services/findingService";
 import { SEVERIDAD_CONFIG } from "../../../types/finding.types";
@@ -110,9 +110,10 @@ const generarConclusion = (auditoria: Auditoria, findings: Finding[]): string =>
 
 interface ReportTaskListProps {
     auditoria: Auditoria;
+    findings: Finding[];
 }
 
-export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => {
+export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findings }) => {
     const empresaNombre = auditoria.empresa?.razon_social || auditoria.razon_social || "la empresa";
     const tipoAuditoria = auditoria.tipo_auditoria ?? "auditoría";
     const fechaInicio = formatDate(auditoria.fecha_inicial);
@@ -122,12 +123,6 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria }) => 
     const totalSubtareas = categorias.flatMap(c => c.subtareas ?? []).length;
     const aprobadas = categorias.flatMap(c => c.subtareas ?? []).filter(s => s.estado_informacion === "aprobado").length;
     const pendientes = totalSubtareas - aprobadas;
-
-    const [findings, setFindings] = useState<Finding[]>([]);
-
-    useEffect(() => {
-        findingService.getByAuditoria(auditoria.id).then(setFindings).catch(() => { });
-    }, [auditoria.id]);
 
     const conclusion = useMemo(() => generarConclusion(auditoria, findings), [auditoria, findings]);
 
