@@ -40,8 +40,21 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   onFindingCreated,
 }) => {
   const [showFindingModal, setShowFindingModal] = useState(false);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [noteText, setNoteText] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingEstado, setPendingEstado] = useState<string>("");
+
+  // Cargar nota guardada al montar
+  React.useEffect(() => {
+    const saved = localStorage.getItem(`nota_subtarea_${subtarea.id}`);
+    if (saved) setNoteText(saved);
+  }, [subtarea.id]);
+
+  const handleSaveNote = () => {
+    localStorage.setItem(`nota_subtarea_${subtarea.id}`, noteText);
+    setShowNoteModal(false);
+  };
 
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newEstado = e.target.value;
@@ -171,18 +184,29 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         <FormatoBadge formato={subtarea.formato_archivo} />
       </td>
       <td className="px-2 py-3 whitespace-nowrap">
-        <button
-          onClick={() => setShowFindingModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
-          title="Crear hallazgo para esta actividad"
-        >
-          {findingsCount > 0 && (
-            <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              {findingsCount}
-            </span>
-          )}
-          Hallazgo
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowFindingModal(true)}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
+            title="Crear hallazgo para esta actividad"
+          >
+            {findingsCount > 0 && (
+              <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {findingsCount}
+              </span>
+            )}
+            Hallazgo
+          </button>
+          <button
+            onClick={() => setShowNoteModal(true)}
+            className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-blue-400 text-blue-500 bg-blue-50' : 'border-gray-300 text-gray-400 hover:border-blue-300 hover:text-blue-400'}`}
+            title={noteText ? "Ver/editar nota" : "Agregar nota"}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </button>
+        </div>
       </td>
 
       {showFindingModal && (
@@ -197,6 +221,42 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
             }
           }}
         />
+      )}
+
+      {showNoteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div>
+                <h3 className="text-base font-semibold text-gray-800">Nota de Tarea</h3>
+                <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{subtarea.nombre}</p>
+              </div>
+              <button onClick={() => setShowNoteModal(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-5">
+              <textarea
+                autoFocus
+                value={noteText}
+                onChange={e => setNoteText(e.target.value)}
+                placeholder="Escribe una nota para esta tarea..."
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                rows={6}
+              />
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                  Cancelar
+                </button>
+                <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold">
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {showConfirmModal && (
