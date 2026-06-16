@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TareaFlat } from '../../hooks/useTareas';
 import { FileUploadButton } from './FileUploadButton';
 
@@ -15,6 +15,20 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     acceptedFileTypes,
     uploading = false
 }) => {
+    const [showNoteModal, setShowNoteModal] = useState(false);
+    const [noteText, setNoteText] = useState("");
+
+    // Cargar nota guardada al montar
+    useEffect(() => {
+        const saved = localStorage.getItem(`nota_subtarea_${tarea.subtareaId}`);
+        if (saved) setNoteText(saved);
+    }, [tarea.subtareaId]);
+
+    const handleSaveNote = () => {
+        localStorage.setItem(`nota_subtarea_${tarea.subtareaId}`, noteText);
+        setShowNoteModal(false);
+    };
+
     // Wrapper para manejar el archivo con nombre personalizado
     const handleFileSelect = (file: File, customName?: string) => {
         onFileUpload(file);
@@ -179,13 +193,24 @@ export const TareaCard: React.FC<TareaCardProps> = ({
 
                 {/* Botón de subir archivo con lógica de estado */}
                 <div className="flex flex-col items-end gap-2">
-                    <FileUploadButton
-                        onFileSelect={handleFileSelect}
-                        acceptedFileTypes={acceptedFileTypes}
-                        hasFile={!!tarea.archivoNombre}
-                        uploading={uploading}
-                        disabled={isUploadDisabled}
-                    />
+                    <div className="flex items-center gap-2">
+                        <FileUploadButton
+                            onFileSelect={handleFileSelect}
+                            acceptedFileTypes={acceptedFileTypes}
+                            hasFile={!!tarea.archivoNombre}
+                            uploading={uploading}
+                            disabled={isUploadDisabled}
+                        />
+                        <button
+                            onClick={() => setShowNoteModal(true)}
+                            className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
+                            title={noteText ? "Ver/editar nota" : "Agregar nota"}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                            </svg>
+                        </button>
+                    </div>
 
                     {/* Mensaje de ayuda basado en el estado */}
                     {isUploadDisabled && tarea.estadoInformacion === 'aprobado' && (
@@ -199,6 +224,43 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                     )}
                 </div>
             </div>
+
+            {/* Modal de nota */}
+            {showNoteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                            <div>
+                                <h3 className="text-base font-semibold text-gray-800">Nota de Tarea</h3>
+                                <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{tarea.subtareaNombre}</p>
+                            </div>
+                            <button onClick={() => setShowNoteModal(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="p-5">
+                            <textarea
+                                autoFocus
+                                value={noteText}
+                                onChange={e => setNoteText(e.target.value)}
+                                placeholder="Escribe una nota para esta tarea..."
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                rows={6}
+                            />
+                            <div className="flex gap-3 mt-4">
+                                <button onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                                    Cancelar
+                                </button>
+                                <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold">
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
