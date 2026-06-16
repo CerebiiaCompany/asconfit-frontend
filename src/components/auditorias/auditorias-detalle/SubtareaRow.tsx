@@ -199,7 +199,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
           </button>
           <button
             onClick={() => setShowNoteModal(true)}
-            className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-blue-400 text-blue-500 bg-blue-50' : 'border-gray-300 text-gray-400 hover:border-blue-300 hover:text-blue-400'}`}
+            className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
             title={noteText ? "Ver/editar nota" : "Agregar nota"}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,14 +243,14 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Escribe una nota para esta tarea..."
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                 rows={6}
               />
               <div className="flex gap-3 mt-4">
                 <button onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
                   Cancelar
                 </button>
-                <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold">
+                <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold">
                   Guardar
                 </button>
               </div>
