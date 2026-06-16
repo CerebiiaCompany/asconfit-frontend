@@ -389,9 +389,16 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
               </div>
               <div className="flex items-start gap-2 px-1 mb-1">
                 <input type="checkbox" onClick={(e) => e.stopPropagation()} className="mt-0.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 w-3 h-3 cursor-pointer" />
-                <span className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2" title={doc.nombre_original}>
-                  {doc.nombre_original}
-                </span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2 block" title={doc.nombre_original}>
+                    {doc.nombre_original}
+                  </span>
+                  {doc.created_at && (
+                    <span className="text-[9px] text-gray-400 block mt-0.5">
+                      {new Date(doc.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </span>
+                  )}
+                </div>
               </div>
             </a>
           ))}
