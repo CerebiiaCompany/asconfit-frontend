@@ -44,9 +44,12 @@ export const auditoriaService = {
     return response.data;
   },
 
-  async uploadFile(subtareaId: number, file: File) {
+  async uploadFile(subtareaId: number, file: File, carpetaId?: number | null) {
     const formData = new FormData();
     formData.append("file", file);
+    if (carpetaId) {
+      formData.append("carpeta_id", carpetaId.toString());
+    }
 
     const response = await axios.post(
       `${API_URL}/auditorias/subtareas/${subtareaId}/upload`,

@@ -54,9 +54,10 @@ export const MisTareas: React.FC = () => {
   const handleFileUpload = async (
     subtareaId: number,
     formatoArchivo: string | null,
-    file: File
+    file: File,
+    carpetaId?: number | null
   ) => {
-    await uploadFile(subtareaId, file, formatoArchivo);
+    await uploadFile(subtareaId, file, formatoArchivo, carpetaId);
   };
 
   const handleCloseModal = () => {
@@ -135,17 +136,25 @@ export const MisTareas: React.FC = () => {
                   <TareaCard
                     key={`${tarea.subtareaId}-${index}`}
                     tarea={tarea}
-                    onFileUpload={(file) =>
+                    onFileUpload={(file, carpetaId) =>
                       handleFileUpload(
                         tarea.subtareaId,
                         tarea.formatoArchivo,
-                        file
+                        file,
+                        carpetaId
                       )
                     }
                     acceptedFileTypes={getAcceptedFileTypes(
                       tarea.formatoArchivo
                     )}
                     uploading={uploadingSubtareaId === tarea.subtareaId}
+                    empresaId={(() => {
+                      const auditoria = auditorias.find((a) => a.auditoriaId === auditoriaSeleccionada);
+                      console.log('Debug MisTareas - auditoriaSeleccionada:', auditoriaSeleccionada);
+                      console.log('Debug MisTareas - auditoria encontrada:', auditoria);
+                      console.log('Debug MisTareas - empresaId:', auditoria?.empresaId);
+                      return auditoria?.empresaId;
+                    })()}
                   />
                 ))}
             </div>

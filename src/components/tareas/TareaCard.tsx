@@ -4,16 +4,18 @@ import { FileUploadButton } from './FileUploadButton';
 
 interface TareaCardProps {
     tarea: TareaFlat;
-    onFileUpload: (file: File) => void;
+    onFileUpload: (file: File, carpetaId?: number | null) => void;
     acceptedFileTypes: string;
     uploading?: boolean;
+    empresaId?: number;
 }
 
 export const TareaCard: React.FC<TareaCardProps> = ({
     tarea,
     onFileUpload,
     acceptedFileTypes,
-    uploading = false
+    uploading = false,
+    empresaId
 }) => {
     const [showNoteModal, setShowNoteModal] = useState(false);
     const [noteText, setNoteText] = useState("");
@@ -30,8 +32,8 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     };
 
     // Wrapper para manejar el archivo con nombre personalizado
-    const handleFileSelect = (file: File, customName?: string) => {
-        onFileUpload(file);
+    const handleFileSelect = (file: File, customName?: string, carpetaId?: number | null) => {
+        onFileUpload(file, carpetaId);
     };
 
     const formatDate = (dateStr: string | null) => {
@@ -199,6 +201,7 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                             hasFile={!!tarea.archivoNombre}
                             uploading={uploading}
                             disabled={isUploadDisabled}
+                            empresaId={empresaId}
                         />
                         <button
                             onClick={() => setShowNoteModal(true)}

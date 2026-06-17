@@ -20,6 +20,7 @@ export interface TareaFlat {
 
 export interface AuditoriaAgrupada {
     auditoriaId: number;
+    empresaId: number;
     empresa: string;
     nit: string;
     tipoAuditoria: string;
@@ -70,11 +71,21 @@ export const useTareas = () => {
             const auditoriasMap = new Map<number, AuditoriaAgrupada>();
             tareasFlat.forEach(tarea => {
                 if (!auditoriasMap.has(tarea.auditoriaId)) {
+                    const auditoria = auditorias.find((a: any) => a.id === tarea.auditoriaId);
+                    // Intentar obtener empresaId de múltiples fuentes
+                    const empresaId = auditoria?.empresa_id || auditoria?.empresa?.id || 0;
+
+                    console.log('Debug useTareas - auditoria:', auditoria);
+                    console.log('Debug useTareas - empresa_id directo:', auditoria?.empresa_id);
+                    console.log('Debug useTareas - empresa.id:', auditoria?.empresa?.id);
+                    console.log('Debug useTareas - empresaId final:', empresaId);
+
                     auditoriasMap.set(tarea.auditoriaId, {
                         auditoriaId: tarea.auditoriaId,
+                        empresaId: empresaId,
                         empresa: tarea.auditoriaEmpresa,
                         nit: tarea.auditoriaNit,
-                        tipoAuditoria: (auditorias.find((a: any) => a.id === tarea.auditoriaId))?.tipo_auditoria || 'N/A',
+                        tipoAuditoria: auditoria?.tipo_auditoria || 'N/A',
                         tareas: []
                     });
                 }

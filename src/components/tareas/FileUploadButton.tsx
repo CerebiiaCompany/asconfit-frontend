@@ -1,11 +1,13 @@
 import React, { useRef, useState } from 'react';
+import { FolderNavigator } from '../common/FolderNavigator';
 
 interface FileUploadButtonProps {
-    onFileSelect: (file: File, customName?: string) => void;
+    onFileSelect: (file: File, customName?: string, carpetaId?: number | null) => void;
     acceptedFileTypes: string;
     hasFile: boolean;
     uploading?: boolean;
     disabled?: boolean;
+    empresaId?: number;
 }
 
 export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
@@ -13,12 +15,15 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
     acceptedFileTypes,
     hasFile,
     uploading = false,
-    disabled = false
+    disabled = false,
+    empresaId
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [showRenameModal, setShowRenameModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [customFileName, setCustomFileName] = useState('');
+    const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+    const [selectedFolderName, setSelectedFolderName] = useState<string>('');
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -44,10 +49,12 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
             // Crear nuevo archivo con nombre personalizado
             const renamedFile = new File([selectedFile], finalName, { type: selectedFile.type });
 
-            onFileSelect(renamedFile, customFileName.trim());
+            onFileSelect(renamedFile, customFileName.trim(), selectedFolderId || undefined);
             setShowRenameModal(false);
             setSelectedFile(null);
             setCustomFileName('');
+            setSelectedFolderId(null);
+            setSelectedFolderName('');
         }
     };
 
@@ -55,6 +62,8 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
         setShowRenameModal(false);
         setSelectedFile(null);
         setCustomFileName('');
+        setSelectedFolderId(null);
+        setSelectedFolderName('');
     };
 
     return (
@@ -70,8 +79,8 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                         disabled={uploading || disabled}
                     />
                     <div className={`px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors text-center whitespace-nowrap flex items-center gap-2 ${uploading || disabled
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-orange-500 hover:bg-orange-600'
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-orange-500 hover:bg-orange-600'
                         }`}>
                         {uploading ? (
                             <>
@@ -96,7 +105,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
             {/* Modal de renombrado */}
             {showRenameModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Nombrar archivo
                         </h3>
@@ -125,6 +134,33 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                                 </p>
                             )}
                         </div>
+
+                        {/* Selector de carpetas */}
+                        <div className="mb-6">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                Seleccionar carpeta de destino
+                            </h4>
+                            {empresaId ? (
+                                <FolderNavigator
+                                    empresaId={empresaId}
+                                    onFolderSelect={(carpetaId, carpetaNombre) => {
+                                        setSelectedFolderId(carpetaId);
+                                        setSelectedFolderName(carpetaNombre);
+                                    }}
+                                    selectedFolderId={selectedFolderId}
+                                />
+                            ) : (
+                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p className="text-sm text-yellow-700">
+                                        <strong>Debug:</strong> No se puede cargar el selector de carpetas.
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        empresaId: {empresaId || 'undefined'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="flex gap-3 justify-end">
                             <button
                                 onClick={handleCancelUpload}
@@ -136,8 +172,8 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                                 onClick={handleConfirmUpload}
                                 disabled={!customFileName.trim()}
                                 className={`px-4 py-2 rounded-lg transition-colors ${customFileName.trim()
-                                        ? 'bg-orange-500 text-white hover:bg-orange-600'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
                                 Subir archivo

@@ -63,7 +63,8 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
   const uploadFile = async (
     subtareaId: number,
     file: File,
-    formatoArchivo: string | null
+    formatoArchivo: string | null,
+    carpetaId?: number | null
   ) => {
     const validation = validateFile(file, formatoArchivo);
 
@@ -75,7 +76,7 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
     try {
       setUploading(true);
       setUploadingSubtareaId(subtareaId);
-      await auditoriaService.uploadFile(subtareaId, file);
+      await auditoriaService.uploadFile(subtareaId, file, carpetaId);
       options?.onSuccess?.(file.name);
       return { success: true };
     } catch (error: any) {
