@@ -38,25 +38,19 @@ export const TareaCard: React.FC<TareaCardProps> = ({
         if (!dateStr) return null;
 
         try {
-            // Manejar formato ISO con zona horaria
-            let date: Date;
-            if (dateStr.includes("T")) {
-                // Formato ISO: 2026-04-28T00:00:00.000000Z
-                date = new Date(dateStr);
-            } else {
-                // Formato simple: 2026-04-28
-                date = new Date(dateStr + "T00:00:00");
-            }
+            // Crear fecha desde el string
+            const date = new Date(dateStr);
 
             if (isNaN(date.getTime())) return dateStr;
 
-            const day = date.getUTCDate();
+            // Usar métodos locales en lugar de UTC
+            const day = date.getDate();
             const monthNames = [
                 "ene", "feb", "mar", "abr", "may", "jun",
                 "jul", "ago", "sep", "oct", "nov", "dic"
             ];
-            const month = monthNames[date.getUTCMonth()];
-            const year = date.getUTCFullYear();
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
 
             return `${day} ${month} ${year}`;
         } catch {
@@ -186,6 +180,11 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         {tarea.observaciones && (
                             <p className="text-sm text-gray-600">
                                 <span className="font-medium text-gray-700">Observaciones:</span> {tarea.observaciones}
+                            </p>
+                        )}
+                        {tarea.archivoNombre && tarea.fechaSubida && (
+                            <p className="text-sm text-gray-600">
+                                <span className="font-medium text-gray-700">Archivo subido:</span> {formatDate(tarea.fechaSubida)}
                             </p>
                         )}
                     </div>

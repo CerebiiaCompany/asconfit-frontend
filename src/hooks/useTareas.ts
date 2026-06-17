@@ -14,6 +14,7 @@ export interface TareaFlat {
     observaciones: string | null;
     fechaSolicitud: string | null;
     fechaEntrega: string | null;
+    fechaSubida: string | null;
     estadoInformacion: string | null;
 }
 
@@ -56,6 +57,7 @@ export const useTareas = () => {
                             observaciones: subtarea.observaciones,
                             fechaSolicitud: subtarea.fecha_solicitud,
                             fechaEntrega: subtarea.tiempo_entrega,
+                            fechaSubida: subtarea.fecha_subida,
                             estadoInformacion: subtarea.estado_informacion
                         });
                     });
