@@ -99,6 +99,7 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/roles": "roles",
   "/roles/nuevo": "roles",
   "/roles/:id": "roles",
+  "/user-stats/:userId": "roles",
   "/perfil": "perfil",
   "/papelera": "papelera",
 };

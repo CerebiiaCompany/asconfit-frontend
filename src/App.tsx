@@ -19,6 +19,7 @@ import { MisTareas } from "./pages/MisTareas";
 import { TareaDetalle } from "./pages/TareaDetalle";
 import { Perfil } from "./pages/Perfil";
 import { Roles } from "./pages/Roles";
+import { UserStats } from "./pages/UserStats";
 import { Papelera } from "./pages/Papelera";
 import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
@@ -184,6 +185,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <Roles />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/user-stats/:userId"
+                    element={
+                      <RoleBasedRoute>
+                        <UserStats />
                       </RoleBasedRoute>
                     }
                   />
