@@ -58,6 +58,8 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
   const [currentCarpetaId, setCurrentCarpetaId] = useState<number>(carpetaId);
   const [breadcrumb, setBreadcrumb] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(false);
+  const [navigationLoading, setNavigationLoading] = useState(false);
+  const lastNavigationRef = useRef<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [docToDelete, setDocToDelete] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -79,6 +81,34 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
     loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCarpetaId]);
+
+  // Función para limpiar duplicados en el breadcrumb
+  const cleanBreadcrumb = () => {
+    setBreadcrumb(prev => {
+      const cleaned = [];
+      const seen = new Set();
+      for (const crumb of prev) {
+        if (!seen.has(crumb.id)) {
+          cleaned.push(crumb);
+          seen.add(crumb.id);
+        }
+      }
+      return cleaned;
+    });
+  };
+
+  // Limpiar duplicados cuando cambie el breadcrumb
+  useEffect(() => {
+    if (breadcrumb.length > 1) {
+      // Verificar si hay duplicados consecutivos
+      const hasDuplicates = breadcrumb.some((crumb, index) =>
+        index > 0 && breadcrumb[index - 1].id === crumb.id
+      );
+      if (hasDuplicates) {
+        cleanBreadcrumb();
+      }
+    }
+  }, [breadcrumb]);
 
   // Cerrar menú de carpeta al hacer clic fuera
   useEffect(() => {
@@ -104,12 +134,40 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
     }
   };
 
-  const navigateToSubcarpeta = (carpeta: Carpeta) => {
-    setBreadcrumb(prev => [...prev, carpeta]);
-    setCurrentCarpetaId(carpeta.id);
+  const navigateToSubcarpeta = async (carpeta: Carpeta) => {
+    // Prevenir navegación múltiple mientras se está cargando
+    if (navigationLoading || lastNavigationRef.current === carpeta.id) return;
+
+    setNavigationLoading(true);
+    lastNavigationRef.current = carpeta.id;
+
+    // Verificar si ya estamos en esta carpeta
+    if (currentCarpetaId === carpeta.id) {
+      setNavigationLoading(false);
+      return;
+    }
+
+    // Verificar si la carpeta ya es la última en el breadcrumb
+    const lastCrumb = breadcrumb[breadcrumb.length - 1];
+    if (lastCrumb && lastCrumb.id === carpeta.id) {
+      setCurrentCarpetaId(carpeta.id);
+    } else {
+      setBreadcrumb(prev => [...prev, carpeta]);
+      setCurrentCarpetaId(carpeta.id);
+    }
+
+    // Reset después de un tiempo para permitir navegación futura
+    setTimeout(() => {
+      setNavigationLoading(false);
+      lastNavigationRef.current = null;
+    }, 500);
   };
 
   const navigateToBreadcrumb = (index: number) => {
+    if (navigationLoading) return;
+
+    setNavigationLoading(true);
+
     if (index === -1) {
       // Volver a la raíz
       setBreadcrumb([]);
@@ -119,6 +177,8 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
       setBreadcrumb(prev => prev.slice(0, index + 1));
       setCurrentCarpetaId(target.id);
     }
+
+    setTimeout(() => setNavigationLoading(false), 500);
   };
 
   const handleCreateSubcarpeta = async () => {
@@ -295,7 +355,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
       {/* Breadcrumb */}
       {breadcrumb.length > 0 && (
         <div className="flex items-center gap-1 mb-4 text-sm text-gray-500">
-          <button onClick={() => navigateToBreadcrumb(-1)} className="hover:text-orange-500 transition-colors font-medium">
+          <button onClick={() => navigateToBreadcrumb(-1)} disabled={navigationLoading} className={`hover:text-orange-500 transition-colors font-medium ${navigationLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
             Inicio
           </button>
           {breadcrumb.map((crumb, i) => (
@@ -303,7 +363,8 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
               <ChevronRight className="w-3 h-3" />
               <button
                 onClick={() => navigateToBreadcrumb(i)}
-                className={`hover:text-orange-500 transition-colors ${i === breadcrumb.length - 1 ? 'text-orange-500 font-semibold' : ''}`}
+                disabled={navigationLoading}
+                className={`hover:text-orange-500 transition-colors ${i === breadcrumb.length - 1 ? 'text-orange-500 font-semibold' : ''} ${navigationLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {crumb.nombre}
               </button>
@@ -322,7 +383,8 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
             <div key={sub.id} className="relative group/folder">
               <button
                 onClick={() => navigateToSubcarpeta(sub)}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col items-center justify-center h-40 w-full gap-3 hover:border-orange-300 hover:shadow-md transition-all group"
+                disabled={navigationLoading}
+                className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col items-center justify-center h-40 w-full gap-3 hover:border-orange-300 hover:shadow-md transition-all group ${navigationLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <Folder className="w-12 h-12 text-orange-400 group-hover:text-orange-500 transition-colors" />
                 <span className="text-xs font-semibold text-gray-700 text-center line-clamp-2">{sub.nombre}</span>
