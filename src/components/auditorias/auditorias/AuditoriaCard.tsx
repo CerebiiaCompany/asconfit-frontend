@@ -161,13 +161,19 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             {/* Fecha y Estado */}
             <div className="flex gap-4">
               <div>
-                <div className="text-xs text-gray-500">Fecha de visita</div>
+                <div className="text-xs text-gray-500">Fecha inicial</div>
                 <div className="text-sm font-medium text-gray-900">
-                  {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
+                  {formatDate(auditoria.fecha_inicial)}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500">Corte</div>
+                <div className="text-xs text-gray-500">Fecha corte</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {formatDate(auditoria.fecha_corte)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Estado</div>
                 <div className="text-sm">
                   {getEstadoBadge(auditoria.estado)}
                 </div>
@@ -257,22 +263,30 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             </div>
           </div>
 
-          {/* Visita de */}
+          {/* Fecha inicial */}
           <div className="col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Fecha de visita</div>
+            <div className="text-xs text-gray-500 mb-1">Fecha inicial</div>
             <div className="text-sm font-medium text-gray-900">
-              {formatDate(auditoria.fecha_inicial || auditoria.fecha_corte)}
+              {formatDate(auditoria.fecha_inicial)}
             </div>
           </div>
 
-          {/* Corte */}
+          {/* Fecha corte */}
           <div className="col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Corte</div>
+            <div className="text-xs text-gray-500 mb-1">Fecha corte</div>
+            <div className="text-sm font-medium text-gray-900">
+              {formatDate(auditoria.fecha_corte)}
+            </div>
+          </div>
+
+          {/* Estado */}
+          <div className="col-span-2">
+            <div className="text-xs text-gray-500 mb-1">Estado</div>
             <div className="text-sm">{getEstadoBadge(auditoria.estado)}</div>
           </div>
 
           {/* Proceso - Progress indicators */}
-          <div className="col-span-3">
+          <div className="col-span-2">
             <div className="text-xs text-gray-500 mb-2">Proceso</div>
             {/* Progress bar */}
             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2">
@@ -281,16 +295,14 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
                 style={{ width: `${checkPct}%` }}
               />
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
-                <span className="text-xs text-gray-500">Completado</span>
-                <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                <span className="text-[10px] text-gray-500">{checkPct.toFixed(0)}%</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-400 shrink-0" />
-                <span className="text-xs text-gray-500">Pendiente</span>
-                <span className="text-xs font-semibold text-gray-800">{pendientePct.toFixed(0)}%</span>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
+                <span className="text-[10px] text-gray-500">{pendientePct.toFixed(0)}%</span>
               </div>
             </div>
           </div>
