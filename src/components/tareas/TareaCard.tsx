@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TareaFlat } from '../../hooks/useTareas';
 import { FileUploadButton } from './FileUploadButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface TareaCardProps {
     tarea: TareaFlat;
@@ -17,8 +18,12 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     uploading = false,
     empresaId
 }) => {
+    const { userRole } = useAuth();
     const [showNoteModal, setShowNoteModal] = useState(false);
     const [noteText, setNoteText] = useState("");
+
+    // Determinar si es admin para modo de solo lectura
+    const isAdmin = userRole === 'admin';
 
     // Cargar nota guardada al montar
     useEffect(() => {
@@ -227,7 +232,7 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                 </div>
             </div>
 
-            {/* Modal de nota */}
+            {/* Modal de nota - Solo lectura para administradores */}
             {showNoteModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
@@ -244,20 +249,23 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         </div>
                         <div className="p-5">
                             <textarea
-                                autoFocus
+                                autoFocus={!isAdmin}
                                 value={noteText}
-                                onChange={e => setNoteText(e.target.value)}
-                                placeholder="Escribe una nota para esta tarea..."
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                onChange={e => !isAdmin && setNoteText(e.target.value)}
+                                placeholder={isAdmin ? "No hay notas para esta tarea" : "Escribe una nota para esta tarea..."}
+                                className={`w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none resize-none ${isAdmin ? 'bg-gray-50 cursor-default' : 'focus:ring-2 focus:ring-orange-500 focus:border-transparent'}`}
                                 rows={6}
+                                readOnly={isAdmin}
                             />
                             <div className="flex gap-3 mt-4">
                                 <button onClick={() => setShowNoteModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
-                                    Cancelar
+                                    {isAdmin ? 'Cerrar' : 'Cancelar'}
                                 </button>
-                                <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold">
-                                    Guardar
-                                </button>
+                                {!isAdmin && (
+                                    <button onClick={handleSaveNote} className="flex-1 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold">
+                                        Guardar
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
