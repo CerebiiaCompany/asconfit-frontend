@@ -164,7 +164,7 @@ export const AuditoriaDetalle: React.FC = () => {
   });
 
   return (
-    <div className="py-4 px-3 sm:px-6 lg:px-8">
+    <div className="py-4 px-3 sm:px-6 lg:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
