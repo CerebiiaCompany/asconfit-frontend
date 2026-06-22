@@ -23,16 +23,16 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
         <div className="col-span-2 text-xs font-medium text-gray-500 ">
           Razón social / Tipo de auditoría
         </div>
-        <div className="col-span-2 text-xs font-medium text-gray-500 ">
+        <div className="col-span-1 text-xs font-medium text-gray-500 ">
           Fecha inicial
         </div>
-        <div className="col-span-2 text-xs font-medium text-gray-500 ">
+        <div className="col-span-1 text-xs font-medium text-gray-500 ">
           Fecha corte
         </div>
         <div className="col-span-2 text-xs font-medium text-gray-500 ">
           Estado
         </div>
-        <div className="col-span-2 text-xs font-medium text-gray-500 ">
+        <div className="col-span-4 text-xs font-medium text-gray-500 ">
           Proceso
         </div>
       </div>
