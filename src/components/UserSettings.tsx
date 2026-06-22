@@ -26,6 +26,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
     handleProfileUpdate,
     handlePhotoUpload,
     handleCVUpload,
+    handleTarjetaProfesionalUpload,
   } = useUserProfile(initialUser);
 
   const {
@@ -93,6 +94,7 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
               handleProfileUpdate={handleProfileUpdate}
               handlePhotoUpload={handlePhotoUpload}
               handleCVUpload={handleCVUpload}
+              handleTarjetaProfesionalUpload={handleTarjetaProfesionalUpload}
             />
           ) : (
             <PasswordTab

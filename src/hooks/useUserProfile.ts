@@ -84,6 +84,21 @@ export const useUserProfile = (initialUser: User) => {
         }
     };
 
+    const handleTarjetaProfesionalUpload = async (file: File) => {
+        setProfileLoading(true);
+        try {
+            const response = await authService.uploadTarjetaProfesional(file);
+            setUser(response.user);
+            setGlobalUser(response.user);
+            addToast(response.message, 'success');
+        } catch (error: any) {
+            const errorText = error.response?.data?.message || error.message || 'Error al subir la tarjeta profesional';
+            addToast(errorText, 'error');
+        } finally {
+            setProfileLoading(false);
+        }
+    };
+
     return {
         user,
         name, setName,
@@ -98,6 +113,7 @@ export const useUserProfile = (initialUser: User) => {
         profileMessage,
         handleProfileUpdate,
         handlePhotoUpload,
-        handleCVUpload
+        handleCVUpload,
+        handleTarjetaProfesionalUpload
     };
 };

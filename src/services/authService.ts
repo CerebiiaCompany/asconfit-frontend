@@ -21,6 +21,8 @@ export interface User {
   profile_photo_url?: string;
   cv_path?: string;
   cv_url?: string;
+  tarjeta_profesional_path?: string;
+  tarjeta_profesional_url?: string;
 }
 
 export interface AuthResponse {
@@ -113,6 +115,17 @@ class AuthService {
     formData.append("cv", file);
     return api.post<{ message: string; user: User; cv_url: string }>(
       "/profile/cv",
+      formData,
+    );
+  }
+
+  async uploadTarjetaProfesional(
+    file: File,
+  ): Promise<{ message: string; user: User; tarjeta_profesional_url: string }> {
+    const formData = new FormData();
+    formData.append("tarjeta_profesional", file);
+    return api.post<{ message: string; user: User; tarjeta_profesional_url: string }>(
+      "/profile/tarjeta-profesional",
       formData,
     );
   }
