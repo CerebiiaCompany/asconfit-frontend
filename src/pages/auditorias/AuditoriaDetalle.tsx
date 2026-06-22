@@ -190,40 +190,11 @@ export const AuditoriaDetalle: React.FC = () => {
           <EstadoBadge estado={auditoria.estado} />
         </div>
 
-        {/* Layout de dos columnas */}
+        {/* Layout superior: Información de la Auditoría y Calendario */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Columna izquierda: Información de la Auditoría y Categorías */}
-          <div className="flex-1 space-y-6">
-            {/* Información de la Auditoría */}
+          {/* Columna izquierda: Información de la Auditoría */}
+          <div className="flex-1">
             <AuditoriaInfoCard auditoria={auditoria} />
-
-            {/* Categorías y Subtareas */}
-            {auditoria.categorias && auditoria.categorias.length > 0 && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  Categorías y Requerimientos
-                </h3>
-
-                {auditoria.categorias.map((categoria: any) => (
-                  <CategoriaCard
-                    key={categoria.id}
-                    categoria={categoria}
-                    auditoria={auditoria}
-                    uploadingSubtareaId={uploadingSubtareaId}
-                    fileInputRefs={fileInputRefs}
-                    onFileSelect={handleFileSelect}
-                    onFileChange={uploadFile}
-                    onOpenFile={handleOpenFile}
-                    getAcceptedFileTypes={getAcceptedFileTypes}
-                    onEstadoChange={handleEstadoChange}
-                    updatingEstadoSubtareaId={updatingEstadoSubtareaId}
-                    userRole={user?.role?.nombre || "delegado"}
-                    findingsCount={findingsCount}
-                    onFindingCreated={handleFindingCreated}
-                  />
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Columna derecha: Calendario */}
@@ -233,6 +204,34 @@ export const AuditoriaDetalle: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Categorías y Subtareas - Ancho completo */}
+        {auditoria.categorias && auditoria.categorias.length > 0 && (
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-gray-800">
+              Categorías y Requerimientos
+            </h3>
+
+            {auditoria.categorias.map((categoria: any) => (
+              <CategoriaCard
+                key={categoria.id}
+                categoria={categoria}
+                auditoria={auditoria}
+                uploadingSubtareaId={uploadingSubtareaId}
+                fileInputRefs={fileInputRefs}
+                onFileSelect={handleFileSelect}
+                onFileChange={uploadFile}
+                onOpenFile={handleOpenFile}
+                getAcceptedFileTypes={getAcceptedFileTypes}
+                onEstadoChange={handleEstadoChange}
+                updatingEstadoSubtareaId={updatingEstadoSubtareaId}
+                userRole={user?.role?.nombre || "delegado"}
+                findingsCount={findingsCount}
+                onFindingCreated={handleFindingCreated}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
