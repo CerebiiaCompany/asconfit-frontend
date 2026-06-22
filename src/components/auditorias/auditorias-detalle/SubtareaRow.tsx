@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PriorityBadge } from "../PriorityBadge";
 import { EstadoInformacionBadge } from "../EstadoInformacionBadge";
 import { FileUploadCell } from "./FileUploadCell";
 import { FormatoBadge } from "../FormatoBadge";
 import { CrearFindingModal } from "../Findings/CrearFindingModal";
+import { notaService } from "../../../services/notaService";
 
 interface SubtareaRowProps {
   subtarea: any;
@@ -42,6 +43,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const [showFindingModal, setShowFindingModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [loadingNote, setLoadingNote] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingEstado, setPendingEstado] = useState<string>("");
 
@@ -49,14 +51,29 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const isAdmin = userRole === 'admin';
 
   // Cargar nota guardada al montar
-  React.useEffect(() => {
-    const saved = localStorage.getItem(`nota_subtarea_${subtarea.id}`);
-    if (saved) setNoteText(saved);
+  useEffect(() => {
+    const loadNota = async () => {
+      setLoadingNote(true);
+      try {
+        const data = await notaService.getNota(subtarea.id);
+        setNoteText(data.contenido || '');
+      } catch (error) {
+        console.error('Error al cargar nota:', error);
+      } finally {
+        setLoadingNote(false);
+      }
+    };
+    loadNota();
   }, [subtarea.id]);
 
-  const handleSaveNote = () => {
-    localStorage.setItem(`nota_subtarea_${subtarea.id}`, noteText);
-    setShowNoteModal(false);
+  const handleSaveNote = async () => {
+    try {
+      await notaService.updateNota(subtarea.id, noteText);
+      setShowNoteModal(false);
+    } catch (error) {
+      console.error('Error al guardar nota:', error);
+      alert('Error al guardar la nota');
+    }
   };
 
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

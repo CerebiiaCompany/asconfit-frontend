@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TareaFlat } from '../../hooks/useTareas';
 import { FileUploadButton } from './FileUploadButton';
 import { useAuth } from '../../contexts/AuthContext';
+import { notaService } from '../../services/notaService';
 
 interface TareaCardProps {
     tarea: TareaFlat;
@@ -21,19 +22,35 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     const { userRole } = useAuth();
     const [showNoteModal, setShowNoteModal] = useState(false);
     const [noteText, setNoteText] = useState("");
+    const [loadingNote, setLoadingNote] = useState(false);
 
     // Determinar si es admin para modo de solo lectura
     const isAdmin = userRole === 'admin';
 
     // Cargar nota guardada al montar
     useEffect(() => {
-        const saved = localStorage.getItem(`nota_subtarea_${tarea.subtareaId}`);
-        if (saved) setNoteText(saved);
+        const loadNota = async () => {
+            setLoadingNote(true);
+            try {
+                const data = await notaService.getNota(tarea.subtareaId);
+                setNoteText(data.contenido || '');
+            } catch (error) {
+                console.error('Error al cargar nota:', error);
+            } finally {
+                setLoadingNote(false);
+            }
+        };
+        loadNota();
     }, [tarea.subtareaId]);
 
-    const handleSaveNote = () => {
-        localStorage.setItem(`nota_subtarea_${tarea.subtareaId}`, noteText);
-        setShowNoteModal(false);
+    const handleSaveNote = async () => {
+        try {
+            await notaService.updateNota(tarea.subtareaId, noteText);
+            setShowNoteModal(false);
+        } catch (error) {
+            console.error('Error al guardar nota:', error);
+            alert('Error al guardar la nota');
+        }
     };
 
     // Wrapper para manejar el archivo con nombre personalizado
