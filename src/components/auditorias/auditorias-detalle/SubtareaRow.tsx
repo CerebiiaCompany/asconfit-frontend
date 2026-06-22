@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { PriorityBadge } from "../PriorityBadge";
 import { EstadoInformacionBadge } from "../EstadoInformacionBadge";
 import { FileUploadCell } from "./FileUploadCell";
@@ -151,85 +152,87 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   };
 
   return (
-    <tr className="hover:bg-gray-50">
-      <td className="px-3 py-3">
-        <div className="text-sm text-gray-900 font-medium break-words">
-          {subtarea.nombre}
-        </div>
-        {subtarea.observaciones && (
-          <div className="text-xs text-gray-500 mt-1 break-words">
-            {subtarea.observaciones}
+    <>
+      <tr className="hover:bg-gray-50">
+        <td className="px-3 py-3">
+          <div className="text-sm text-gray-900 font-medium break-words">
+            {subtarea.nombre}
           </div>
-        )}
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap">
-        <PriorityBadge prioridad={subtarea.prioridad} />
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-        {formatDate(subtarea.fecha_solicitud)}
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
-        {formatDate(subtarea.tiempo_entrega)}
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap">
-        {userRole === "auditor" || userRole === "admin" ? (
-          <select
-            value={subtarea.estado_informacion || "pendiente"}
-            onChange={handleEstadoChange}
-            disabled={isUpdatingEstado}
-            className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="pendiente">Pendiente</option>
-            <option value="aprobado">Aprobado</option>
-            <option value="rechazado">Rechazado</option>
-          </select>
-        ) : (
-          <EstadoInformacionBadge estado={subtarea.estado_informacion} />
-        )}
-      </td>
-      <td className="px-3 py-3">
-        <FileUploadCell
-          subtareaId={subtarea.id}
-          archivoNombre={subtarea.archivo_nombre}
-          formatoArchivo={subtarea.formato_archivo}
-          isUploading={isUploading}
-          fileInputRef={fileInputRef}
-          onFileSelect={onFileSelect}
-          onFileChange={onFileChange}
-          onOpenFile={onOpenFile}
-          getAcceptedFileTypes={getAcceptedFileTypes}
-        />
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap">
-        <FormatoBadge formato={subtarea.formato_archivo} />
-      </td>
-      <td className="px-2 py-3 whitespace-nowrap">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowFindingModal(true)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
-            title="Crear hallazgo para esta actividad"
-          >
-            {findingsCount > 0 && (
-              <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {findingsCount}
-              </span>
-            )}
-            Hallazgo
-          </button>
-          <button
-            onClick={() => setShowNoteModal(true)}
-            className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
-            title={noteText ? "Ver/editar nota" : "Agregar nota"}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
-          </button>
-        </div>
-      </td>
+          {subtarea.observaciones && (
+            <div className="text-xs text-gray-500 mt-1 break-words">
+              {subtarea.observaciones}
+            </div>
+          )}
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap">
+          <PriorityBadge prioridad={subtarea.prioridad} />
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
+          {formatDate(subtarea.fecha_solicitud)}
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
+          {formatDate(subtarea.tiempo_entrega)}
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap">
+          {userRole === "auditor" || userRole === "admin" ? (
+            <select
+              value={subtarea.estado_informacion || "pendiente"}
+              onChange={handleEstadoChange}
+              disabled={isUpdatingEstado}
+              className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="pendiente">Pendiente</option>
+              <option value="aprobado">Aprobado</option>
+              <option value="rechazado">Rechazado</option>
+            </select>
+          ) : (
+            <EstadoInformacionBadge estado={subtarea.estado_informacion} />
+          )}
+        </td>
+        <td className="px-3 py-3">
+          <FileUploadCell
+            subtareaId={subtarea.id}
+            archivoNombre={subtarea.archivo_nombre}
+            formatoArchivo={subtarea.formato_archivo}
+            isUploading={isUploading}
+            fileInputRef={fileInputRef}
+            onFileSelect={onFileSelect}
+            onFileChange={onFileChange}
+            onOpenFile={onOpenFile}
+            getAcceptedFileTypes={getAcceptedFileTypes}
+          />
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap">
+          <FormatoBadge formato={subtarea.formato_archivo} />
+        </td>
+        <td className="px-2 py-3 whitespace-nowrap">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFindingModal(true)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
+              title="Crear hallazgo para esta actividad"
+            >
+              {findingsCount > 0 && (
+                <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {findingsCount}
+                </span>
+              )}
+              Hallazgo
+            </button>
+            <button
+              onClick={() => setShowNoteModal(true)}
+              className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
+              title={noteText ? "Ver/editar nota" : "Agregar nota"}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
 
-      {showFindingModal && (
+      {showFindingModal && createPortal(
         <CrearFindingModal
           auditoria={auditoria}
           initialActividadId={subtarea.id}
@@ -240,10 +243,11 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
               onFindingCreated(subtarea.id, findingsCount + savedFindings.length);
             }
           }}
-        />
+        />,
+        document.body
       )}
 
-      {showNoteModal && (
+      {showNoteModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -279,10 +283,11 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {showConfirmModal && (
+      {showConfirmModal && createPortal(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -307,8 +312,9 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </tr>
+    </>
   );
 };
