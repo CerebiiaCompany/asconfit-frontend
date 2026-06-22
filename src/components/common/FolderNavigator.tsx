@@ -178,61 +178,68 @@ export const FolderNavigator: React.FC<FolderNavigatorProps> = ({
                     {error}
                 </div>
             ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
-                    {/* Opción "No subir a carpeta" */}
-                    <button
-                        onClick={handleSelectNoFolder}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${selectedFolderId === null
-                            ? 'bg-orange-100 text-orange-700 font-medium'
-                            : 'hover:bg-gray-100 text-gray-700'
-                            }`}
-                    >
-                        <div className="flex items-center gap-2">
-                            <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            <span>No subir a carpeta</span>
-                        </div>
-                    </button>
-
-                    {/* Carpetas disponibles */}
+                <div className="space-y-3">
+                    {/* Carpetas disponibles - Layout horizontal */}
                     {carpetas && carpetas.length > 0 ? (
-                        carpetas.map((carpeta) => (
-                            <div key={carpeta.id} className="space-y-1">
-                                <button
-                                    onClick={() => handleSelectFolder(carpeta.id, carpeta.nombre)}
-                                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm flex items-center justify-between group ${selectedFolderId === carpeta.id
-                                        ? 'bg-orange-100 text-orange-700 font-medium'
-                                        : 'hover:bg-gray-100 text-gray-700'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <svg className="h-4 w-4 text-gray-500 group-hover:text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="flex flex-wrap gap-2">
+                            {/* Opción "No subir a carpeta" */}
+                            <button
+                                onClick={handleSelectNoFolder}
+                                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm border-2 ${selectedFolderId === null
+                                    ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
+                                    }`}
+                            >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                <span>Sin carpeta</span>
+                            </button>
+
+                            {/* Carpetas */}
+                            {carpetas.map((carpeta) => (
+                                <div key={carpeta.id} className="flex flex-col gap-1">
+                                    <button
+                                        onClick={() => handleSelectFolder(carpeta.id, carpeta.nombre)}
+                                        className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm border-2 ${selectedFolderId === carpeta.id
+                                            ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
+                                            : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
+                                            }`}
+                                    >
+                                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
                                         <span>{carpeta.nombre}</span>
-                                    </div>
-                                    {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
-                                        <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    )}
-                                </button>
-
-                                {/* Botón para navegar dentro de la carpeta */}
-                                {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
-                                    <button
-                                        onClick={() => handleNavigateTo(carpeta)}
-                                        className="w-full text-left px-3 py-1 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded transition-colors flex items-center gap-1"
-                                    >
-                                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m7-7H5" />
-                                        </svg>
-                                        Ver {carpeta.subcarpetas.length} subcarpeta{carpeta.subcarpetas.length !== 1 ? 's' : ''}
+                                        {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
+                                            <span className="text-xs text-gray-500 ml-1">
+                                                ({carpeta.subcarpetas.length})
+                                            </span>
+                                        )}
                                     </button>
-                                )}
-                            </div>
-                        ))
+
+                                    {/* Subcarpetas - mostrar directamente */}
+                                    {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 ml-4">
+                                            {carpeta.subcarpetas.map((subcarpeta) => (
+                                                <button
+                                                    key={subcarpeta.id}
+                                                    onClick={() => handleSelectFolder(subcarpeta.id, `${carpeta.nombre} / ${subcarpeta.nombre}`)}
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-xs border ${selectedFolderId === subcarpeta.id
+                                                        ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
+                                                        : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
+                                                        }`}
+                                                >
+                                                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                                                    </svg>
+                                                    <span>{subcarpeta.nombre}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <div className="text-center py-4 text-gray-500 text-sm">
                             {currentCarpeta ? 'No hay subcarpetas disponibles' :

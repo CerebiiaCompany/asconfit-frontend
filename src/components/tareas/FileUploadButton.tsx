@@ -105,12 +105,12 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
             {/* Modal de renombrado */}
             {showRenameModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Nombrar archivo
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Subir archivo
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
-                            Dale un nombre descriptivo al archivo para identificarlo fácilmente.
+                        <p className="text-sm text-gray-600 mb-6">
+                            Nombra el archivo y selecciona una carpeta de destino (opcional).
                         </p>
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -138,8 +138,11 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                         {/* Selector de carpetas */}
                         <div className="mb-6">
                             <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                                Seleccionar carpeta de destino
+                                Carpeta de destino (opcional)
                             </h4>
+                            <p className="text-xs text-gray-500 mb-3">
+                                Si no seleccionas una carpeta, el archivo se guardará en la auditoría.
+                            </p>
                             {empresaId ? (
                                 <FolderNavigator
                                     empresaId={empresaId}
