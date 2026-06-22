@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
-import { storageUrl } from "../../utils/storageUrl";
 import { CustomSelect } from "../common/CustomSelect";
+import { UserProfileModal } from "./UserProfileModal";
 
 interface UserRoleAssignmentProps {
   users: User[];
@@ -22,6 +22,7 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   const navigate = useNavigate();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
 
   const handleRoleChange = async (userId: number, roleId: string) => {
     setUpdatingId(userId);
@@ -30,6 +31,10 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handleViewProfile = (userId: number) => {
+    setSelectedProfileUserId(userId);
   };
 
   // Filter users by name or email
@@ -100,7 +105,7 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   Asignar Rol
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Hoja de Vida
+                  PERFIL
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Acciones
@@ -163,55 +168,25 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {user.cv_path || user.cv_url ? (
-                      <a
-                        href={storageUrl(user.cv_url ?? user.cv_path) ?? "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+                    <button
+                      onClick={() => handleViewProfile(user.id)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                        Ver CV
-                      </a>
-                    ) : (
-                      <button
-                        disabled
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-400 rounded-lg cursor-not-allowed opacity-60 text-sm font-medium"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                          />
-                        </svg>
-                        Sin CV
-                      </button>
-                    )}
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      Ver Perfil
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
@@ -239,6 +214,15 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* User Profile Modal */}
+      {selectedProfileUserId && (
+        <UserProfileModal
+          isOpen={true}
+          onClose={() => setSelectedProfileUserId(null)}
+          userId={selectedProfileUserId}
+        />
       )}
     </div>
   );

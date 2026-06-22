@@ -23,6 +23,22 @@ export interface User {
   cv_url?: string;
 }
 
+export interface UserProfile {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  department?: string;
+  role?: string;
+  profile_photo_url?: string;
+  cv_url?: string;
+  has_cv: boolean;
+  created_at: string;
+}
+
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     const response = await axios.get(`${API_URL}/users`, {
@@ -52,5 +68,20 @@ export const userService = {
       headers: getAuthHeader(),
     });
     return response.data;
+  },
+
+  async getUserProfile(userId: number): Promise<UserProfile> {
+    const response = await axios.get(`${API_URL}/users/${userId}/profile`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
+  async getUserCV(userId: number): Promise<string> {
+    const response = await axios.get(`${API_URL}/users/${userId}/cv`, {
+      headers: getAuthHeader(),
+      responseType: 'blob'
+    });
+    return URL.createObjectURL(response.data);
   },
 };
