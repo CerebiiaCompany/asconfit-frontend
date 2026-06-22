@@ -47,6 +47,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         }
     };
 
+    const handleViewTarjetaProfesional = async () => {
+        try {
+            // Obtener la URL de la tarjeta profesional y abrirla en nueva pestaña
+            const tarjetaUrl = await userService.getUserTarjetaProfesional(userId);
+            window.open(tarjetaUrl, '_blank');
+        } catch (error) {
+            addToast('Error al abrir la tarjeta profesional', 'error');
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -196,6 +206,33 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                                         >
                                             <Eye className="w-4 h-4" />
                                             Ver CV
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Tarjeta Profesional Section */}
+                            <div className="bg-gray-50 rounded-xl p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <FileText className="w-5 h-5 text-blue-500" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-lg font-semibold text-gray-800">Tarjeta Profesional</h4>
+                                            <p className="text-sm text-gray-500">
+                                                {profile.has_tarjeta_profesional ? 'Tarjeta profesional disponible para visualización' : 'No hay tarjeta profesional cargada'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {profile.has_tarjeta_profesional && (
+                                        <button
+                                            onClick={handleViewTarjetaProfesional}
+                                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
+                                        >
+                                            <Eye className="w-4 h-4" />
+                                            Ver Tarjeta
                                         </button>
                                     )}
                                 </div>

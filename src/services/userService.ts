@@ -36,6 +36,8 @@ export interface UserProfile {
   profile_photo_url?: string;
   cv_url?: string;
   has_cv: boolean;
+  tarjeta_profesional_url?: string;
+  has_tarjeta_profesional: boolean;
   created_at: string;
 }
 
@@ -79,6 +81,14 @@ export const userService = {
 
   async getUserCV(userId: number): Promise<string> {
     const response = await axios.get(`${API_URL}/users/${userId}/cv`, {
+      headers: getAuthHeader(),
+      responseType: 'blob'
+    });
+    return URL.createObjectURL(response.data);
+  },
+
+  async getUserTarjetaProfesional(userId: number): Promise<string> {
+    const response = await axios.get(`${API_URL}/users/${userId}/tarjeta-profesional`, {
       headers: getAuthHeader(),
       responseType: 'blob'
     });
