@@ -21,7 +21,6 @@ import { Perfil } from "./pages/Perfil";
 import { Roles } from "./pages/Roles";
 import { UserStats } from "./pages/UserStats";
 import { Papelera } from "./pages/Papelera";
-import UserCV from "./pages/UserCV";
 import { authService } from "./services/authService";
 import { AppLayout } from "./components/AppLayout";
 import { CreateCompany } from "./pages/Companies/CreateCompany";
@@ -202,14 +201,6 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <Papelera />
-                      </RoleBasedRoute>
-                    }
-                  />
-                  <Route
-                    path="/usuarios/:userId/cv"
-                    element={
-                      <RoleBasedRoute>
-                        <UserCV />
                       </RoleBasedRoute>
                     }
                   />

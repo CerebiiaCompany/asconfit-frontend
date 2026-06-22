@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Mail, Phone, MapPin, Building, Calendar, FileText, Eye } from 'lucide-react';
 import { userService, UserProfile } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
-import { useNavigate } from 'react-router-dom';
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -18,7 +17,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(false);
     const { addToast } = useToast();
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (isOpen && userId) {
@@ -39,10 +37,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         }
     };
 
-    const handleViewCV = () => {
-        // Navegar a una nueva página para ver el CV
-        navigate(`/usuarios/${userId}/cv`);
-        onClose();
+    const handleViewCV = async () => {
+        try {
+            // Obtener la URL del CV y abrirlo en nueva pestaña
+            const cvUrl = await userService.getUserCV(userId);
+            window.open(cvUrl, '_blank');
+        } catch (error) {
+            addToast('Error al abrir el CV', 'error');
+        }
     };
 
     if (!isOpen) return null;
