@@ -10,6 +10,7 @@ import { AuditoriaInfoCard } from "../../components/auditorias/auditorias-detall
 import { CategoriaCard } from "../../components/auditorias/auditorias-detalle/CategoriaCard";
 import { EstadoBadge } from "../../components/auditorias/EstadoBadge";
 import { LoadingState } from "../../components/common/LoadingState";
+import { Calendar, CalendarEvent } from "../../components/common/Calendar";
 
 export const AuditoriaDetalle: React.FC = () => {
   const navigate = useNavigate();
@@ -123,6 +124,45 @@ export const AuditoriaDetalle: React.FC = () => {
     );
   }
 
+  // Generar eventos del calendario basados en la auditoría y subtareas
+  const calendarEvents: CalendarEvent[] = [];
+
+  // Eventos de la auditoría
+  if (auditoria.fecha_inicial) {
+    calendarEvents.push({
+      date: auditoria.fecha_inicial,
+      title: 'Fecha Inicial Auditoría',
+      color: 'bg-orange-500'
+    });
+  }
+  if (auditoria.fecha_corte) {
+    calendarEvents.push({
+      date: auditoria.fecha_corte,
+      title: 'Fecha Corte Auditoría',
+      color: 'bg-green-500'
+    });
+  }
+
+  // Eventos de las subtareas (requerimientos)
+  auditoria.categorias?.forEach((categoria: any) => {
+    categoria.subtareas?.forEach((subtarea: any) => {
+      if (subtarea.fecha_solicitud) {
+        calendarEvents.push({
+          date: subtarea.fecha_solicitud,
+          title: `Solicitud: ${subtarea.nombre}`,
+          color: 'bg-blue-500'
+        });
+      }
+      if (subtarea.tiempo_entrega) {
+        calendarEvents.push({
+          date: subtarea.tiempo_entrega,
+          title: `Entrega: ${subtarea.nombre}`,
+          color: 'bg-purple-500'
+        });
+      }
+    });
+  });
+
   return (
     <div className="py-4 px-3 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
@@ -150,36 +190,49 @@ export const AuditoriaDetalle: React.FC = () => {
           <EstadoBadge estado={auditoria.estado} />
         </div>
 
-        {/* Información de la Auditoría */}
-        <AuditoriaInfoCard auditoria={auditoria} />
+        {/* Layout de dos columnas */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Columna izquierda: Información de la Auditoría y Categorías */}
+          <div className="flex-1 space-y-6">
+            {/* Información de la Auditoría */}
+            <AuditoriaInfoCard auditoria={auditoria} />
 
-        {/* Categorías y Subtareas */}
-        {auditoria.categorias && auditoria.categorias.length > 0 && (
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-gray-800">
-              Categorías y Requerimientos
-            </h3>
+            {/* Categorías y Subtareas */}
+            {auditoria.categorias && auditoria.categorias.length > 0 && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-gray-800">
+                  Categorías y Requerimientos
+                </h3>
 
-            {auditoria.categorias.map((categoria: any) => (
-              <CategoriaCard
-                key={categoria.id}
-                categoria={categoria}
-                auditoria={auditoria}
-                uploadingSubtareaId={uploadingSubtareaId}
-                fileInputRefs={fileInputRefs}
-                onFileSelect={handleFileSelect}
-                onFileChange={uploadFile}
-                onOpenFile={handleOpenFile}
-                getAcceptedFileTypes={getAcceptedFileTypes}
-                onEstadoChange={handleEstadoChange}
-                updatingEstadoSubtareaId={updatingEstadoSubtareaId}
-                userRole={user?.role?.nombre || "delegado"}
-                findingsCount={findingsCount}
-                onFindingCreated={handleFindingCreated}
-              />
-            ))}
+                {auditoria.categorias.map((categoria: any) => (
+                  <CategoriaCard
+                    key={categoria.id}
+                    categoria={categoria}
+                    auditoria={auditoria}
+                    uploadingSubtareaId={uploadingSubtareaId}
+                    fileInputRefs={fileInputRefs}
+                    onFileSelect={handleFileSelect}
+                    onFileChange={uploadFile}
+                    onOpenFile={handleOpenFile}
+                    getAcceptedFileTypes={getAcceptedFileTypes}
+                    onEstadoChange={handleEstadoChange}
+                    updatingEstadoSubtareaId={updatingEstadoSubtareaId}
+                    userRole={user?.role?.nombre || "delegado"}
+                    findingsCount={findingsCount}
+                    onFindingCreated={handleFindingCreated}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Columna derecha: Calendario */}
+          <div className="lg:w-[280px] flex-shrink-0">
+            <div className="sticky top-4">
+              <Calendar events={calendarEvents} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Modal */}
