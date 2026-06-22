@@ -3,6 +3,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import { api } from "../services/api";
 
+interface Task {
+    id: number;
+    nombre: string;
+    estado_informacion: string;
+    fecha_entrega: string | null;
+    completada: boolean;
+    rechazada: boolean;
+    pendiente: boolean;
+}
+
 interface AuditoriaStats {
     id: number;
     titulo: string;
@@ -13,6 +23,7 @@ interface AuditoriaStats {
     tareas_pendientes: number;
     tareas_aprobadas: number;
     tareas_rechazadas: number;
+    tareas: Task[];
 }
 
 interface UserStatsData {
@@ -207,39 +218,83 @@ export const UserStats: React.FC = () => {
                                             </span>
                                         </div>
 
-                                        {/* Barra de progreso */}
-                                        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden mb-3">
-                                            <div
-                                                className="bg-gradient-to-r from-orange-500 to-orange-600 h-4 rounded-full transition-all duration-500"
-                                                style={{ width: `${auditoria.porcentaje_completado}%` }}
-                                            />
-                                        </div>
+                                        {/* Barra de progreso con tareas */}
+                                        <div className="flex gap-4 items-start">
+                                            {/* Barra de progreso */}
+                                            <div className="flex-1">
+                                                <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden mb-3">
+                                                    <div
+                                                        className="bg-gradient-to-r from-orange-500 to-orange-600 h-4 rounded-full transition-all duration-500"
+                                                        style={{ width: `${auditoria.porcentaje_completado}%` }}
+                                                    />
+                                                </div>
 
-                                        {/* Detalles de las tareas */}
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                                                <span className="text-gray-600">
-                                                    Total: <span className="font-semibold text-gray-800">{auditoria.total_tareas}</span>
-                                                </span>
+                                                {/* Detalles de las tareas */}
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-3 h-3 rounded-full bg-gray-400"></span>
+                                                        <span className="text-gray-600">
+                                                            Total: <span className="font-semibold text-gray-800">{auditoria.total_tareas}</span>
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                                                        <span className="text-gray-600">
+                                                            Aprobadas: <span className="font-semibold text-green-700">{auditoria.tareas_aprobadas}</span>
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                                                        <span className="text-gray-600">
+                                                            Pendientes: <span className="font-semibold text-orange-700">{auditoria.tareas_pendientes}</span>
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                                                        <span className="text-gray-600">
+                                                            Rechazadas: <span className="font-semibold text-red-700">{auditoria.tareas_rechazadas}</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                                                <span className="text-gray-600">
-                                                    Aprobadas: <span className="font-semibold text-green-700">{auditoria.tareas_aprobadas}</span>
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-3 h-3 rounded-full bg-orange-500"></span>
-                                                <span className="text-gray-600">
-                                                    Pendientes: <span className="font-semibold text-orange-700">{auditoria.tareas_pendientes}</span>
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                                                <span className="text-gray-600">
-                                                    Rechazadas: <span className="font-semibold text-red-700">{auditoria.tareas_rechazadas}</span>
-                                                </span>
+
+                                            {/* Lista de tareas a la derecha */}
+                                            <div className="w-64 bg-gray-50 rounded-lg p-3 border border-gray-200 max-h-48 overflow-y-auto">
+                                                <h5 className="text-xs font-semibold text-gray-700 mb-2">Tareas</h5>
+                                                <div className="space-y-2">
+                                                    {auditoria.tareas.map((tarea) => (
+                                                        <div
+                                                            key={tarea.id}
+                                                            className="flex items-start gap-2 text-xs"
+                                                        >
+                                                            <div className="flex-shrink-0 mt-0.5">
+                                                                {tarea.completada ? (
+                                                                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                    </svg>
+                                                                ) : tarea.rechazada ? (
+                                                                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                    </svg>
+                                                                ) : (
+                                                                    <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className={`font-medium truncate ${tarea.completada ? 'text-green-700' : tarea.rechazada ? 'text-red-700' : 'text-orange-700'}`} title={tarea.nombre}>
+                                                                    {tarea.nombre}
+                                                                </p>
+                                                                {tarea.fecha_entrega && (
+                                                                    <p className="text-gray-500 text-[10px]">
+                                                                        {tarea.fecha_entrega}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
