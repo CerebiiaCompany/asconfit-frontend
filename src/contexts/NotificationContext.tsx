@@ -9,6 +9,9 @@ export interface Notification {
     time: string;
     read: boolean;
     type?: 'info' | 'warning' | 'success' | 'error';
+    tipo?: string;
+    auditoria_id?: number | null;
+    subtarea_id?: number | null;
 }
 
 interface NotificationContextType {
@@ -63,7 +66,10 @@ const convertToNotification = (notif: Notificacion): Notification => ({
     message: notif.mensaje,
     time: getTimeAgo(notif.created_at),
     read: notif.leida,
-    type: getNotificationType(notif.tipo)
+    type: getNotificationType(notif.tipo),
+    tipo: notif.tipo,
+    auditoria_id: notif.auditoria_id,
+    subtarea_id: notif.subtarea_id
 });
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

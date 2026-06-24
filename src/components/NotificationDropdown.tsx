@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Notification {
   id: string;
@@ -7,6 +8,9 @@ interface Notification {
   time: string;
   read: boolean;
   type?: "info" | "warning" | "success" | "error";
+  tipo?: string;
+  auditoria_id?: number | null;
+  subtarea_id?: number | null;
 }
 
 interface NotificationDropdownProps {
@@ -23,7 +27,38 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onClearAll,
 }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const navigate = useNavigate();
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.read) {
+      onMarkAsRead?.(notification.id);
+    }
+
+    // Navegar según el tipo de notificación
+    switch (notification.tipo) {
+      case 'auditoria_creada':
+      case 'auditoria_completada':
+        if (notification.auditoria_id) {
+          navigate(`/auditorias/${notification.auditoria_id}`);
+        }
+        break;
+      case 'tarea_asignada':
+      case 'archivo_subido':
+      case 'documento_aprobado':
+      case 'documento_pendiente':
+      case 'documento_rechazado':
+        if (notification.auditoria_id) {
+          navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
+        }
+        break;
+      default:
+        if (notification.auditoria_id) {
+          navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
+        }
+    }
+    setShowNotifications(false);
+  };
 
   const getNotificationIcon = (type?: string) => {
     const colorClass =
@@ -122,11 +157,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     className={`px-3 py-1.5 border-b border-gray-100 hover:bg-gray-50 transition duration-150 cursor-pointer ${
                       !notification.read ? "bg-blue-50" : ""
                     }`}
-                    onClick={() => {
-                      if (!notification.read) {
-                        onMarkAsRead?.(notification.id);
-                      }
-                    }}
+                    onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start space-x-2">
                       <div className="flex-shrink-0 mt-1">

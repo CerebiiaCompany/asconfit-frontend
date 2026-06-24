@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import { useTareas } from "../hooks/useTareas";
 import { useFileUpload } from "../hooks/useFileUpload";
@@ -12,6 +12,7 @@ import { authService } from "../services/authService";
 
 export const MisTareas: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useUser(() => navigate("/login"));
   const [auditoriaSeleccionada, setAuditoriaSeleccionada] = useState<
     number | null
@@ -29,6 +30,17 @@ export const MisTareas: React.FC = () => {
   });
 
   const { auditorias, loading, recargar } = useTareas();
+
+  // Auto-seleccionar auditoría si viene en query param
+  useEffect(() => {
+    const auditoriaId = searchParams.get('auditoria_id');
+    if (auditoriaId) {
+      const id = parseInt(auditoriaId);
+      if (!isNaN(id)) {
+        setAuditoriaSeleccionada(id);
+      }
+    }
+  }, [searchParams]);
 
   const { uploadFile, uploadingSubtareaId, getAcceptedFileTypes } =
     useFileUpload({
