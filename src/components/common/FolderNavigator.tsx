@@ -71,6 +71,9 @@ export const FolderNavigator: React.FC<FolderNavigatorProps> = ({
                 ...breadcrumbs,
                 { id: carpeta.id, nombre: carpeta.nombre }
             ]);
+            
+            // Auto-seleccionar la carpeta al navegar
+            onFolderSelect(carpeta.id, carpeta.nombre);
         } catch (err) {
             console.error('Error al navegar a carpeta:', err);
             setError('No se pudieron cargar las subcarpetas');
@@ -137,6 +140,12 @@ export const FolderNavigator: React.FC<FolderNavigatorProps> = ({
         onFolderSelect(carpetaId, carpetaNombre);
     };
 
+    const handleSelectCurrentFolder = () => {
+        if (currentCarpeta) {
+            onFolderSelect(currentCarpeta.id, currentCarpeta.nombre);
+        }
+    };
+
     const handleSelectNoFolder = () => {
         onFolderSelect(null, 'Sin carpeta');
     };
@@ -179,64 +188,61 @@ export const FolderNavigator: React.FC<FolderNavigatorProps> = ({
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {/* Carpetas disponibles - Layout horizontal */}
+                    {/* Botón para seleccionar carpeta actual */}
+                    {currentCarpeta && (
+                        <button
+                            onClick={handleSelectCurrentFolder}
+                            className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg transition-colors text-sm border-2 ${selectedFolderId === currentCarpeta.id
+                                ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
+                                : 'border-orange-300 bg-orange-50 text-orange-600 hover:border-orange-500 hover:bg-orange-100'
+                                }`}
+                        >
+                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                            </svg>
+                            <span>Seleccionar esta carpeta: {currentCarpeta.nombre}</span>
+                        </button>
+                    )}
+
+                    {/* Carpetas disponibles - Grid layout */}
                     {carpetas && carpetas.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {/* Opción "No subir a carpeta" */}
-                            <button
-                                onClick={handleSelectNoFolder}
-                                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm border-2 ${selectedFolderId === null
-                                    ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
-                                    : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
-                                    }`}
-                            >
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                <span>Sin carpeta</span>
-                            </button>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {/* Opción "No subir a carpeta" - solo en raíz */}
+                            {!currentCarpeta && (
+                                <button
+                                    onClick={handleSelectNoFolder}
+                                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg transition-colors text-sm border-2 min-h-[100px] ${selectedFolderId === null
+                                        ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
+                                        : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
+                                        }`}
+                                >
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span className="text-center">Sin carpeta</span>
+                                </button>
+                            )}
 
                             {/* Carpetas */}
                             {carpetas.map((carpeta) => (
-                                <div key={carpeta.id} className="flex flex-col gap-1">
+                                <div key={carpeta.id}>
                                     <button
-                                        onClick={() => handleSelectFolder(carpeta.id, carpeta.nombre)}
-                                        className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm border-2 ${selectedFolderId === carpeta.id
+                                        onClick={() => handleNavigateTo(carpeta)}
+                                        className={`w-full flex flex-col items-center justify-center gap-2 p-4 rounded-lg transition-colors text-sm border-2 min-h-[100px] ${selectedFolderId === carpeta.id
                                             ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
                                             : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
                                             }`}
                                     >
-                                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
-                                        <span>{carpeta.nombre}</span>
+                                        <span className="text-center font-medium">{carpeta.nombre}</span>
                                         {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
-                                            <span className="text-xs text-gray-500 ml-1">
-                                                ({carpeta.subcarpetas.length})
+                                            <span className="text-xs text-gray-500">
+                                                {carpeta.subcarpetas.length} subcarpeta{carpeta.subcarpetas.length !== 1 ? 's' : ''}
                                             </span>
                                         )}
                                     </button>
-
-                                    {/* Subcarpetas - mostrar directamente */}
-                                    {carpeta.subcarpetas && carpeta.subcarpetas.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 ml-4">
-                                            {carpeta.subcarpetas.map((subcarpeta) => (
-                                                <button
-                                                    key={subcarpeta.id}
-                                                    onClick={() => handleSelectFolder(subcarpeta.id, `${carpeta.nombre} / ${subcarpeta.nombre}`)}
-                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-xs border ${selectedFolderId === subcarpeta.id
-                                                        ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
-                                                        : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50'
-                                                        }`}
-                                                >
-                                                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
-                                                    </svg>
-                                                    <span>{subcarpeta.nombre}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
