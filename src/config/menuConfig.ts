@@ -78,7 +78,15 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "papelera",
     "perfil",
   ],
-  auditor: ["dashboard", "hallazgos", "auditorias", "ai-analysis", "mis-tareas", "empresas", "perfil"],
+  auditor: [
+    "dashboard",
+    "hallazgos",
+    "auditorias",
+    "ai-analysis",
+    "mis-tareas",
+    "empresas",
+    "perfil",
+  ],
   delegado: ["dashboard", "mis-tareas", "perfil"],
 };
 
@@ -112,7 +120,9 @@ export const getMenuItemsByRole = (role: UserRole): MenuItem[] => {
 };
 
 // Función para obtener items del menú según los permisos granulares
-export const getMenuItemsByPermissions = (permissions: string[]): MenuItem[] => {
+export const getMenuItemsByPermissions = (
+  permissions: string[],
+): MenuItem[] => {
   if (!permissions || permissions.length === 0) return [];
   return ALL_MENU_ITEMS.filter((item) => permissions.includes(item.id));
 };

@@ -21,7 +21,9 @@ export const Auditorias: React.FC = () => {
   const [fechaHasta, setFechaHasta] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [auditoriaToDelete, setAuditoriaToDelete] = useState<number | null>(null);
+  const [auditoriaToDelete, setAuditoriaToDelete] = useState<number | null>(
+    null,
+  );
 
   // Filtrar auditorías según búsqueda, fecha de visita y proceso
   const filteredAuditorias = auditorias.filter((auditoria) => {
@@ -93,8 +95,8 @@ export const Auditorias: React.FC = () => {
       // Refrescar la lista de auditorías sin recargar la página
       await refetch();
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al mover la auditoría a la papelera');
+      console.error("Error:", error);
+      alert("Error al mover la auditoría a la papelera");
     }
   };
 
@@ -114,21 +116,35 @@ export const Auditorias: React.FC = () => {
         {/* Filter Bar */}
         <AuditoriaFilterBar
           searchTerm={searchTerm}
-          onSearchChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
+          onSearchChange={(v) => {
+            setSearchTerm(v);
+            setCurrentPage(1);
+          }}
           onNewAuditoria={handleNewAuditoria}
           fechaDesde={fechaDesde}
-          onFechaDesdeChange={(v) => { setFechaDesde(v); setCurrentPage(1); }}
+          onFechaDesdeChange={(v) => {
+            setFechaDesde(v);
+            setCurrentPage(1);
+          }}
           fechaHasta={fechaHasta}
-          onFechaHastaChange={(v) => { setFechaHasta(v); setCurrentPage(1); }}
+          onFechaHastaChange={(v) => {
+            setFechaHasta(v);
+            setCurrentPage(1);
+          }}
           estadoFilter={estadoFilter}
-          onEstadoFilterChange={(v) => { setEstadoFilter(v); setCurrentPage(1); }}
+          onEstadoFilterChange={(v) => {
+            setEstadoFilter(v);
+            setCurrentPage(1);
+          }}
         />
 
         {/* Auditorías List */}
         {loading ? (
           <div className="py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4 text-center text-gray-600">Cargando auditorías...</p>
+            <p className="mt-4 text-center text-gray-600">
+              Cargando auditorías...
+            </p>
           </div>
         ) : filteredAuditorias.length === 0 ? (
           auditorias.length === 0 ? (

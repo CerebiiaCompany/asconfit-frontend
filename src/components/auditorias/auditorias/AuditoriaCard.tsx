@@ -70,7 +70,7 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
 
     // Obtener todas las subtareas
     const allSubtareas = auditoria.categorias.flatMap(
-      (cat) => cat.subtareas || []
+      (cat) => cat.subtareas || [],
     );
     const totalSubtareas = allSubtareas.length;
 
@@ -87,17 +87,17 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
     // Contar subtareas por estado
     const sinArchivo = allSubtareas.filter((s) => !s.archivo_nombre).length;
     const aprobadas = allSubtareas.filter(
-      (s) => s.estado_informacion === "aprobado"
+      (s) => s.estado_informacion === "aprobado",
     ).length;
     const pendientes = allSubtareas.filter(
       (s) =>
         s.estado_informacion === "pendiente" ||
-        (!s.estado_informacion && s.archivo_nombre)
+        (!s.estado_informacion && s.archivo_nombre),
     ).length;
     const enProceso = allSubtareas.filter(
       (s) =>
         s.estado_informacion === "recibido" ||
-        s.estado_informacion === "revision"
+        s.estado_informacion === "revision",
     ).length;
     const conArchivo = allSubtareas.filter((s) => s.archivo_nombre).length;
 
@@ -155,12 +155,15 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             <div>
               <div className="text-xs text-gray-500">Razón social</div>
               <div className="text-sm font-medium text-gray-900">
-                {auditoria.empresa?.razon_social || auditoria.razon_social || "-"}
+                {auditoria.empresa?.razon_social ||
+                  auditoria.razon_social ||
+                  "-"}
                 {auditoria.tipo_auditoria && ` - ${auditoria.tipo_auditoria}`}
               </div>
               {auditoria.npr !== undefined && (
                 <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                  NPR {Number(auditoria.npr).toFixed(0)} · {auditoria.nivel_riesgo || "Nivel"}
+                  NPR {Number(auditoria.npr).toFixed(0)} ·{" "}
+                  {auditoria.nivel_riesgo || "Nivel"}
                 </div>
               )}
             </div>
@@ -201,12 +204,16 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-xs text-gray-500">Completado</span>
-                  <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
+                  <span className="text-xs font-semibold text-gray-800">
+                    {checkPct.toFixed(0)}%
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-red-400" />
                   <span className="text-xs text-gray-500">Pendiente</span>
-                  <span className="text-xs font-semibold text-gray-800">{pendientePct.toFixed(0)}%</span>
+                  <span className="text-xs font-semibold text-gray-800">
+                    {pendientePct.toFixed(0)}%
+                  </span>
                 </div>
               </div>
             </div>
@@ -221,8 +228,18 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               className="border border-red-300 text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
               title="Mover a papelera"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
           )}
@@ -236,11 +253,23 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             </button>
           )}
           <button
-            onClick={() => navigate(`/auditorias/${auditoria.id}/informe-preliminar`)}
+            onClick={() =>
+              navigate(`/auditorias/${auditoria.id}/informe-preliminar`)
+            }
             className="flex-1 bg-gray-50 border-2 border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Crear Informe
           </button>
@@ -249,8 +278,18 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             Ver auditoría
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>
@@ -260,7 +299,6 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
       <div className="hidden lg:block">
         <div className="grid grid-cols-12 gap-4 items-center">
           {/* Radio button */}
-
 
           {/* NIT */}
           <div className="col-span-2">
@@ -315,12 +353,16 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500 shrink-0" />
                 <span className="text-xs text-gray-500">Completado</span>
-                <span className="text-xs font-semibold text-gray-800">{checkPct.toFixed(0)}%</span>
+                <span className="text-xs font-semibold text-gray-800">
+                  {checkPct.toFixed(0)}%
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-400 shrink-0" />
                 <span className="text-xs text-gray-500">Pendiente</span>
-                <span className="text-xs font-semibold text-gray-800">{pendientePct.toFixed(0)}%</span>
+                <span className="text-xs font-semibold text-gray-800">
+                  {pendientePct.toFixed(0)}%
+                </span>
               </div>
             </div>
           </div>
@@ -334,8 +376,18 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               className="border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               title="Mover a papelera"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
           )}
@@ -349,11 +401,23 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             </button>
           )}
           <button
-            onClick={() => navigate(`/auditorias/${auditoria.id}/informe-preliminar`)}
+            onClick={() =>
+              navigate(`/auditorias/${auditoria.id}/informe-preliminar`)
+            }
             className="bg-gray-50 border-2 border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Crear Informe
           </button>
@@ -362,8 +426,18 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
           >
             Ver auditoría
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>

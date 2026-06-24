@@ -19,9 +19,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
     <div className="space-y-3 sm:space-y-4">
       {/* Header - Hidden on mobile */}
       <div className="hidden lg:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="col-span-2 text-xs font-medium text-gray-500 ">
-          NIT
-        </div>
+        <div className="col-span-2 text-xs font-medium text-gray-500 ">NIT</div>
         <div className="col-span-2 text-xs font-medium text-gray-500 ">
           Razón social / Tipo de auditoría
         </div>
