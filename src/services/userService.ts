@@ -39,6 +39,14 @@ export interface UserProfile {
   tarjeta_profesional_url?: string;
   has_tarjeta_profesional: boolean;
   created_at: string;
+  especialidad_revisoria_fiscal?: boolean;
+  especialidad_auditoria_externa?: boolean;
+  especialidad_evaluacion_estructuras?: boolean;
+  especialidad_valoracion_empresas?: boolean;
+  especialidad_control_interno?: boolean;
+  especialidad_auditoria_financiera?: boolean;
+  especialidad_analisis_riesgos?: boolean;
+  especialidad_otros?: boolean;
 }
 
 export const userService = {

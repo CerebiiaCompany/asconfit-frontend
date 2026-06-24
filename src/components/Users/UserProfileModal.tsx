@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Mail, Phone, MapPin, Building, Calendar, FileText, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, User, Mail, Phone, MapPin, Building, Calendar, FileText, Eye, BarChart3 } from 'lucide-react';
 import { userService, UserProfile } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -14,6 +15,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     onClose,
     userId
 }) => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(false);
     const { addToast } = useToast();
@@ -237,6 +239,37 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                                     )}
                                 </div>
                             </div>
+
+                            {/* Especialidades Section */}
+                            <div className="bg-gray-50 rounded-xl p-6">
+                                <h4 className="text-lg font-semibold text-gray-800 mb-4">Especialidades</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {[
+                                        { label: 'Revisoría Fiscal', value: profile.especialidad_revisoria_fiscal },
+                                        { label: 'Auditoría Externa', value: profile.especialidad_auditoria_externa },
+                                        { label: 'Evaluación y Estructura Societaria', value: profile.especialidad_evaluacion_estructuras },
+                                        { label: 'Valoración de Empresas', value: profile.especialidad_valoracion_empresas },
+                                        { label: 'Control Interno', value: profile.especialidad_control_interno },
+                                        { label: 'Auditoría Financiera y Tributaria', value: profile.especialidad_auditoria_financiera },
+                                        { label: 'Análisis de Riesgos', value: profile.especialidad_analisis_riesgos },
+                                        { label: 'Otros', value: profile.especialidad_otros },
+                                    ].map((especialidad, index) => (
+                                        especialidad.value ? (
+                                            <div key={index} className="flex items-center gap-2 text-sm text-gray-700">
+                                                <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span>{especialidad.label}</span>
+                                            </div>
+                                        ) : null
+                                    ))}
+                                </div>
+                                {(!profile.especialidad_revisoria_fiscal && !profile.especialidad_auditoria_externa && !profile.especialidad_evaluacion_estructuras && 
+                                 !profile.especialidad_valoracion_empresas && !profile.especialidad_control_interno && !profile.especialidad_auditoria_financiera && 
+                                 !profile.especialidad_analisis_riesgos && !profile.especialidad_otros) && (
+                                  <p className="text-sm text-gray-400 mt-2">No hay especialidades seleccionadas</p>
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <div className="text-center py-12 text-gray-500">
@@ -247,12 +280,21 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 rounded-b-2xl">
-                    <button
-                        onClick={onClose}
-                        className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
-                    >
-                        Cerrar
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => navigate(`/user-stats/${userId}`)}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
+                        >
+                            <BarChart3 className="w-4 h-4" />
+                            Ver Estadísticas
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

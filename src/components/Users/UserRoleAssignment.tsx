@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
@@ -19,7 +18,6 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   loading,
   onUpdateRole,
 }) => {
-  const navigate = useNavigate();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
@@ -107,9 +105,6 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   PERFIL
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -186,27 +181,6 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                         />
                       </svg>
                       Ver Perfil
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => navigate(`/user-stats/${user.id}`)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-sm"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                        />
-                      </svg>
-                      Ver Estadísticas
                     </button>
                   </td>
                 </tr>
