@@ -50,90 +50,89 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
   } = usePasswordUpdate();
 
   return (
-    <div className="max-w-[1200px] mx-auto py-10 px-6">
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Sidebar Menu */}
-        <aside className="w-full lg:w-64 flex-shrink-0">
-          <nav className="space-y-4">
-            <button
-              onClick={() => setActiveTab("profile")}
-              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${activeTab === "profile"
-                ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
-                : "bg-transparent text-gray-400 hover:text-gray-600"
-                }`}
-            >
-              Cuenta
-            </button>
-            <button
-              onClick={() => setActiveTab("password")}
-              className={`w-full text-left px-5 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${activeTab === "password"
-                ? "bg-[#FFE4CC] text-[#F97316] shadow-sm"
-                : "bg-transparent text-gray-400 hover:text-gray-600"
-                }`}
-            >
-              Cambiar Clave
-            </button>
-          </nav>
-        </aside>
-
-        {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
-          {activeTab === "profile" ? (
-            <ProfileTab
-              user={user}
-              name={name}
-              setName={setName}
-              email={email}
-              setEmail={setEmail}
-              phone={phone}
-              setPhone={setPhone}
-              documentType={documentType}
-              setDocumentType={setDocumentType}
-              documentNumber={documentNumber}
-              setDocumentNumber={setDocumentNumber}
-              country={country}
-              setCountry={setCountry}
-              city={city}
-              setCity={setCity}
-              department={department}
-              setDepartment={setDepartment}
-              especialidadRevisoriaFiscal={especialidadRevisoriaFiscal}
-              setEspecialidadRevisoriaFiscal={setEspecialidadRevisoriaFiscal}
-              especialidadAuditoriaExterna={especialidadAuditoriaExterna}
-              setEspecialidadAuditoriaExterna={setEspecialidadAuditoriaExterna}
-              especialidadEvaluacionEstructuras={especialidadEvaluacionEstructuras}
-              setEspecialidadEvaluacionEstructuras={setEspecialidadEvaluacionEstructuras}
-              especialidadValoracionEmpresas={especialidadValoracionEmpresas}
-              setEspecialidadValoracionEmpresas={setEspecialidadValoracionEmpresas}
-              especialidadControlInterno={especialidadControlInterno}
-              setEspecialidadControlInterno={setEspecialidadControlInterno}
-              especialidadAuditoriaFinanciera={especialidadAuditoriaFinanciera}
-              setEspecialidadAuditoriaFinanciera={setEspecialidadAuditoriaFinanciera}
-              especialidadAnalisisRiesgos={especialidadAnalisisRiesgos}
-              setEspecialidadAnalisisRiesgos={setEspecialidadAnalisisRiesgos}
-              especialidadOtros={especialidadOtros}
-              setEspecialidadOtros={setEspecialidadOtros}
-              profileLoading={profileLoading}
-              profileMessage={profileMessage}
-              handleProfileUpdate={handleProfileUpdate}
-              handlePhotoUpload={handlePhotoUpload}
-              handleCVUpload={handleCVUpload}
-              handleTarjetaProfesionalUpload={handleTarjetaProfesionalUpload}
-            />
-          ) : (
-            <PasswordTab
-              currentPassword={currentPassword}
-              setCurrentPassword={setCurrentPassword}
-              newPassword={newPassword}
-              setNewPassword={setNewPassword}
-              confirmPassword={confirmPassword}
-              setConfirmPassword={setConfirmPassword}
-              passwordLoading={passwordLoading}
-              passwordMessage={passwordMessage}
-              handlePasswordUpdate={handlePasswordUpdate}
-            />
-          )}
+    <div className="max-w-4xl mx-auto py-6 px-4">
+      {/* Header with tabs */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h1>
+        <div className="flex gap-2 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${activeTab === "profile"
+              ? "border-orange-500 text-orange-600"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+          >
+            Cuenta
+          </button>
+          <button
+            onClick={() => setActiveTab("password")}
+            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${activeTab === "password"
+              ? "border-orange-500 text-orange-600"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+          >
+            Cambiar Clave
+          </button>
         </div>
+      </div>
+
+      {/* Content */}
+      <div>
+        {activeTab === "profile" ? (
+          <ProfileTab
+            user={user}
+            name={name}
+            setName={setName}
+            email={email}
+            setEmail={setEmail}
+            phone={phone}
+            setPhone={setPhone}
+            documentType={documentType}
+            setDocumentType={setDocumentType}
+            documentNumber={documentNumber}
+            setDocumentNumber={setDocumentNumber}
+            country={country}
+            setCountry={setCountry}
+            city={city}
+            setCity={setCity}
+            department={department}
+            setDepartment={setDepartment}
+            especialidadRevisoriaFiscal={especialidadRevisoriaFiscal}
+            setEspecialidadRevisoriaFiscal={setEspecialidadRevisoriaFiscal}
+            especialidadAuditoriaExterna={especialidadAuditoriaExterna}
+            setEspecialidadAuditoriaExterna={setEspecialidadAuditoriaExterna}
+            especialidadEvaluacionEstructuras={especialidadEvaluacionEstructuras}
+            setEspecialidadEvaluacionEstructuras={setEspecialidadEvaluacionEstructuras}
+            especialidadValoracionEmpresas={especialidadValoracionEmpresas}
+            setEspecialidadValoracionEmpresas={setEspecialidadValoracionEmpresas}
+            especialidadControlInterno={especialidadControlInterno}
+            setEspecialidadControlInterno={setEspecialidadControlInterno}
+            especialidadAuditoriaFinanciera={especialidadAuditoriaFinanciera}
+            setEspecialidadAuditoriaFinanciera={setEspecialidadAuditoriaFinanciera}
+            especialidadAnalisisRiesgos={especialidadAnalisisRiesgos}
+            setEspecialidadAnalisisRiesgos={setEspecialidadAnalisisRiesgos}
+            especialidadOtros={especialidadOtros}
+            setEspecialidadOtros={setEspecialidadOtros}
+            profileLoading={profileLoading}
+            profileMessage={profileMessage}
+            handleProfileUpdate={handleProfileUpdate}
+            handlePhotoUpload={handlePhotoUpload}
+            handleCVUpload={handleCVUpload}
+            handleTarjetaProfesionalUpload={handleTarjetaProfesionalUpload}
+          />
+        ) : (
+          <PasswordTab
+            currentPassword={currentPassword}
+            setCurrentPassword={setCurrentPassword}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            passwordLoading={passwordLoading}
+            passwordMessage={passwordMessage}
+            handlePasswordUpdate={handlePasswordUpdate}
+          />
+        )}
       </div>
     </div>
   );

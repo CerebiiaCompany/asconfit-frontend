@@ -63,10 +63,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
   if (isEditing) {
     return (
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Editar Perfil</h2>
+            <h2 className="text-xl font-bold text-gray-800">Editar Perfil</h2>
             <p className="text-sm text-gray-400 mt-1">Actualiza tu información personal</p>
           </div>
           <button onClick={() => setIsEditing(false)}
@@ -78,11 +78,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300" />
           <form
             onSubmit={async e => { e.preventDefault(); const ok = await handleProfileUpdate(e); if (ok) setIsEditing(false); }}
-            className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5"
+            className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             {[
               { id: "name", label: "Nombre Completo", value: name, span: true, onChange: (v: string) => setName(v.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "")), type: "text" },
@@ -96,14 +96,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                 <label htmlFor={f.id} className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{f.label}</label>
                 <input type={f.type} id={f.id} value={f.value}
                   onChange={e => f.onChange(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all" />
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all" />
               </div>
             ))}
 
             <div>
               <label htmlFor="documentType" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tipo de Documento</label>
               <select id="documentType" value={documentType} onChange={e => setDocumentType(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all">
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all">
                 <option value="">Seleccionar...</option>
                 <option value="CC">CC Cédula de Ciudadanía</option>
                 <option value="CE">CE Cédula de Extranjería</option>
@@ -115,7 +115,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             {/* Especialidades */}
             <div className="md:col-span-2">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Especialidades</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   { id: 'revisoriaFiscal', label: 'Revisoría Fiscal', value: especialidadRevisoriaFiscal, setter: setEspecialidadRevisoriaFiscal },
                   { id: 'auditoriaExterna', label: 'Auditoría Externa', value: especialidadAuditoriaExterna, setter: setEspecialidadAuditoriaExterna },
@@ -142,7 +142,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <div className="md:col-span-2">
               {profileMessage && <Alert type={profileMessage.type} message={profileMessage.text} />}
               <button type="submit" disabled={profileLoading}
-                className="w-full mt-2 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-200 text-white text-sm font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                className="w-full mt-2 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-200 text-white text-sm font-semibold rounded-lg transition-all shadow-sm flex items-center justify-center gap-2">
                 {profileLoading ? "Guardando..." : "Guardar cambios"}
               </button>
             </div>
@@ -153,21 +153,16 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800">Mi Perfil</h2>
-        <p className="text-sm text-gray-400 mt-1">Tu información personal y de cuenta</p>
-      </div>
-
+    <div className="space-y-4">
       {/* Hero card — foto + info principal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="h-24 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300 relative">
-          <div className="absolute -bottom-10 left-6">
-            <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md bg-gray-100 overflow-hidden flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="h-20 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300 relative">
+          <div className="absolute -bottom-8 left-4">
+            <div className="w-16 h-16 rounded-xl border-4 border-white shadow-md bg-gray-100 overflow-hidden flex items-center justify-center">
               {photoUrl ? (
                 <img src={photoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-9 h-9 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-7 h-7 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               )}
@@ -175,7 +170,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
         </div>
 
-        <div className="pt-14 pb-5 px-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="pt-10 pb-4 px-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
             <p className="text-lg font-bold text-gray-800">{fullName || user.email}</p>
             <div className="flex items-center gap-2 mt-1">
@@ -190,14 +185,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           <div className="flex items-center gap-2">
             <input type="file" ref={fileInputRef} onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); }} accept="image/*" className="hidden" />
             <button onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-orange-500 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors">
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-orange-500 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               Cambiar foto
             </button>
             <button onClick={() => setIsEditing(true)}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-colors shadow-sm">
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors shadow-sm">
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
               </svg>
@@ -208,11 +203,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {/* Info personal */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-50">
           <p className="text-sm font-semibold text-gray-700">Información Personal</p>
         </div>
-        <div className="p-6 grid grid-cols-2 sm:grid-cols-3 gap-5">
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
           <InfoRow label="Teléfono" value={phone} />
           <InfoRow label="Tipo Documento" value={docLabel(documentType)} />
           <InfoRow label="Número Documento" value={documentNumber} />
@@ -223,12 +218,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {/* Especialidades */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-50">
           <p className="text-sm font-semibold text-gray-700">Especialidades</p>
         </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
               { label: 'Revisoría Fiscal', value: especialidadRevisoriaFiscal },
               { label: 'Auditoría Externa', value: especialidadAuditoriaExterna },
@@ -258,14 +253,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {/* Hoja de vida */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-50">
           <p className="text-sm font-semibold text-gray-700">Hoja de Vida</p>
         </div>
-        <div className="p-6 flex items-center justify-between gap-4">
+        <div className="p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
@@ -280,12 +275,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <input type="file" ref={cvInputRef} onChange={e => { const f = e.target.files?.[0]; if (f && handleCVUpload) handleCVUpload(f); }} accept=".pdf" className="hidden" />
             {(user.cv_path || user.cv_url) && (
               <a href={storageUrl(user.cv_url ?? user.cv_path) ?? "#"} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                 Ver CV
               </a>
             )}
             <button onClick={() => cvInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-colors shadow-sm">
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors shadow-sm">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
@@ -296,14 +291,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {/* Tarjeta Profesional */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-50">
           <p className="text-sm font-semibold text-gray-700">Tarjeta Profesional</p>
         </div>
-        <div className="p-6 flex items-center justify-between gap-4">
+        <div className="p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4m2 2h10a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v2m2 4h10a2 2 0 002-2v-2m-2 2h-10" />
               </svg>
             </div>
@@ -318,12 +313,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <input type="file" ref={tarjetaProfesionalInputRef} onChange={e => { const f = e.target.files?.[0]; if (f && handleTarjetaProfesionalUpload) handleTarjetaProfesionalUpload(f); }} accept=".pdf" className="hidden" />
             {(user.tarjeta_profesional_path || user.tarjeta_profesional_url) && (
               <a href={storageUrl(user.tarjeta_profesional_url ?? user.tarjeta_profesional_path) ?? "#"} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                 Ver Tarjeta
               </a>
             )}
             <button onClick={() => tarjetaProfesionalInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-colors shadow-sm">
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors shadow-sm">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
