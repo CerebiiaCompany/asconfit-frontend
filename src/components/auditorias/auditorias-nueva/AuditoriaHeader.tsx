@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SearchInput } from "../../SearchInput";
 import { Search, Building2 } from "lucide-react";
-import { empresaService, Empresa as EmpresaModel } from "../../../services/empresaService";
+import {
+  empresaService,
+  Empresa as EmpresaModel,
+} from "../../../services/empresaService";
 
 interface AuditoriaHeaderProps {
   searchEmpresa: string;
@@ -25,14 +28,18 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    empresaService.getAll()
+    empresaService
+      .getAll()
       .then(setEmpresas)
-      .catch(err => console.error("Error cargando empresas:", err));
+      .catch((err) => console.error("Error cargando empresas:", err));
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -74,7 +81,10 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
           </h1>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative z-10" ref={dropdownRef}>
+          <div
+            className="flex flex-col sm:flex-row sm:items-center gap-2 relative z-10"
+            ref={dropdownRef}
+          >
             <span className="text-sm text-gray-600 flex-shrink-0">Empresa</span>
             <div className="relative w-full sm:w-48 lg:w-64">
               <SearchInput
@@ -105,8 +115,12 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
                           <Building2 className="w-5 h-5 text-orange-600" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-semibold text-gray-800 text-sm leading-tight break-words">{emp.razon_social}</span>
-                          <span className="text-xs text-gray-500 mt-0.5 font-medium">NIT: {emp.nit}</span>
+                          <span className="font-semibold text-gray-800 text-sm leading-tight break-words">
+                            {emp.razon_social}
+                          </span>
+                          <span className="text-xs text-gray-500 mt-0.5 font-medium">
+                            NIT: {emp.nit}
+                          </span>
                         </div>
                       </div>
                     ))
@@ -120,17 +134,7 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
               )}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <span className="text-sm text-gray-600 flex-shrink-0">
-              Fecha de visita
-            </span>
-            <SearchInput
-              value={searchConcepto}
-              onChange={onSearchConceptoChange}
-              placeholder="Concepto de visita..."
-              className="w-full sm:w-48 lg:w-64"
-            />
-          </div>
+
           <button className="hidden sm:block p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
             <svg
               className="h-6 w-6"
