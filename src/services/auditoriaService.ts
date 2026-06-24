@@ -88,7 +88,7 @@ export const auditoriaService = {
     const response = await axios.post(
       `${API_URL}/auditorias/analizar-ia`,
       { empresa_id: empresaId, tipo_auditoria: tipoAuditoria },
-      { headers: getAuthHeader() }
+      { headers: getAuthHeader(), timeout: 120000 }
     );
     return response.data;
   },
