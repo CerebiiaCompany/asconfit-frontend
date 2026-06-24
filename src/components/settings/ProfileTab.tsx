@@ -12,6 +12,14 @@ interface ProfileTabProps {
   country: string; setCountry: (v: string) => void;
   city: string; setCity: (v: string) => void;
   department: string; setDepartment: (v: string) => void;
+  especialidadRevisoriaFiscal: boolean; setEspecialidadRevisoriaFiscal: (v: boolean) => void;
+  especialidadAuditoriaExterna: boolean; setEspecialidadAuditoriaExterna: (v: boolean) => void;
+  especialidadEvaluacionEstructuras: boolean; setEspecialidadEvaluacionEstructuras: (v: boolean) => void;
+  especialidadValoracionEmpresas: boolean; setEspecialidadValoracionEmpresas: (v: boolean) => void;
+  especialidadControlInterno: boolean; setEspecialidadControlInterno: (v: boolean) => void;
+  especialidadAuditoriaFinanciera: boolean; setEspecialidadAuditoriaFinanciera: (v: boolean) => void;
+  especialidadAnalisisRiesgos: boolean; setEspecialidadAnalisisRiesgos: (v: boolean) => void;
+  especialidadOtros: boolean; setEspecialidadOtros: (v: boolean) => void;
   profileLoading: boolean;
   profileMessage: { type: "success" | "error"; text: string } | null;
   handleProfileUpdate: (e: React.FormEvent) => Promise<boolean>;
@@ -33,6 +41,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   user, name, setName, email, setEmail, phone, setPhone,
   documentType, setDocumentType, documentNumber, setDocumentNumber,
   country, setCountry, city, setCity, department, setDepartment,
+  especialidadRevisoriaFiscal, setEspecialidadRevisoriaFiscal,
+  especialidadAuditoriaExterna, setEspecialidadAuditoriaExterna,
+  especialidadEvaluacionEstructuras, setEspecialidadEvaluacionEstructuras,
+  especialidadValoracionEmpresas, setEspecialidadValoracionEmpresas,
+  especialidadControlInterno, setEspecialidadControlInterno,
+  especialidadAuditoriaFinanciera, setEspecialidadAuditoriaFinanciera,
+  especialidadAnalisisRiesgos, setEspecialidadAnalisisRiesgos,
+  especialidadOtros, setEspecialidadOtros,
   profileLoading, profileMessage, handleProfileUpdate,
   handlePhotoUpload, handleCVUpload, handleTarjetaProfesionalUpload,
 }) => {
@@ -94,6 +110,33 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                 <option value="NIT">NIT</option>
                 <option value="PP">Pasaporte</option>
               </select>
+            </div>
+
+            {/* Especialidades */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Especialidades</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { id: 'revisoriaFiscal', label: 'Revisoría Fiscal', value: especialidadRevisoriaFiscal, setter: setEspecialidadRevisoriaFiscal },
+                  { id: 'auditoriaExterna', label: 'Auditoría Externa', value: especialidadAuditoriaExterna, setter: setEspecialidadAuditoriaExterna },
+                  { id: 'evaluacionEstructuras', label: 'Evaluación y Estructura Societaria', value: especialidadEvaluacionEstructuras, setter: setEspecialidadEvaluacionEstructuras },
+                  { id: 'valoracionEmpresas', label: 'Valoración de Empresas', value: especialidadValoracionEmpresas, setter: setEspecialidadValoracionEmpresas },
+                  { id: 'controlInterno', label: 'Control Interno', value: especialidadControlInterno, setter: setEspecialidadControlInterno },
+                  { id: 'auditoriaFinanciera', label: 'Auditoría Financiera y Tributaria', value: especialidadAuditoriaFinanciera, setter: setEspecialidadAuditoriaFinanciera },
+                  { id: 'analisisRiesgos', label: 'Análisis de Riesgos', value: especialidadAnalisisRiesgos, setter: setEspecialidadAnalisisRiesgos },
+                  { id: 'otros', label: 'Otros', value: especialidadOtros, setter: setEspecialidadOtros },
+                ].map(especialidad => (
+                  <label key={especialidad.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={especialidad.value}
+                      onChange={(e) => especialidad.setter(e.target.checked)}
+                      className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-gray-700">{especialidad.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="md:col-span-2">
@@ -176,6 +219,41 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           <InfoRow label="País" value={country} />
           <InfoRow label="Departamento" value={department} />
           <InfoRow label="Ciudad" value={city} />
+        </div>
+      </div>
+
+      {/* Especialidades */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-50">
+          <p className="text-sm font-semibold text-gray-700">Especialidades</p>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { label: 'Revisoría Fiscal', value: especialidadRevisoriaFiscal },
+              { label: 'Auditoría Externa', value: especialidadAuditoriaExterna },
+              { label: 'Evaluación y Estructura Societaria', value: especialidadEvaluacionEstructuras },
+              { label: 'Valoración de Empresas', value: especialidadValoracionEmpresas },
+              { label: 'Control Interno', value: especialidadControlInterno },
+              { label: 'Auditoría Financiera y Tributaria', value: especialidadAuditoriaFinanciera },
+              { label: 'Análisis de Riesgos', value: especialidadAnalisisRiesgos },
+              { label: 'Otros', value: especialidadOtros },
+            ].map((especialidad, index) => (
+              especialidad.value ? (
+                <div key={index} className="flex items-center gap-2 text-sm text-gray-700">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{especialidad.label}</span>
+                </div>
+              ) : null
+            ))}
+            {!especialidadRevisoriaFiscal && !especialidadAuditoriaExterna && !especialidadEvaluacionEstructuras && 
+             !especialidadValoracionEmpresas && !especialidadControlInterno && !especialidadAuditoriaFinanciera && 
+             !especialidadAnalisisRiesgos && !especialidadOtros && (
+              <p className="text-sm text-gray-400">No hay especialidades seleccionadas</p>
+            )}
+          </div>
         </div>
       </div>
 

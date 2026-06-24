@@ -23,6 +23,14 @@ export interface User {
   cv_url?: string;
   tarjeta_profesional_path?: string;
   tarjeta_profesional_url?: string;
+  especialidad_revisoria_fiscal?: boolean;
+  especialidad_auditoria_externa?: boolean;
+  especialidad_evaluacion_estructuras?: boolean;
+  especialidad_valoracion_empresas?: boolean;
+  especialidad_control_interno?: boolean;
+  especialidad_auditoria_financiera?: boolean;
+  especialidad_analisis_riesgos?: boolean;
+  especialidad_otros?: boolean;
 }
 
 export interface AuthResponse {
@@ -52,6 +60,14 @@ export interface UpdateProfileData {
   country?: string;
   city?: string;
   department?: string;
+  especialidad_revisoria_fiscal?: boolean;
+  especialidad_auditoria_externa?: boolean;
+  especialidad_evaluacion_estructuras?: boolean;
+  especialidad_valoracion_empresas?: boolean;
+  especialidad_control_interno?: boolean;
+  especialidad_auditoria_financiera?: boolean;
+  especialidad_analisis_riesgos?: boolean;
+  especialidad_otros?: boolean;
 }
 
 export interface UpdatePasswordData {

@@ -15,6 +15,14 @@ export const useUserProfile = (initialUser: User) => {
     const [country, setCountry] = useState(initialUser.country || '');
     const [city, setCity] = useState(initialUser.city || '');
     const [department, setDepartment] = useState(initialUser.department || '');
+    const [especialidadRevisoriaFiscal, setEspecialidadRevisoriaFiscal] = useState(initialUser.especialidad_revisoria_fiscal || false);
+    const [especialidadAuditoriaExterna, setEspecialidadAuditoriaExterna] = useState(initialUser.especialidad_auditoria_externa || false);
+    const [especialidadEvaluacionEstructuras, setEspecialidadEvaluacionEstructuras] = useState(initialUser.especialidad_evaluacion_estructuras || false);
+    const [especialidadValoracionEmpresas, setEspecialidadValoracionEmpresas] = useState(initialUser.especialidad_valoracion_empresas || false);
+    const [especialidadControlInterno, setEspecialidadControlInterno] = useState(initialUser.especialidad_control_interno || false);
+    const [especialidadAuditoriaFinanciera, setEspecialidadAuditoriaFinanciera] = useState(initialUser.especialidad_auditoria_financiera || false);
+    const [especialidadAnalisisRiesgos, setEspecialidadAnalisisRiesgos] = useState(initialUser.especialidad_analisis_riesgos || false);
+    const [especialidadOtros, setEspecialidadOtros] = useState(initialUser.especialidad_otros || false);
 
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileMessage, setProfileMessage] = useState<Message | null>(null);
@@ -34,7 +42,15 @@ export const useUserProfile = (initialUser: User) => {
                 document_number: documentNumber,
                 country,
                 city,
-                department
+                department,
+                especialidad_revisoria_fiscal: especialidadRevisoriaFiscal,
+                especialidad_auditoria_externa: especialidadAuditoriaExterna,
+                especialidad_evaluacion_estructuras: especialidadEvaluacionEstructuras,
+                especialidad_valoracion_empresas: especialidadValoracionEmpresas,
+                especialidad_control_interno: especialidadControlInterno,
+                especialidad_auditoria_financiera: especialidadAuditoriaFinanciera,
+                especialidad_analisis_riesgos: especialidadAnalisisRiesgos,
+                especialidad_otros: especialidadOtros,
             });
             setProfileMessage({ type: 'success', text: response.message });
             setUser(response.user);
@@ -109,6 +125,14 @@ export const useUserProfile = (initialUser: User) => {
         country, setCountry,
         city, setCity,
         department, setDepartment,
+        especialidadRevisoriaFiscal, setEspecialidadRevisoriaFiscal,
+        especialidadAuditoriaExterna, setEspecialidadAuditoriaExterna,
+        especialidadEvaluacionEstructuras, setEspecialidadEvaluacionEstructuras,
+        especialidadValoracionEmpresas, setEspecialidadValoracionEmpresas,
+        especialidadControlInterno, setEspecialidadControlInterno,
+        especialidadAuditoriaFinanciera, setEspecialidadAuditoriaFinanciera,
+        especialidadAnalisisRiesgos, setEspecialidadAnalisisRiesgos,
+        especialidadOtros, setEspecialidadOtros,
         profileLoading,
         profileMessage,
         handleProfileUpdate,

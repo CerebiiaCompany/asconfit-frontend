@@ -21,6 +21,14 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
     country, setCountry,
     city, setCity,
     department, setDepartment,
+    especialidadRevisoriaFiscal, setEspecialidadRevisoriaFiscal,
+    especialidadAuditoriaExterna, setEspecialidadAuditoriaExterna,
+    especialidadEvaluacionEstructuras, setEspecialidadEvaluacionEstructuras,
+    especialidadValoracionEmpresas, setEspecialidadValoracionEmpresas,
+    especialidadControlInterno, setEspecialidadControlInterno,
+    especialidadAuditoriaFinanciera, setEspecialidadAuditoriaFinanciera,
+    especialidadAnalisisRiesgos, setEspecialidadAnalisisRiesgos,
+    especialidadOtros, setEspecialidadOtros,
     profileLoading,
     profileMessage,
     handleProfileUpdate,
@@ -89,6 +97,22 @@ export const UserSettings: React.FC<UserSettingsProps> = ({
               setCity={setCity}
               department={department}
               setDepartment={setDepartment}
+              especialidadRevisoriaFiscal={especialidadRevisoriaFiscal}
+              setEspecialidadRevisoriaFiscal={setEspecialidadRevisoriaFiscal}
+              especialidadAuditoriaExterna={especialidadAuditoriaExterna}
+              setEspecialidadAuditoriaExterna={setEspecialidadAuditoriaExterna}
+              especialidadEvaluacionEstructuras={especialidadEvaluacionEstructuras}
+              setEspecialidadEvaluacionEstructuras={setEspecialidadEvaluacionEstructuras}
+              especialidadValoracionEmpresas={especialidadValoracionEmpresas}
+              setEspecialidadValoracionEmpresas={setEspecialidadValoracionEmpresas}
+              especialidadControlInterno={especialidadControlInterno}
+              setEspecialidadControlInterno={setEspecialidadControlInterno}
+              especialidadAuditoriaFinanciera={especialidadAuditoriaFinanciera}
+              setEspecialidadAuditoriaFinanciera={setEspecialidadAuditoriaFinanciera}
+              especialidadAnalisisRiesgos={especialidadAnalisisRiesgos}
+              setEspecialidadAnalisisRiesgos={setEspecialidadAnalisisRiesgos}
+              especialidadOtros={especialidadOtros}
+              setEspecialidadOtros={setEspecialidadOtros}
               profileLoading={profileLoading}
               profileMessage={profileMessage}
               handleProfileUpdate={handleProfileUpdate}
