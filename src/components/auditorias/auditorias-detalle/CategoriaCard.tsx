@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SubtareaTable } from './SubtareaTable';
+import { UserProfileModal } from '../../Users/UserProfileModal';
 
 interface CategoriaCardProps {
     categoria: any;
@@ -32,14 +33,18 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     findingsCount = {},
     onFindingCreated,
 }) => {
+    const [showProfileModal, setShowProfileModal] = useState(false);
+
     return (
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex justify-between items-center">
                 <h4 className="text-xl font-bold text-white">{categoria.nombre}</h4>
                 {categoria.delegado && (
                     <div className="flex items-center text-white bg-white/20 px-3 py-1 rounded-full text-sm">
-
-                        Delegado: <span className="font-semibold ml-1.5">{categoria.delegado.name}</span>
+                        Delegado: <span 
+                            className="font-semibold ml-1.5 cursor-pointer hover:underline"
+                            onClick={() => setShowProfileModal(true)}
+                        >{categoria.delegado.name}</span>
                     </div>
                 )}
             </div>
@@ -67,6 +72,14 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                     </p>
                 )}
             </div>
+
+            {showProfileModal && categoria.delegado && (
+                <UserProfileModal
+                    isOpen={showProfileModal}
+                    onClose={() => setShowProfileModal(false)}
+                    userId={categoria.delegado.id}
+                />
+            )}
         </div>
     );
 };
