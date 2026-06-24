@@ -6,6 +6,8 @@ import { AnnouncementUploader } from './AnnouncementUploader';
 import { OurServices } from './OurServices';
 import { FounderBanner } from './VideoPlayerCard';
 import { OverdueStats } from './OverdueStats';
+import { FindingsStats } from './FindingsStats';
+import { ProductivityStats } from './ProductivityStats';
 
 interface HomeViewProps {
     user: User | null;
@@ -20,6 +22,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ user }) => {
                 {/* Row 1 */}
                 <ActivitySchedule />
                 <OverdueStats />
+                {/* Row 2 */}
+                <FindingsStats />
+                <ProductivityStats />
                 {/* Row 1 
                 <AnnouncementUploader />
 

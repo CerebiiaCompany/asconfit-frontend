@@ -46,4 +46,11 @@ export const findingService = {
 
     delete: (auditoriaId: number, id: number) =>
         api.delete<{ message: string }>(`/auditorias/${auditoriaId}/findings/${id}`),
+
+    getStats: () =>
+        api.get<{
+            this_month: number;
+            by_severity: { critico: number; grave: number; leve: number };
+            total: number;
+        }>(`/findings/estadisticas`),
 };

@@ -142,4 +142,11 @@ export const auditoriaService = {
     });
     return response.data;
   },
+
+  async getProductivityStats(): Promise<any> {
+    const response = await axios.get(`${API_URL}/auditorias/estadisticas-productividad`, {
+      headers: getAuthHeader()
+    });
+    return response.data;
+  },
 };
