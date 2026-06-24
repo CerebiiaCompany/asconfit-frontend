@@ -74,7 +74,7 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
           </h1>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative z-50" ref={dropdownRef}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative z-10" ref={dropdownRef}>
             <span className="text-sm text-gray-600 flex-shrink-0">Empresa</span>
             <div className="relative w-full sm:w-48 lg:w-64">
               <SearchInput
@@ -89,7 +89,7 @@ export const AuditoriaHeader: React.FC<AuditoriaHeaderProps> = ({
 
               {/* Dropdown de Empresas */}
               {showDropdown && searchEmpresa.trim().length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-72 overflow-y-auto left-0">
+                <div className="absolute z-40 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-72 overflow-y-auto left-0">
                   {filteredEmpresas.length > 0 ? (
                     filteredEmpresas.map((emp) => (
                       <div
