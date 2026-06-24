@@ -106,13 +106,13 @@ export const UserStats: React.FC = () => {
                 <div className="bg-white overflow-hidden shadow-xl rounded-2xl mb-6">
                     <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-8 text-white">
                         <button
-                            onClick={() => navigate("/roles")}
+                            onClick={() => navigate(-1)}
                             className="mb-4 inline-flex items-center gap-2 text-white hover:text-orange-100 transition-colors"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
-                            Volver a Roles
+                            Volver
                         </button>
                         <h2 className="text-3xl font-bold">
                             Estadísticas de {user.name}
