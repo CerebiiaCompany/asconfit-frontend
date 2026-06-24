@@ -23,6 +23,20 @@ function getMetricColor(value: number) {
   return "bg-emerald-500";
 }
 
+function normalizeRiskValue(value: number) {
+  if (value === 0) {
+    return 0;
+  }
+
+  if (value < 1) {
+    return 1;
+  }
+  if (value > 10) {
+    return 10;
+  }
+  return value;
+}
+
 const SORT_OPTIONS = [
   { value: "default", label: "Orden predeterminado" },
   { value: "gravity", label: "Gravedad" },
@@ -198,6 +212,14 @@ export const MatrizRiesgo: React.FC = () => {
   const isTaskSaved = (task: SubtareaRiskState) =>
     task.hasRisk && !hasTaskChanged(task);
 
+  const isValidRiskTask = (task: SubtareaRiskState) =>
+    task.gravedad >= 1 &&
+    task.gravedad <= 10 &&
+    task.probabilidad >= 1 &&
+    task.probabilidad <= 10 &&
+    task.detencion >= 1 &&
+    task.detencion <= 10;
+
   const updateSubtareaField = (
     subtareaId: number,
     field: keyof SubtareaRiskState,
@@ -229,6 +251,10 @@ export const MatrizRiesgo: React.FC = () => {
     const task = subtareas.find((item) => item.id === subtareaId);
     if (!task) return;
     if (!hasTaskChanged(task)) return;
+    if (!isValidRiskTask(task)) {
+      addToast("Los valores deben estar entre 1 y 10.", "error");
+      return;
+    }
     try {
       const response = await auditoriaService.updateSubtareaRiskMatrix(
         subtareaId,
@@ -279,6 +305,13 @@ export const MatrizRiesgo: React.FC = () => {
 
   const handleSaveAll = async () => {
     if (!filteredSubtareas.length) return;
+
+    const invalidTask = filteredSubtareas.find((task) => !isValidRiskTask(task));
+    if (invalidTask) {
+      addToast("Todas las tareas deben tener valores entre 1 y 10 antes de guardar.", "error");
+      return;
+    }
+
     setSavingAll(true);
 
     try {
@@ -509,7 +542,7 @@ export const MatrizRiesgo: React.FC = () => {
                           </span>
                           <button
                             onClick={() => handleSaveSubtarea(task.id)}
-                            disabled={isSaving || !hasChanges}
+                            disabled={isSaving || !hasChanges || !isValidRiskTask(task)}
                             className="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-orange-300"
                           >
                             {isSaving ? "Guardando" : "Guardar"}
@@ -561,6 +594,8 @@ export const MatrizRiesgo: React.FC = () => {
                           type="number"
                           min={1}
                           max={10}
+                          step={1}
+                          inputMode="numeric"
                           value={item.value || ""}
                           onChange={(e) =>
                             updateSubtareaField(
@@ -568,9 +603,17 @@ export const MatrizRiesgo: React.FC = () => {
                               item.field,
                               e.target.value === ""
                                 ? 0
-                                : Number(e.target.value),
+                                : normalizeRiskValue(Number(e.target.value)),
                             )
                           }
+                          onBlur={(e) => {
+                            const rawValue = e.target.value === "" ? 0 : Number(e.target.value);
+                            updateSubtareaField(
+                              task.id,
+                              item.field,
+                              normalizeRiskValue(rawValue),
+                            );
+                          }}
                           className="w-16 rounded-full border border-gray-200 bg-white px-2 py-2 text-center text-sm font-semibold text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
                         />
                         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
