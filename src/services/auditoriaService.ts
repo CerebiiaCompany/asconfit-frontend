@@ -93,6 +93,15 @@ export const auditoriaService = {
     return response.data;
   },
 
+  async generarInformePreliminarIA(auditoriaId: string) {
+    const response = await axios.post(
+      `${API_URL}/auditorias/${auditoriaId}/informe-preliminar/generar-ia`,
+      {},
+      { headers: getAuthHeader(), timeout: 120000 }
+    );
+    return response.data;
+  },
+
   async uploadInformePreliminar(auditoriaId: string, file: File) {
     const formData = new FormData();
     formData.append("informe", file);

@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Auditoria } from "../../../types/auditoria";
-import { findingService, Finding } from "../../../services/findingService";
+import { Finding } from "../../../services/findingService";
 import { SEVERIDAD_CONFIG } from "../../../types/finding.types";
+import { auditoriaService } from "../../../services/auditoriaService";
+import { InformePreliminarIA } from "../../../types/informePreliminar";
 
 const formatDate = (d?: string) => {
     if (!d) return null;
@@ -11,120 +13,108 @@ const formatDate = (d?: string) => {
     return `${parseInt(day)} de ${meses[parseInt(m) - 1]} de ${y}`;
 };
 
-const estadoTexto = (s: any): string => {
-    const estado = s.estado_informacion ?? "pendiente";
-    const entrega = formatDate(s.tiempo_entrega);
-    const solicitud = formatDate(s.fecha_solicitud);
-    const tieneArchivo = !!s.archivo_nombre;
-
-    if (estado === "aprobado") {
-        return `fue entregada y aprobada${s.archivo_nombre ? `, con el archivo "${s.archivo_nombre}"` : ""}${entrega ? ` antes de la fecha límite del ${entrega}` : ""}.`;
-    }
-    if (estado === "rechazado") {
-        return `fue entregada pero rechazada${entrega ? `, con fecha límite el ${entrega}` : ""}. Se requiere corrección.`;
-    }
-    if (estado === "recibido" || estado === "revision") {
-        return `fue entregada${s.archivo_nombre ? ` con el archivo "${s.archivo_nombre}"` : ""} y se encuentra en espera de revisión por parte del auditor${entrega ? `, con fecha límite el ${entrega}` : ""}.`;
-    }
-    if (tieneArchivo) {
-        return `el archivo "${s.archivo_nombre}" fue enviado${entrega ? ` antes de la fecha límite del ${entrega}` : ""}, sin embargo aún no ha sido aceptado ni rechazado por el auditor y se encuentra en espera de respuesta.`;
-    }
-    if (entrega) {
-        const vencida = new Date(s.tiempo_entrega) < new Date();
-        if (vencida) return `se encuentra pendiente y su fecha límite de entrega fue el ${entrega}, por lo que se encuentra vencida.`;
-        return `se encuentra pendiente de entrega, con fecha máxima el ${entrega}${solicitud ? `, solicitada desde el ${solicitud}` : ""}.`;
-    }
-    return `se encuentra pendiente de entrega${solicitud ? `, solicitada desde el ${solicitud}` : ""}.`;
-};
-
-const generarConclusion = (auditoria: Auditoria, findings: Finding[]): string => {
-    const empresa = auditoria.empresa?.razon_social || auditoria.razon_social || "la empresa";
-    const tipo = auditoria.tipo_auditoria ?? "auditoría";
-    const subtareas = (auditoria.categorias ?? []).flatMap(c => c.subtareas ?? []);
-    const total = subtareas.length;
-    const aprobadas = subtareas.filter(s => s.estado_informacion === "aprobado").length;
-    const rechazadas = subtareas.filter(s => (s.estado_informacion as string) === "rechazado").length;
-    const enEspera = subtareas.filter(s =>
-    (s.estado_informacion === "recibido" || s.estado_informacion === "revision" ||
-        (s.estado_informacion === "pendiente" && !!s.archivo_nombre))
-    ).length;
-    const sinEntregar = subtareas.filter(s =>
-        (s.estado_informacion === "pendiente" || !s.estado_informacion) && !s.archivo_nombre
-    ).length;
-    const vencidas = subtareas.filter(s =>
-        !s.archivo_nombre && s.tiempo_entrega && new Date(s.tiempo_entrega) < new Date()
-    ).length;
-
-    const pct = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
-    const pendientes = total - aprobadas;
-
-    let texto = `Con base en la revisión del estado de los requerimientos solicitados en el marco de la ${tipo} practicada a ${empresa}, `;
-
-    if (pct === 100) {
-        texto += `se concluye que la totalidad de ${total === 1 ? "el requerimiento ha sido entregado y aprobado" : `los ${total} requerimientos han sido entregados y aprobados`} satisfactoriamente, lo que refleja un alto nivel de cumplimiento y colaboración por parte de la entidad auditada.`;
-    } else if (pct === 0) {
-        texto += `a la fecha de este informe, ninguno de los requerimientos solicitados ha sido entregado. El avance general es del 0%. `;
-
-        if (sinEntregar > 0) texto += `${sinEntregar === 1 ? "El requerimiento se encuentra" : `Los ${sinEntregar} requerimientos se encuentran`} pendiente${sinEntregar === 1 ? "" : "s"} de entrega. `;
-        if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
-
-        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega ${pendientes === 1 ? "del requerimiento pendiente" : "de los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
-    } else {
-        texto += `se evidencia un avance del ${pct}% en la entrega y aprobación de ${total === 1 ? "el requerimiento solicitado" : `los ${total} requerimientos solicitados`}. `;
-
-        if (aprobadas > 0) texto += `Un total de ${aprobadas} ${aprobadas === 1 ? "requerimiento fue aprobado" : "requerimientos fueron aprobados"} correctamente. `;
-        if (enEspera > 0) texto += `${enEspera} ${enEspera === 1 ? "requerimiento se encuentra" : "requerimientos se encuentran"} en proceso de revisión, pendiente${enEspera === 1 ? "" : "s"} de respuesta por parte del equipo auditor. `;
-        if (rechazadas > 0) texto += `${rechazadas} ${rechazadas === 1 ? "requerimiento fue rechazado y requiere" : "requerimientos fueron rechazados y requieren"} corrección y nueva entrega por parte del auditado. `;
-        if (sinEntregar > 0) texto += `${sinEntregar} ${sinEntregar === 1 ? "requerimiento no ha sido entregado" : "requerimientos no han sido entregados"} a la fecha de elaboración de este informe. `;
-        if (vencidas > 0) texto += `Se alerta que ${vencidas} ${vencidas === 1 ? "requerimiento se encuentra vencido" : "requerimientos se encuentran vencidos"}, superando la fecha límite establecida. `;
-
-        texto += `\n\nSe recomienda a ${empresa} priorizar la entrega ${pendientes === 1 ? "del requerimiento pendiente" : "de los requerimientos pendientes"} a la mayor brevedad posible, con el fin de no retrasar el proceso de auditoría y garantizar el cumplimiento de los plazos acordados.`;
-
-        if (rechazadas > 0) {
-            texto += ` Así mismo, se solicita revisar y corregir los documentos rechazados conforme a las observaciones realizadas por el auditor.`;
-        }
-    }
-
-    // Párrafo de hallazgos
-    if (findings.length > 0) {
-        const criticos = findings.filter(f => f.severidad === "critico").length;
-        const graves = findings.filter(f => f.severidad === "grave").length;
-        const leves = findings.filter(f => f.severidad === "leve").length;
-
-        const partesSev: string[] = [];
-        if (criticos > 0) partesSev.push(`${criticos} ${criticos === 1 ? "crítico" : "críticos"}`);
-        if (graves > 0) partesSev.push(`${graves} ${graves === 1 ? "grave" : "graves"}`);
-        if (leves > 0) partesSev.push(`${leves} ${leves === 1 ? "leve" : "leves"}`);
-
-        texto += `\n\nAdicionalmente, en el transcurso de la revisión se identificaron ${findings.length} ${findings.length === 1 ? "hallazgo" : "hallazgos"}`;
-        if (partesSev.length > 0) texto += `, de ${findings.length === 1 ? "los cuales" : "los cuales"} ${partesSev.join(", ")}`;
-        texto += `. Se recomienda atender ${findings.length === 1 ? "el hallazgo identificado" : "los hallazgos identificados"} con la prioridad que corresponda según su severidad, estableciendo planes de mejora y acciones correctivas dentro de los plazos acordados.`;
-
-        if (criticos > 0) {
-            texto += ` Los hallazgos críticos requieren atención inmediata dado el nivel de riesgo que representan para la organización.`;
-        }
-    }
-
-    return texto;
-};
-
 interface ReportTaskListProps {
     auditoria: Auditoria;
     findings: Finding[];
 }
 
+const TextoIA: React.FC<{ loading: boolean; texto?: string; placeholder: string }> = ({
+    loading,
+    texto,
+    placeholder,
+}) => {
+    if (loading && !texto) {
+        return <p className="text-gray-400 italic">{placeholder}</p>;
+    }
+    if (texto) {
+        return <p className="text-gray-700 leading-relaxed">{texto}</p>;
+    }
+    return <p className="text-gray-400 italic">No disponible.</p>;
+};
+
 export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findings }) => {
-    const empresaNombre = auditoria.empresa?.razon_social || auditoria.razon_social || "la empresa";
-    const tipoAuditoria = auditoria.tipo_auditoria ?? "auditoría";
-    const fechaInicio = formatDate(auditoria.fecha_inicial);
-    const fechaCorte = formatDate(auditoria.fecha_corte);
+    const [iaInforme, setIaInforme] = useState<InformePreliminarIA | null>(null);
+    const [loadingIA, setLoadingIA] = useState(true);
+    const [errorIA, setErrorIA] = useState<string | null>(null);
 
     const categorias = (auditoria.categorias ?? []).filter(c => (c.subtareas ?? []).length > 0);
     const totalSubtareas = categorias.flatMap(c => c.subtareas ?? []).length;
     const aprobadas = categorias.flatMap(c => c.subtareas ?? []).filter(s => s.estado_informacion === "aprobado").length;
     const pendientes = totalSubtareas - aprobadas;
 
-    const conclusion = useMemo(() => generarConclusion(auditoria, findings), [auditoria, findings]);
+    const conclusionesPorFinding = useMemo(() => {
+        const map = new Map<number, string>();
+        iaInforme?.hallazgos?.forEach(h => {
+            if (h.finding_id && h.conclusion) {
+                map.set(h.finding_id, h.conclusion);
+            }
+        });
+        return map;
+    }, [iaInforme]);
+
+    const cargarInformeIA = useCallback(() => {
+        if (!auditoria?.id) return;
+        setLoadingIA(true);
+        setErrorIA(null);
+        auditoriaService
+            .generarInformePreliminarIA(String(auditoria.id))
+            .then(setIaInforme)
+            .catch((err: any) => {
+                setErrorIA(err.response?.data?.error || "No se pudo generar el informe con IA.");
+            })
+            .finally(() => setLoadingIA(false));
+    }, [auditoria?.id]);
+
+    useEffect(() => {
+        cargarInformeIA();
+    }, [cargarInformeIA]);
+
+    const renderHallazgo = (f: Finding, numero: number) => {
+        const sev = SEVERIDAD_CONFIG[f.severidad as keyof typeof SEVERIDAD_CONFIG];
+        const conclusion = conclusionesPorFinding.get(f.id);
+        const actividadNombre = f.actividad?.nombre;
+
+        return (
+            <div key={f.id ?? numero} className="pl-3 space-y-2">
+                <div className="flex gap-2 items-start">
+                    {sev && (
+                        <span className={`mt-1 shrink-0 inline-block w-2 h-2 rounded-full ${sev.color}`} />
+                    )}
+                    <div className="space-y-2">
+                        <p className="font-medium text-gray-900 text-sm">
+                            Hallazgo {numero}: {f.titulo}
+                            {sev ? ` (${sev.label})` : ""}
+                        </p>
+                        {actividadNombre && (
+                            <p className="text-xs text-gray-500">Actividad: {actividadNombre}</p>
+                        )}
+                        <div>
+                            <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-0.5">
+                                Problema identificado
+                            </p>
+                            <p className="text-gray-600 text-sm leading-relaxed">
+                                {f.descripcion || f.titulo}
+                                {f.responsable ? `. Responsable: ${f.responsable}` : ""}
+                                {f.fecha_limite ? `. Fecha límite: ${formatDate(f.fecha_limite)}` : ""}
+                            </p>
+                        </div>
+                        <div className="bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
+                            <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-1">
+                                Conclusión y recomendaciones (IA)
+                            </p>
+                            {loadingIA ? (
+                                <p className="text-sm text-gray-400 italic">Generando conclusión...</p>
+                            ) : conclusion ? (
+                                <p className="text-gray-700 text-sm leading-relaxed">{conclusion}</p>
+                            ) : (
+                                <p className="text-sm text-gray-400 italic">No se generó conclusión para este hallazgo.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
@@ -132,109 +122,83 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                 <h2 className="text-white font-semibold text-base">Informe Preliminar</h2>
                 <p className="text-orange-100 text-xs mt-0.5">
                     {aprobadas} de {totalSubtareas} aprobados · {pendientes} pendientes
+                    {loadingIA ? " · Generando con IA..." : " · Generado con IA"}
                 </p>
             </div>
 
+            {errorIA && (
+                <div className="mx-5 mt-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center justify-between gap-3">
+                    <p className="text-sm text-red-700">{errorIA}</p>
+                    <button
+                        onClick={cargarInformeIA}
+                        className="text-sm font-medium text-red-700 hover:text-red-900 whitespace-nowrap"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            )}
+
             <div className="px-6 py-5 space-y-5 text-sm text-gray-700 leading-relaxed">
-
-                {/* Párrafo introductorio */}
-                <p>
-                    En el marco de la <span className="font-medium">{tipoAuditoria}</span> realizada a{" "}
-                    <span className="font-medium">{empresaNombre}</span>
-                    {fechaInicio ? `, con fecha de inicio el ${fechaInicio}` : ""}
-                    {fechaCorte ? ` y fecha de corte el ${fechaCorte}` : ""}
-                    , se solicitaron un total de <span className="font-medium">{totalSubtareas} {totalSubtareas === 1 ? "requerimiento" : "requerimientos"}</span> distribuidos
-                    en {categorias.length} {categorias.length === 1 ? "categoría" : "categorías"}.
-                    A continuación se presenta el estado actual de cada uno:
-                </p>
-
-                {/* Párrafos por categoría */}
-                {categorias.map((cat, ci) => (
-                    <div key={cat.id ?? ci}>
-                        <p className="font-semibold mb-1.5 uppercase tracking-wide text-xs text-orange-600">
-                            {cat.nombre}
-                        </p>
-                        <div className="space-y-2 pl-1 border-l-2 border-orange-100">
-                            {(cat.subtareas ?? []).map((s, si) => (
-                                <p key={s.id ?? si} className="pl-3">
-                                    <span className="font-medium text-gray-900">{si + 1}. {s.nombre}</span>
-                                    {" — "}
-                                    <span className="text-gray-600">{estadoTexto(s)}</span>
-                                </p>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-
-                {/* Párrafo de cierre */}
-                {totalSubtareas > 0 && (
-                    <p className="pt-2 border-t border-gray-100 text-gray-500 italic">
-                        {(() => {
-                            const subtareas = categorias.flatMap(c => c.subtareas ?? []);
-                            const enEspera = subtareas.filter(s =>
-                                (s.estado_informacion === "pendiente" || s.estado_informacion === "recibido" || s.estado_informacion === "revision") && !!s.archivo_nombre
-                            ).length;
-                            const sinEntregar = subtareas.filter(s =>
-                                (s.estado_informacion === "pendiente" || !s.estado_informacion) && !s.archivo_nombre
-                            ).length;
-                            if (pendientes === 0) return `Todos los requerimientos han sido recibidos y aprobados satisfactoriamente.`;
-                            const partes: string[] = [];
-                            if (sinEntregar > 0) partes.push(`${sinEntregar} ${sinEntregar === 1 ? "requerimiento continúa pendiente de entrega" : "requerimientos continúan pendientes de entrega"}`);
-                            if (enEspera > 0) partes.push(`${enEspera} ${enEspera === 1 ? "archivo enviado en espera de respuesta" : "archivos enviados en espera de respuesta"}`);
-                            return `Al cierre de este informe, ${partes.join(" y ")}.`;
-                        })()}
+                <div>
+                    <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-2">
+                        Introducción
                     </p>
+                    <TextoIA
+                        loading={loadingIA}
+                        texto={iaInforme?.introduccion}
+                        placeholder="Generando introducción..."
+                    />
+                </div>
+
+                {totalSubtareas > 0 && (
+                    <div className="pt-2 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-2">
+                            Estado de requerimientos
+                        </p>
+                        <TextoIA
+                            loading={loadingIA}
+                            texto={iaInforme?.cierre_requerimientos}
+                            placeholder="Generando resumen de requerimientos..."
+                        />
+                    </div>
                 )}
 
-                {/* Hallazgos por categoría/actividad */}
                 {findings.length > 0 && (
                     <div className="pt-3 border-t border-gray-100">
                         <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">
-                            Hallazgos Identificados
+                            Hallazgos identificados
                         </p>
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                            Durante el desarrollo de la {tipoAuditoria} practicada a{" "}
-                            <span className="font-medium">{empresaNombre}</span>, se identificaron{" "}
-                            <span className="font-medium">{findings.length} {findings.length === 1 ? "hallazgo" : "hallazgos"}</span>{" "}
-                            distribuidos entre las actividades evaluadas, los cuales se detallan a continuación:
-                        </p>
+                        <div className="mb-4">
+                            <TextoIA
+                                loading={loadingIA}
+                                texto={iaInforme?.intro_hallazgos}
+                                placeholder="Generando introducción de hallazgos..."
+                            />
+                        </div>
+
                         {categorias.map((cat, ci) => {
                             const findingsCat = findings.filter(f =>
                                 (cat.subtareas ?? []).some(s => s.id === f.actividad_id)
                             );
                             if (findingsCat.length === 0) return null;
+
+                            let contador = 0;
                             return (
                                 <div key={cat.id ?? ci} className="mb-4">
                                     <p className="font-semibold mb-1.5 uppercase tracking-wide text-xs text-orange-600">
                                         {cat.nombre}
                                     </p>
-                                    <div className="space-y-3 pl-1 border-l-2 border-orange-100">
+                                    <div className="space-y-4 pl-1 border-l-2 border-orange-100">
                                         {(cat.subtareas ?? []).map(s => {
                                             const findingsSub = findingsCat.filter(f => f.actividad_id === s.id);
                                             if (findingsSub.length === 0) return null;
                                             return (
-                                                <div key={s.id} className="pl-3">
-                                                    <p className="font-medium text-gray-900 text-sm mb-1">{s.nombre}</p>
-                                                    <div className="space-y-2">
-                                                        {findingsSub.map((f, fi) => {
-                                                            const sev = SEVERIDAD_CONFIG[f.severidad as keyof typeof SEVERIDAD_CONFIG];
-                                                            return (
-                                                                <div key={f.id ?? fi} className="flex gap-2 items-start">
-                                                                    {sev && (
-                                                                        <span className={`mt-0.5 shrink-0 inline-block w-2 h-2 rounded-full ${sev.color}`} />
-                                                                    )}
-                                                                    <p className="text-gray-600 text-sm leading-relaxed">
-                                                                        <span className="font-medium text-gray-800">{f.titulo}</span>
-                                                                        {f.descripcion ? ` — ${f.descripcion}` : ""}
-                                                                        {sev ? ` (${sev.label})` : ""}
-                                                                        {f.responsable ? `. Responsable: ${f.responsable}` : ""}
-                                                                        {f.fecha_limite ? `. Fecha límite: ${formatDate(f.fecha_limite)}` : ""}
-                                                                        .
-                                                                    </p>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
+                                                <div key={s.id} className="space-y-3">
+                                                    <p className="pl-3 font-medium text-gray-900 text-sm">{s.nombre}</p>
+                                                    {findingsSub.map(f => {
+                                                        contador += 1;
+                                                        return renderHallazgo(f, contador);
+                                                    })}
                                                 </div>
                                             );
                                         })}
@@ -242,34 +206,18 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                                 </div>
                             );
                         })}
-                        {/* Hallazgos sin actividad asignada */}
+
                         {(() => {
                             const sinActividad = findings.filter(f => !f.actividad_id);
                             if (sinActividad.length === 0) return null;
+                            const offset = findings.filter(f => f.actividad_id).length;
                             return (
                                 <div className="mb-4">
                                     <p className="font-semibold mb-1.5 uppercase tracking-wide text-xs text-orange-600">
                                         Generales
                                     </p>
-                                    <div className="space-y-2 pl-1 border-l-2 border-orange-100 pl-3">
-                                        {sinActividad.map((f, fi) => {
-                                            const sev = SEVERIDAD_CONFIG[f.severidad as keyof typeof SEVERIDAD_CONFIG];
-                                            return (
-                                                <div key={f.id ?? fi} className="flex gap-2 items-start pl-3">
-                                                    {sev && (
-                                                        <span className={`mt-0.5 shrink-0 inline-block w-2 h-2 rounded-full ${sev.color}`} />
-                                                    )}
-                                                    <p className="text-gray-600 text-sm leading-relaxed">
-                                                        <span className="font-medium text-gray-800">{f.titulo}</span>
-                                                        {f.descripcion ? ` — ${f.descripcion}` : ""}
-                                                        {sev ? ` (${sev.label})` : ""}
-                                                        {f.responsable ? `. Responsable: ${f.responsable}` : ""}
-                                                        {f.fecha_limite ? `. Fecha límite: ${formatDate(f.fecha_limite)}` : ""}
-                                                        .
-                                                    </p>
-                                                </div>
-                                            );
-                                        })}
+                                    <div className="space-y-4 pl-1 border-l-2 border-orange-100">
+                                        {sinActividad.map((f, fi) => renderHallazgo(f, offset + fi + 1))}
                                     </div>
                                 </div>
                             );
@@ -277,20 +225,19 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                     </div>
                 )}
 
-                {/* Conclusión generada automáticamente */}
                 <div className="pt-3 border-t border-gray-100">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide">
-                                Conclusión y Recomendaciones
-                            </p>
-
-                        </div>
-
-                    </div>
-                    {conclusion.split("\n\n").filter(Boolean).map((parrafo, i) => (
-                        <p key={i} className="text-gray-700 leading-relaxed mb-3">{parrafo}</p>
-                    ))}
+                    <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">
+                        Conclusión y recomendaciones generales
+                    </p>
+                    {loadingIA && !iaInforme?.conclusion_general ? (
+                        <p className="text-gray-400 italic">Generando conclusión general...</p>
+                    ) : iaInforme?.conclusion_general ? (
+                        iaInforme.conclusion_general.split("\n\n").filter(Boolean).map((parrafo, i) => (
+                            <p key={i} className="text-gray-700 leading-relaxed mb-3">{parrafo}</p>
+                        ))
+                    ) : (
+                        <p className="text-gray-400 italic">No se pudo generar la conclusión general.</p>
+                    )}
                 </div>
             </div>
         </div>
