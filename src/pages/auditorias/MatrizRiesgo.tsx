@@ -306,9 +306,14 @@ export const MatrizRiesgo: React.FC = () => {
   const handleSaveAll = async () => {
     if (!filteredSubtareas.length) return;
 
-    const invalidTask = filteredSubtareas.find((task) => !isValidRiskTask(task));
+    const invalidTask = filteredSubtareas.find(
+      (task) => !isValidRiskTask(task),
+    );
     if (invalidTask) {
-      addToast("Todas las tareas deben tener valores entre 1 y 10 antes de guardar.", "error");
+      addToast(
+        "Todas las tareas deben tener valores entre 1 y 10 antes de guardar.",
+        "error",
+      );
       return;
     }
 
@@ -488,7 +493,7 @@ export const MatrizRiesgo: React.FC = () => {
           </div>
 
           <div className="mt-6 overflow-hidden rounded-3xl border border-gray-200">
-            <div className="grid min-w-full gap-0 bg-slate-950 px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.2em] text-white sm:grid-cols-[3fr_120px_120px_120px_120px_120px]">
+            <div className="grid min-w-full gap-0 bg-orange-500 px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.2em] text-white sm:grid-cols-[3fr_120px_120px_120px_120px_120px]">
               <div>Tarea de auditoría</div>
               <div className="hidden sm:block">Prioridad</div>
               <div className="text-center">
@@ -530,7 +535,7 @@ export const MatrizRiesgo: React.FC = () => {
                               taskSaved
                                 ? "bg-emerald-100 text-emerald-700"
                                 : hasChanges
-                                  ? "bg-amber-100 text-amber-700"
+                                  ? "bg-orange-100 text-orange-700"
                                   : "bg-slate-100 text-slate-700"
                             }`}
                           >
@@ -542,7 +547,9 @@ export const MatrizRiesgo: React.FC = () => {
                           </span>
                           <button
                             onClick={() => handleSaveSubtarea(task.id)}
-                            disabled={isSaving || !hasChanges || !isValidRiskTask(task)}
+                            disabled={
+                              isSaving || !hasChanges || !isValidRiskTask(task)
+                            }
                             className="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-orange-300"
                           >
                             {isSaving ? "Guardando" : "Guardar"}
@@ -607,7 +614,10 @@ export const MatrizRiesgo: React.FC = () => {
                             )
                           }
                           onBlur={(e) => {
-                            const rawValue = e.target.value === "" ? 0 : Number(e.target.value);
+                            const rawValue =
+                              e.target.value === ""
+                                ? 0
+                                : Number(e.target.value);
                             updateSubtareaField(
                               task.id,
                               item.field,
