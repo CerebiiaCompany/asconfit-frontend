@@ -5,6 +5,7 @@ import { ActivitySchedule } from './ActivitySchedule';
 import { AnnouncementUploader } from './AnnouncementUploader';
 import { OurServices } from './OurServices';
 import { FounderBanner } from './VideoPlayerCard';
+import { OverdueStats } from './OverdueStats';
 
 interface HomeViewProps {
     user: User | null;
@@ -18,6 +19,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ user }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
                 {/* Row 1 */}
                 <ActivitySchedule />
+                <OverdueStats />
                 {/* Row 1 
                 <AnnouncementUploader />
 

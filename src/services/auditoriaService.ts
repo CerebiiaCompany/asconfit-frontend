@@ -135,4 +135,11 @@ export const auditoriaService = {
     );
     return response.data;
   },
+
+  async getOverdueStats(): Promise<any> {
+    const response = await axios.get(`${API_URL}/auditorias/estadisticas-atrasos`, {
+      headers: getAuthHeader()
+    });
+    return response.data;
+  },
 };
