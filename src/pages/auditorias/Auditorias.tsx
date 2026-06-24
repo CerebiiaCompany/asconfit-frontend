@@ -79,6 +79,10 @@ export const Auditorias: React.FC = () => {
     setShowDeleteModal(true);
   };
 
+  const handleRiskMatrix = (id: number) => {
+    navigate(`/auditorias/${id}/matriz-riesgo`);
+  };
+
   const confirmDelete = async () => {
     if (!auditoriaToDelete) return;
 
@@ -142,6 +146,7 @@ export const Auditorias: React.FC = () => {
               auditorias={paginatedAuditorias}
               onViewAuditoria={handleViewAuditoria}
               onDeleteAuditoria={handleDeleteAuditoria}
+              onRiskMatrixAuditoria={handleRiskMatrix}
             />
             <Pagination
               totalItems={totalItems}

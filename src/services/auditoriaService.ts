@@ -30,6 +30,24 @@ export const auditoriaService = {
     return response.data;
   },
 
+  async updateRiskMatrix(auditoriaId: string, data: { gravedad_riesgo: number; probabilidad_riesgo: number; detencion_riesgo: number; }) {
+    const response = await axios.put(
+      `${API_URL}/auditorias/${auditoriaId}/matriz-riesgo`,
+      data,
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
+
+  async updateSubtareaRiskMatrix(subtareaId: string | number, data: { gravedad_riesgo: number; probabilidad_riesgo: number; detencion_riesgo: number; }) {
+    const response = await axios.put(
+      `${API_URL}/auditorias/subtareas/${subtareaId}/matriz-riesgo`,
+      data,
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
+
   async updateAuditoria(id: string, data: Partial<NuevaAuditoriaData>) {
     const response = await axios.put(`${API_URL}/auditorias/${id}`, data, {
       headers: getAuthHeader(),

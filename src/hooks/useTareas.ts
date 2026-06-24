@@ -16,6 +16,11 @@ export interface TareaFlat {
     fechaEntrega: string | null;
     fechaSubida: string | null;
     estadoInformacion: string | null;
+    gravedad_riesgo?: number;
+    probabilidad_riesgo?: number;
+    detencion_riesgo?: number;
+    npr?: number;
+    nivel_riesgo?: string;
 }
 
 export interface AuditoriaAgrupada {
@@ -59,7 +64,12 @@ export const useTareas = () => {
                             fechaSolicitud: subtarea.fecha_solicitud,
                             fechaEntrega: subtarea.tiempo_entrega,
                             fechaSubida: subtarea.fecha_subida,
-                            estadoInformacion: subtarea.estado_informacion
+                        estadoInformacion: subtarea.estado_informacion,
+                        gravedad_riesgo: subtarea.gravedad_riesgo,
+                        probabilidad_riesgo: subtarea.probabilidad_riesgo,
+                        detencion_riesgo: subtarea.detencion_riesgo,
+                        npr: subtarea.npr,
+                        nivel_riesgo: subtarea.nivel_riesgo
                         });
                     });
                 });

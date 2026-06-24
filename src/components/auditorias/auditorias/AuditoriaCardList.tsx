@@ -6,12 +6,14 @@ interface AuditoriaCardListProps {
   auditorias: Auditoria[];
   onViewAuditoria: (id: number) => void;
   onDeleteAuditoria?: (id: number) => void;
+  onRiskMatrixAuditoria?: (id: number) => void;
 }
 
 export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
   auditorias,
   onViewAuditoria,
   onDeleteAuditoria,
+  onRiskMatrixAuditoria,
 }) => {
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -44,6 +46,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
           auditoria={auditoria}
           onViewComplete={onViewAuditoria}
           onDelete={onDeleteAuditoria}
+          onRiskMatrix={onRiskMatrixAuditoria}
         />
       ))}
     </div>

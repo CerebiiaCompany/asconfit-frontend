@@ -15,6 +15,7 @@ import { Auditorias } from "./pages/auditorias/Auditorias";
 import { NuevaAuditoria } from "./pages/auditorias/NuevaAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
 import { PreliminaryReport } from "./pages/auditorias/PreliminaryReport";
+import { MatrizRiesgo } from "./pages/auditorias/MatrizRiesgo";
 import { MisTareas } from "./pages/MisTareas";
 import { TareaDetalle } from "./pages/TareaDetalle";
 import { Perfil } from "./pages/Perfil";
@@ -137,6 +138,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <NuevaAuditoria />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/auditorias/:id/matriz-riesgo"
+                    element={
+                      <RoleBasedRoute>
+                        <MatrizRiesgo />
                       </RoleBasedRoute>
                     }
                   />

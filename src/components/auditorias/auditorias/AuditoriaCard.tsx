@@ -6,12 +6,14 @@ interface AuditoriaCardProps {
   auditoria: Auditoria;
   onViewComplete: (id: number) => void;
   onDelete?: (id: number) => void;
+  onRiskMatrix?: (id: number) => void;
 }
 
 export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
   auditoria,
   onViewComplete,
   onDelete,
+  onRiskMatrix,
 }) => {
   const navigate = useNavigate();
   // Formatear fecha
@@ -156,6 +158,11 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
                 {auditoria.empresa?.razon_social || auditoria.razon_social || "-"}
                 {auditoria.tipo_auditoria && ` - ${auditoria.tipo_auditoria}`}
               </div>
+              {auditoria.npr !== undefined && (
+                <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
+                  NPR {Number(auditoria.npr).toFixed(0)} · {auditoria.nivel_riesgo || "Nivel"}
+                </div>
+              )}
             </div>
 
             {/* Fecha y Estado */}
@@ -217,6 +224,15 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
+            </button>
+          )}
+          {onRiskMatrix && (
+            <button
+              onClick={() => onRiskMatrix(auditoria.id)}
+              className="border border-orange-300 text-orange-600 hover:bg-orange-50 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              title="Abrir matriz de riesgo"
+            >
+              Matriz de riesgo
             </button>
           )}
           <button
@@ -321,6 +337,15 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
+            </button>
+          )}
+          {onRiskMatrix && (
+            <button
+              onClick={() => onRiskMatrix(auditoria.id)}
+              className="bg-orange-50 border border-orange-300 text-orange-700 hover:bg-orange-100 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              title="Abrir matriz de riesgo"
+            >
+              Matriz de riesgo
             </button>
           )}
           <button

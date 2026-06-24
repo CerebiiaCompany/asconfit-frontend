@@ -10,6 +10,11 @@ export interface Subtarea {
     archivo_nombre?: string;
     archivo_path?: string;
     formato_archivo?: string;
+    gravedad_riesgo?: number;
+    probabilidad_riesgo?: number;
+    detencion_riesgo?: number;
+    npr?: number;
+    nivel_riesgo?: string;
     orden: number;
     created_at: string;
     updated_at: string;
@@ -41,6 +46,11 @@ export interface Auditoria {
     fecha_inicial?: string;
     fecha_corte?: string;
     search_concepto?: string;
+    gravedad_riesgo?: number;
+    probabilidad_riesgo?: number;
+    detencion_riesgo?: number;
+    npr?: number;
+    nivel_riesgo?: string;
     estado: 'pendiente' | 'en_progreso' | 'completada' | 'aprobado';
     categorias?: Categoria[];
     created_at: string;
