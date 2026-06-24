@@ -47,7 +47,7 @@ const PasswordField: React.FC<{
   required?: boolean; minLength?: number;
   hint?: React.ReactNode;
 }> = ({ id, label, value, onChange, show, onToggle, placeholder = "••••••••", required, minLength, hint }) => (
-  <div className="space-y-1.5">
+  <div className="space-y-1">
     <label htmlFor={id} className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</label>
     <div className="relative">
       <input
@@ -56,10 +56,10 @@ const PasswordField: React.FC<{
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         required={required} minLength={minLength}
-        className="w-full px-4 py-3 pr-11 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all"
+        className="w-full px-2 py-2 pr-10 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all"
       />
       <button type="button" onClick={onToggle}
-        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
         <EyeIcon open={show} />
       </button>
     </div>
@@ -82,24 +82,19 @@ export const PasswordTab: React.FC<PasswordTabProps> = ({
   const mismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   return (
-    <div className="space-y-6 max-w-lg">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800">Seguridad</h2>
-        <p className="text-sm text-gray-400 mt-1">Actualiza tu contraseña de acceso</p>
-      </div>
+    <div className="space-y-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300" />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Banner decorativo */}
-        <div className="h-1.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-300" />
-
-        <form onSubmit={handlePasswordUpdate} className="p-6 space-y-5">
-          <PasswordField
-            id="currentPassword" label="Contraseña actual"
-            value={currentPassword} onChange={setCurrentPassword}
-            show={showCurrent} onToggle={() => setShowCurrent(v => !v)}
-            required
-          />
+        <form onSubmit={handlePasswordUpdate} className="p-4 space-y-4">
+          <div className="w-1/2 mx-auto">
+            <PasswordField
+              id="currentPassword" label="Contraseña actual"
+              value={currentPassword} onChange={setCurrentPassword}
+              show={showCurrent} onToggle={() => setShowCurrent(v => !v)}
+              required
+            />
+          </div>
 
           <div className="relative flex items-center gap-3 py-1">
             <div className="flex-1 h-px bg-gray-100" />
@@ -107,30 +102,32 @@ export const PasswordTab: React.FC<PasswordTabProps> = ({
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
-          <PasswordField
-            id="newPassword" label="Nueva contraseña"
-            value={newPassword} onChange={setNewPassword}
-            show={showNew} onToggle={() => setShowNew(v => !v)}
-            required minLength={8}
-            hint={
-              newPassword.length > 0 ? (
-                <div className="space-y-1 mt-1">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= strength.score ? strength.color : "bg-gray-100"}`} />
-                    ))}
+          <div className="w-1/2 mx-auto">
+            <PasswordField
+              id="newPassword" label="Nueva contraseña"
+              value={newPassword} onChange={setNewPassword}
+              show={showNew} onToggle={() => setShowNew(v => !v)}
+              required minLength={8}
+              hint={
+                newPassword.length > 0 ? (
+                  <div className="space-y-1 mt-1">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= strength.score ? strength.color : "bg-gray-100"}`} />
+                      ))}
+                    </div>
+                    <p className={`text-xs font-medium ${strength.score <= 2 ? "text-red-500" : strength.score === 3 ? "text-yellow-500" : "text-green-600"}`}>
+                      {strength.label}
+                    </p>
                   </div>
-                  <p className={`text-xs font-medium ${strength.score <= 2 ? "text-red-500" : strength.score === 3 ? "text-yellow-500" : "text-green-600"}`}>
-                    {strength.label}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xs text-gray-400 mt-1">Mínimo 8 caracteres</p>
-              )
-            }
-          />
+                ) : (
+                  <p className="text-xs text-gray-400 mt-1">Mínimo 8 caracteres</p>
+                )
+              }
+            />
+          </div>
 
-          <div className="space-y-1.5">
+          <div className="w-1/2 mx-auto space-y-1">
             <label htmlFor="confirmPassword" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Confirmar contraseña
             </label>
@@ -140,12 +137,12 @@ export const PasswordTab: React.FC<PasswordTabProps> = ({
                 id="confirmPassword" value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="••••••••" required
-                className={`w-full px-4 py-3 pr-11 bg-gray-50 border rounded-xl text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:border-transparent focus:bg-white transition-all ${mismatch ? "border-red-300 focus:ring-red-300" :
-                    matches ? "border-green-300 focus:ring-green-300" :
-                      "border-gray-200 focus:ring-orange-400"
+                className={`w-full px-2 py-2 pr-10 bg-gray-50 border rounded-lg text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:border-transparent focus:bg-white transition-all ${mismatch ? "border-red-300 focus:ring-red-300" :
+                  matches ? "border-green-300 focus:ring-green-300" :
+                    "border-gray-200 focus:ring-orange-400"
                   }`}
               />
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 {matches && (
                   <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -163,28 +160,30 @@ export const PasswordTab: React.FC<PasswordTabProps> = ({
 
           {passwordMessage && <Alert type={passwordMessage.type} message={passwordMessage.text} />}
 
-          <button
-            type="submit"
-            disabled={passwordLoading || mismatch}
-            className="w-full py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-200 text-white text-sm font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 mt-2"
-          >
-            {passwordLoading ? (
-              <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                </svg>
-                Actualizando...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Actualizar contraseña
-              </>
-            )}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={passwordLoading || mismatch}
+              className="w-auto py-2 px-6 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-200 text-white text-sm font-semibold rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 mt-2"
+            >
+              {passwordLoading ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Actualizando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Actualizar contraseña
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
