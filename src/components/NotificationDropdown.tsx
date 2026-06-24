@@ -36,26 +36,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     }
 
     // Navegar según el tipo de notificación
-    switch (notification.tipo) {
-      case 'auditoria_creada':
-      case 'auditoria_completada':
-        if (notification.auditoria_id) {
-          navigate(`/auditorias/${notification.auditoria_id}`);
-        }
-        break;
-      case 'tarea_asignada':
-      case 'archivo_subido':
-      case 'documento_aprobado':
-      case 'documento_pendiente':
-      case 'documento_rechazado':
-        if (notification.auditoria_id) {
-          navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
-        }
-        break;
-      default:
-        if (notification.auditoria_id) {
-          navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
-        }
+    // Todas las notificaciones relacionadas con tareas y documentos van a mis-tareas
+    if (notification.auditoria_id) {
+      navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
     }
     setShowNotifications(false);
   };
