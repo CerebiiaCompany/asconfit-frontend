@@ -7,6 +7,7 @@ import { EmpresaSection } from "../../components/auditorias/auditorias-nueva/Emp
 import { PTSection } from "../../components/auditorias/auditorias-nueva/PTSection";
 import { TipoAuditoriaSection } from "../../components/auditorias/auditorias-nueva/TipoAuditoriaSection";
 import { FechasSection } from "../../components/auditorias/auditorias-nueva/FechasSection";
+import { DelegadosSection } from "../../components/auditorias/auditorias-nueva/DelegadosSection";
 import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/CategoriasSection";
 import { FormActions } from "../../components/auditorias/auditorias-nueva/FormActions";
 import { useUser } from "../../hooks/useUser";
@@ -36,10 +37,12 @@ export const NuevaAuditoria: React.FC = () => {
     formData,
     setFormData,
     categorias,
+    delegados,
     handleInputChange,
     handleAddCategoria,
     handleRemoveCategoria,
     handleCategoriaChange,
+    handleDelegateChange,
     handleAddSubtarea,
     handleRemoveSubtarea,
     handleSubtareaChange,
@@ -64,7 +67,7 @@ export const NuevaAuditoria: React.FC = () => {
 
   const handleSubmit = async () => {
     // Validar formulario
-    const validation = validateForm(formData, categorias);
+    const validation = validateForm(formData, categorias, delegados);
     if (!validation.isValid) {
       setModal({
         isOpen: true,
@@ -81,6 +84,7 @@ export const NuevaAuditoria: React.FC = () => {
         formData,
         categorias,
         searchConcepto,
+        delegados: delegados.filter((item): item is number => item !== null),
       };
 
       await auditoriaService.createAuditoria(auditoriaData);
@@ -144,6 +148,11 @@ export const NuevaAuditoria: React.FC = () => {
               fechaInicial={formData.fechaInicial}
               fechaCorte={formData.fechaCorte}
               onInputChange={handleInputChange}
+            />
+
+            <DelegadosSection
+              selectedDelegados={delegados}
+              onDelegateChange={handleDelegateChange}
             />
 
             <CategoriasSection

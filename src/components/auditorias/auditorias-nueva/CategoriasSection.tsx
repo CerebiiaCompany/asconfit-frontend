@@ -162,9 +162,14 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
 
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-800">
-            Crear categorías requeridas
-          </h2>
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+              Categorías (opcional)
+            </h2>
+            <p className="text-sm text-gray-600">
+              Agrega categorías y requerimientos solo si necesitas dividir la auditoría en tareas específicas.
+            </p>
+          </div>
           <button
             onClick={onAddCategoria}
             className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
@@ -186,22 +191,27 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
         </div>
 
         <div className="space-y-6">
-          {categorias.map((categoria) => {
-            const esPlantillaExistente = plantillasDisponibles.some(
-              (p) =>
-                p.codigo === categoria.nombre || p.nombre === categoria.nombre
-            );
-            const tieneModificaciones = plantillasModificadas.has(
-              categoria.nombre
-            );
+          {categorias.length === 0 ? (
+            <div className="bg-[#F8FAFC] border border-dashed border-gray-300 rounded-lg p-4 text-sm text-gray-600">
+              No has agregado categorías. Si deseas, puedes crear una o dejar este paso en blanco.
+            </div>
+          ) : (
+            categorias.map((categoria) => {
+              const esPlantillaExistente = plantillasDisponibles.some(
+                (p) =>
+                  p.codigo === categoria.nombre || p.nombre === categoria.nombre
+              );
+              const tieneModificaciones = plantillasModificadas.has(
+                categoria.nombre
+              );
 
-            return (
-              <div
-                key={categoria.id}
-                className="bg-[#E8E8E8] p-3 sm:p-4 rounded-lg"
-              >
-                {/* Header de Categoría */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              return (
+                <div
+                  key={categoria.id}
+                  className="bg-[#E8E8E8] p-3 sm:p-4 rounded-lg"
+                >
+                  {/* Header de Categoría */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1">
                       <div className="flex-1">
                         <label className="block text-xs text-gray-500 mb-1">
@@ -277,39 +287,59 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         </select>
                       </div>
                     </div>
-                  <button
-                    onClick={() => onRemoveCategoria(categoria.id)}
-                    className="self-end sm:self-auto p-2 text-white bg-[#9A9A9A] hover:bg-red-500 rounded-full transition-colors flex-shrink-0"
-                    title="Eliminar categoría"
-                  >
-                    <svg
-                      className="h-4 w-4 sm:h-5 sm:w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    <button
+                      onClick={() => onRemoveCategoria(categoria.id)}
+                      className="self-end sm:self-auto p-2 text-white bg-[#9A9A9A] hover:bg-red-500 rounded-full transition-colors flex-shrink-0"
+                      title="Eliminar categoría"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                      <svg
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
 
-                {/* Subtareas */}
-                {categoria.nombre && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-medium text-gray-700">
-                        Requerimientos
-                      </h3>
-                      <div className="flex gap-2">
-                        {esPlantillaExistente && tieneModificaciones && (
+                  {/* Subtareas */}
+                  {categoria.nombre && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-medium text-gray-700">
+                          Requerimientos
+                        </h3>
+                        <div className="flex gap-2">
+                          {esPlantillaExistente && tieneModificaciones && (
+                            <button
+                              onClick={() => handleActualizarPlantilla(categoria)}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors font-medium"
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                              Actualizar plantilla
+                            </button>
+                          )}
                           <button
-                            onClick={() => handleActualizarPlantilla(categoria)}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors font-medium"
+                            onClick={() => handleAddSubtarea(categoria.id)}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
                           >
                             <svg
                               className="h-4 w-4"
@@ -321,67 +351,48 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                d="M12 4v16m8-8H4"
                               />
                             </svg>
-                            Actualizar plantilla
+                            Agregar requerimiento
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleAddSubtarea(categoria.id)}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 4v16m8-8H4"
-                            />
-                          </svg>
-                          Agregar requerimiento
-                        </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {categoria.subtareas.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500 text-sm">
-                        No hay requerimientos. Haz clic en "Agregar
-                        requerimiento" para comenzar.
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {categoria.subtareas.map((subtarea) => (
-                          <SubtareaItem
-                            key={subtarea.id}
-                            subtarea={subtarea}
-                            onRemove={() =>
-                              handleRemoveSubtarea(categoria.id, subtarea.id)
-                            }
-                            onChange={(field, value) =>
-                              onSubtareaChange(
-                                categoria.id,
-                                subtarea.id,
-                                field,
-                                value
-                              )
-                            }
-                            fechaAuditoriaInicio={fechaAuditoriaInicio}
-                            fechaAuditoriaCorte={fechaAuditoriaCorte}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                      {categoria.subtareas.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500 text-sm">
+                          No hay requerimientos. Haz clic en "Agregar
+                          requerimiento" para comenzar.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {categoria.subtareas.map((subtarea) => (
+                            <SubtareaItem
+                              key={subtarea.id}
+                              subtarea={subtarea}
+                              onRemove={() =>
+                                handleRemoveSubtarea(categoria.id, subtarea.id)
+                              }
+                              onChange={(field, value) =>
+                                onSubtareaChange(
+                                  categoria.id,
+                                  subtarea.id,
+                                  field,
+                                  value
+                                )
+                              }
+                              fechaAuditoriaInicio={fechaAuditoriaInicio}
+                              fechaAuditoriaCorte={fechaAuditoriaCorte}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </>

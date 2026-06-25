@@ -22,9 +22,8 @@ const initialFormData: AuditoriaFormData = {
 
 export const useAuditoriaForm = () => {
   const [formData, setFormData] = useState<AuditoriaFormData>(initialFormData);
-  const [categorias, setCategorias] = useState<Categoria[]>([
-    { id: "1", nombre: "", delegadoId: null, subtareas: [] },
-  ]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [delegados, setDelegados] = useState<(number | null)[]>([null, null]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -41,6 +40,10 @@ export const useAuditoriaForm = () => {
       ...prev,
       { id: Date.now().toString(), nombre: "", delegadoId: null, subtareas: [] },
     ]);
+  };
+
+  const handleDelegateChange = (index: number, value: number | null) => {
+    setDelegados((prev) => prev.map((item, idx) => (idx === index ? value : item)));
   };
 
   const handleRemoveCategoria = (id: string) => {
@@ -148,10 +151,12 @@ export const useAuditoriaForm = () => {
     formData,
     setFormData,
     categorias,
+    delegados,
     handleInputChange,
     handleAddCategoria,
     handleRemoveCategoria,
     handleCategoriaChange,
+    handleDelegateChange,
     handleAddSubtarea,
     handleRemoveSubtarea,
     handleSubtareaChange,

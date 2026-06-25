@@ -36,4 +36,5 @@ export interface NuevaAuditoriaData {
     formData: AuditoriaFormData;
     categorias: Categoria[];
     searchConcepto: string;
+    delegados: number[];
 }
