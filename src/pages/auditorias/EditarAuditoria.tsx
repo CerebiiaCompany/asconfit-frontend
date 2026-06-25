@@ -53,8 +53,10 @@ export const EditarAuditoria: React.FC = () => {
         const data = await auditoriaService.getAuditoria(id);
         setAuditoria(data);
 
-        // Verificar permisos: creador o delegado
+        // Verificar permisos: admin, creador o delegado
+        const isAdmin = user?.role?.nombre?.toLowerCase() === 'admin';
         const tienePermiso =
+          isAdmin ||
           data.user_id === user.id ||
           data.delegado_1_id === user.id ||
           data.delegado_2_id === user.id;
