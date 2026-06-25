@@ -24,8 +24,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ user }) => {
                 <OverdueStats />
                 {/* Row 2 */}
                 <FindingsStats />
+                 {/* Row 1 
                 <ProductivityStats />
-                {/* Row 1 
+               
                 <AnnouncementUploader />
 
                 <OurServices />
