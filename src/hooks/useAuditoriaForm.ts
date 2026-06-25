@@ -26,7 +26,7 @@ export const useAuditoriaForm = () => {
   const [delegados, setDelegados] = useState<(number | null)[]>([null, null]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,21 +38,32 @@ export const useAuditoriaForm = () => {
   const handleAddCategoria = () => {
     setCategorias((prev) => [
       ...prev,
-      { id: Date.now().toString(), nombre: "", delegadoId: null, subtareas: [] },
+      {
+        id: Date.now().toString(),
+        nombre: "",
+        delegadoId: null,
+        subtareas: [],
+      },
     ]);
   };
 
   const handleDelegateChange = (index: number, value: number | null) => {
-    setDelegados((prev) => prev.map((item, idx) => (idx === index ? value : item)));
+    setDelegados((prev) =>
+      prev.map((item, idx) => (idx === index ? value : item)),
+    );
   };
 
   const handleRemoveCategoria = (id: string) => {
     setCategorias((prev) => prev.filter((cat) => cat.id !== id));
   };
 
-  const handleCategoriaChange = (id: string, field: keyof Categoria, value: any) => {
+  const handleCategoriaChange = (
+    id: string,
+    field: keyof Categoria,
+    value: any,
+  ) => {
     setCategorias((prev) =>
-      prev.map((cat) => (cat.id === id ? { ...cat, [field]: value } : cat))
+      prev.map((cat) => (cat.id === id ? { ...cat, [field]: value } : cat)),
     );
   };
 
@@ -74,7 +85,7 @@ export const useAuditoriaForm = () => {
           return { ...cat, subtareas: [...cat.subtareas, newSubtarea] };
         }
         return cat;
-      })
+      }),
     );
   };
 
@@ -88,7 +99,7 @@ export const useAuditoriaForm = () => {
           };
         }
         return cat;
-      })
+      }),
     );
   };
 
@@ -96,7 +107,7 @@ export const useAuditoriaForm = () => {
     categoriaId: string,
     subtareaId: string,
     field: keyof Subtarea,
-    value: string
+    value: string,
   ) => {
     setCategorias((prev) =>
       prev.map((cat) => {
@@ -104,18 +115,18 @@ export const useAuditoriaForm = () => {
           return {
             ...cat,
             subtareas: cat.subtareas.map((st) =>
-              st.id === subtareaId ? { ...st, [field]: value } : st
+              st.id === subtareaId ? { ...st, [field]: value } : st,
             ),
           };
         }
         return cat;
-      })
+      }),
     );
   };
 
   const handleLoadPlantilla = async (
     categoriaId: string,
-    codigoONombre: string
+    codigoONombre: string,
   ) => {
     try {
       const { plantillaService } = await import("../services/plantillaService");
@@ -135,12 +146,12 @@ export const useAuditoriaForm = () => {
                 estadoInformacion: "pendiente",
                 archivoNombre: "",
                 formatoArchivo: req.formato_archivo || "",
-              })
+              }),
             );
             return { ...cat, subtareas, delegadoId: cat.delegadoId };
           }
           return cat;
-        })
+        }),
       );
     } catch (error) {
       console.error("Error al cargar plantilla:", error);

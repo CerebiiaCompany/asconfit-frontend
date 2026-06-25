@@ -16,7 +16,7 @@ interface CategoriasSectionProps {
     categoriaId: string,
     subtareaId: string,
     field: keyof Subtarea,
-    value: string
+    value: string,
   ) => void;
   onLoadPlantilla: (categoriaId: string, codigo: string) => void;
   fechaAuditoriaInicio: string;
@@ -58,7 +58,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
       try {
         const [plantillas, listaDelegados] = await Promise.all([
           plantillaService.getPlantillas(),
-          userService.getDelegados()
+          userService.getDelegados(),
         ]);
         setPlantillasDisponibles(plantillas);
         setDelegados(listaDelegados);
@@ -76,7 +76,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   const handleActualizarPlantilla = async (categoria: Categoria) => {
     try {
       const plantilla = plantillasDisponibles.find(
-        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre
+        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre,
       );
 
       if (!plantilla) {
@@ -128,7 +128,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
     const categoria = categorias.find((c) => c.id === categoriaId);
     if (categoria) {
       const esPlantillaExistente = plantillasDisponibles.some(
-        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre
+        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre,
       );
       if (esPlantillaExistente) {
         marcarPlantillaModificada(categoria.nombre);
@@ -141,7 +141,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
     const categoria = categorias.find((c) => c.id === categoriaId);
     if (categoria) {
       const esPlantillaExistente = plantillasDisponibles.some(
-        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre
+        (p) => p.codigo === categoria.nombre || p.nombre === categoria.nombre,
       );
       if (esPlantillaExistente) {
         marcarPlantillaModificada(categoria.nombre);
@@ -167,7 +167,8 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
               Categorías (opcional)
             </h2>
             <p className="text-sm text-gray-600">
-              Agrega categorías y requerimientos solo si necesitas dividir la auditoría en tareas específicas.
+              Agrega categorías y requerimientos solo si necesitas dividir la
+              auditoría en tareas específicas.
             </p>
           </div>
           <button
@@ -193,16 +194,18 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
         <div className="space-y-6">
           {categorias.length === 0 ? (
             <div className="bg-[#F8FAFC] border border-dashed border-gray-300 rounded-lg p-4 text-sm text-gray-600">
-              No has agregado categorías. Si deseas, puedes crear una o dejar este paso en blanco.
+              No has agregado categorías. Si deseas, puedes crear una o dejar
+              este paso en blanco.
             </div>
           ) : (
             categorias.map((categoria) => {
               const esPlantillaExistente = plantillasDisponibles.some(
                 (p) =>
-                  p.codigo === categoria.nombre || p.nombre === categoria.nombre
+                  p.codigo === categoria.nombre ||
+                  p.nombre === categoria.nombre,
               );
               const tieneModificaciones = plantillasModificadas.has(
-                categoria.nombre
+                categoria.nombre,
               );
 
               return (
@@ -228,14 +231,22 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                   type="text"
                                   value={categoria.nombre}
                                   onChange={(e) =>
-                                    onCategoriaChange(categoria.id, "nombre", e.target.value)
+                                    onCategoriaChange(
+                                      categoria.id,
+                                      "nombre",
+                                      e.target.value,
+                                    )
                                   }
                                   className="flex-1 px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm font-medium"
                                   placeholder="Categoría personalizada"
                                 />
                                 <button
                                   onClick={() =>
-                                    onCategoriaChange(categoria.id, "nombre", "")
+                                    onCategoriaChange(
+                                      categoria.id,
+                                      "nombre",
+                                      "",
+                                    )
                                   }
                                   className="text-xs text-gray-600 hover:text-gray-900 underline whitespace-nowrap"
                                 >
@@ -251,20 +262,39 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                               onChange={(e) => {
                                 const newValue = e.target.value;
                                 if (newValue === "nueva") {
-                                  const name = prompt("Nombre de la nueva categoría:");
-                                  if (name?.trim()) onCategoriaChange(categoria.id, "nombre", name.trim());
+                                  const name = prompt(
+                                    "Nombre de la nueva categoría:",
+                                  );
+                                  if (name?.trim())
+                                    onCategoriaChange(
+                                      categoria.id,
+                                      "nombre",
+                                      name.trim(),
+                                    );
                                 } else {
-                                  onCategoriaChange(categoria.id, "nombre", newValue);
-                                  if (newValue && newValue !== "nueva") onLoadPlantilla(categoria.id, newValue);
+                                  onCategoriaChange(
+                                    categoria.id,
+                                    "nombre",
+                                    newValue,
+                                  );
+                                  if (newValue && newValue !== "nueva")
+                                    onLoadPlantilla(categoria.id, newValue);
                                 }
                               }}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm"
                             >
                               <option value="">Selecciona una categoría</option>
                               {plantillasDisponibles.map((p) => (
-                                <option key={p.id} value={p.codigo}>{p.nombre}</option>
+                                <option key={p.id} value={p.codigo}>
+                                  {p.nombre}
+                                </option>
                               ))}
-                              <option value="nueva" className="font-semibold text-orange-600">+ Nueva categoría</option>
+                              <option
+                                value="nueva"
+                                className="font-semibold text-orange-600"
+                              >
+                                + Nueva categoría
+                              </option>
                             </select>
                           );
                         })()}
@@ -276,13 +306,21 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         </label>
                         <select
                           value={categoria.delegadoId || ""}
-                          onChange={(e) => onCategoriaChange(categoria.id, "delegadoId", Number(e.target.value))}
+                          onChange={(e) =>
+                            onCategoriaChange(
+                              categoria.id,
+                              "delegadoId",
+                              Number(e.target.value),
+                            )
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
                           required
                         >
                           <option value="">Seleccione delegado</option>
                           {delegados.map((d) => (
-                            <option key={d.id} value={d.id}>{d.name}</option>
+                            <option key={d.id} value={d.id}>
+                              {d.name}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -318,7 +356,9 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         <div className="flex gap-2">
                           {esPlantillaExistente && tieneModificaciones && (
                             <button
-                              onClick={() => handleActualizarPlantilla(categoria)}
+                              onClick={() =>
+                                handleActualizarPlantilla(categoria)
+                              }
                               className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors font-medium"
                             >
                               <svg
@@ -378,7 +418,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                   categoria.id,
                                   subtarea.id,
                                   field,
-                                  value
+                                  value,
                                 )
                               }
                               fechaAuditoriaInicio={fechaAuditoriaInicio}

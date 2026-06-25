@@ -123,57 +123,60 @@ export const NuevaAuditoria: React.FC = () => {
   return (
     <div className="pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto pt-8">
-          <Breadcrumb items={breadcrumbItems} />
+        <Breadcrumb items={breadcrumbItems} />
 
-          <AuditoriaHeader
-            searchEmpresa={searchEmpresa}
-            searchConcepto={searchConcepto}
-            onSearchEmpresaChange={setSearchEmpresa}
-            onSearchConceptoChange={setSearchConcepto}
-            onSelectEmpresa={handleSelectEmpresa}
-            onBack={() => navigate("/auditorias")}
+        <AuditoriaHeader
+          searchEmpresa={searchEmpresa}
+          searchConcepto={searchConcepto}
+          onSearchEmpresaChange={setSearchEmpresa}
+          onSearchConceptoChange={setSearchConcepto}
+          onSelectEmpresa={handleSelectEmpresa}
+          onBack={() => navigate("/auditorias")}
+        />
+
+        <div className="bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8">
+          <EmpresaSection
+            formData={formData}
+            onInputChange={handleInputChange}
           />
 
-          <div className="bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8">
-            <EmpresaSection
-              formData={formData}
-              onInputChange={handleInputChange}
-            />
+          <PTSection value={formData.pt} onChange={handleInputChange} />
 
-            <PTSection value={formData.pt} onChange={handleInputChange} />
+          <TipoAuditoriaSection
+            value={formData.tipoAuditoria}
+            onChange={handleInputChange}
+          />
 
-            <TipoAuditoriaSection value={formData.tipoAuditoria} onChange={handleInputChange} />
+          <FechasSection
+            fechaInicial={formData.fechaInicial}
+            fechaCorte={formData.fechaCorte}
+            onInputChange={handleInputChange}
+          />
 
-            <FechasSection
-              fechaInicial={formData.fechaInicial}
-              fechaCorte={formData.fechaCorte}
-              onInputChange={handleInputChange}
-            />
+          <DelegadosSection
+            selectedDelegados={delegados}
+            onDelegateChange={handleDelegateChange}
+          />
 
-            <DelegadosSection
-              selectedDelegados={delegados}
-              onDelegateChange={handleDelegateChange}
-            />
+          <CategoriasSection
+            categorias={categorias}
+            onAddCategoria={handleAddCategoria}
+            onRemoveCategoria={handleRemoveCategoria}
+            onCategoriaChange={handleCategoriaChange}
+            onAddSubtarea={handleAddSubtarea}
+            onRemoveSubtarea={handleRemoveSubtarea}
+            onSubtareaChange={handleSubtareaChange}
+            onLoadPlantilla={handleLoadPlantilla}
+            fechaAuditoriaInicio={formData.fechaInicial}
+            fechaAuditoriaCorte={formData.fechaCorte}
+          />
 
-            <CategoriasSection
-              categorias={categorias}
-              onAddCategoria={handleAddCategoria}
-              onRemoveCategoria={handleRemoveCategoria}
-              onCategoriaChange={handleCategoriaChange}
-              onAddSubtarea={handleAddSubtarea}
-              onRemoveSubtarea={handleRemoveSubtarea}
-              onSubtareaChange={handleSubtareaChange}
-              onLoadPlantilla={handleLoadPlantilla}
-              fechaAuditoriaInicio={formData.fechaInicial}
-              fechaAuditoriaCorte={formData.fechaCorte}
-            />
-
-            <FormActions
-              onSubmit={handleSubmit}
-              submitLabel="Guardar auditoría"
-              isLoading={isSubmitting}
-            />
-          </div>
+          <FormActions
+            onSubmit={handleSubmit}
+            submitLabel="Guardar auditoría"
+            isLoading={isSubmitting}
+          />
+        </div>
       </div>
 
       <Modal

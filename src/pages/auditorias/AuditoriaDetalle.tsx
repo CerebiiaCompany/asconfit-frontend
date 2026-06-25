@@ -80,6 +80,13 @@ export const AuditoriaDetalle: React.FC = () => {
     setFindingsCount(prev => ({ ...prev, [actividadId]: newCount }));
   };
 
+  // Verificar si el usuario actual puede editar la auditoría
+  const canEdit = user && (
+    auditoria.user_id === user.id ||
+    auditoria.delegado_1_id === user.id ||
+    auditoria.delegado_2_id === user.id
+  );
+
   const handleEstadoChange = async (subtareaId: number, estado: string) => {
     try {
       setUpdatingEstadoSubtareaId(subtareaId);
@@ -187,7 +194,30 @@ export const AuditoriaDetalle: React.FC = () => {
             </svg>
             Volver a auditorías
           </button>
-          <EstadoBadge estado={auditoria.estado} />
+          <div className="flex items-center gap-4">
+            {canEdit && (
+              <button
+                onClick={() => navigate(`/auditorias/${id}/editar`)}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-sm"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Agregar categorías
+              </button>
+            )}
+            <EstadoBadge estado={auditoria.estado} />
+          </div>
         </div>
 
         {/* Layout superior: Información de la Auditoría y Calendario */}

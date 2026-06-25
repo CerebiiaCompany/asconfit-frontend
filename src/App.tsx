@@ -13,6 +13,7 @@ import { Companies } from "./pages/Companies/Companies";
 import { ViewCompanies } from "./pages/Companies/ViewCompanies";
 import { Auditorias } from "./pages/auditorias/Auditorias";
 import { NuevaAuditoria } from "./pages/auditorias/NuevaAuditoria";
+import { EditarAuditoria } from "./pages/auditorias/EditarAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
 import { PreliminaryReport } from "./pages/auditorias/PreliminaryReport";
 import { MatrizRiesgo } from "./pages/auditorias/MatrizRiesgo";
@@ -138,6 +139,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <NuevaAuditoria />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/auditorias/:id/editar"
+                    element={
+                      <RoleBasedRoute>
+                        <EditarAuditoria />
                       </RoleBasedRoute>
                     }
                   />

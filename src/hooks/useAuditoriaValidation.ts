@@ -9,7 +9,7 @@ export const useAuditoriaValidation = () => {
   const validateForm = (
     formData: any,
     categorias: Categoria[],
-    delegados: Array<number | null>
+    delegados: Array<number | null>,
   ): ValidationResult => {
     // Validar campos de empresa
     const camposEmpresaRequeridos = [
@@ -100,7 +100,10 @@ export const useAuditoriaValidation = () => {
               };
             }
 
-            if (!subtarea.tiempoEntrega || subtarea.tiempoEntrega.trim() === "") {
+            if (
+              !subtarea.tiempoEntrega ||
+              subtarea.tiempoEntrega.trim() === ""
+            ) {
               return {
                 isValid: false,
                 message: `El requerimiento "${subtarea.nombre}" debe tener un tiempo de entrega`,
