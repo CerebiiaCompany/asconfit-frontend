@@ -169,6 +169,7 @@ export const NuevaAuditoria: React.FC = () => {
             onLoadPlantilla={handleLoadPlantilla}
             fechaAuditoriaInicio={formData.fechaInicial}
             fechaAuditoriaCorte={formData.fechaCorte}
+            auditoriaDelegados={delegados.filter((item): item is number => item !== null)}
           />
 
           <FormActions

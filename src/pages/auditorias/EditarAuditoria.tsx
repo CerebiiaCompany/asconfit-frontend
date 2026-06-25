@@ -246,6 +246,7 @@ export const EditarAuditoria: React.FC = () => {
             onLoadPlantilla={handleLoadPlantilla}
             fechaAuditoriaInicio={formData.fechaInicial}
             fechaAuditoriaCorte={formData.fechaCorte}
+            auditoriaDelegados={[auditoria?.delegado_1_id, auditoria?.delegado_2_id].filter((id): id is number => id !== null && id !== undefined)}
           />
 
           <FormActions

@@ -21,6 +21,7 @@ interface CategoriasSectionProps {
   onLoadPlantilla: (categoriaId: string, codigo: string) => void;
   fechaAuditoriaInicio: string;
   fechaAuditoriaCorte: string;
+  auditoriaDelegados?: number[];
 }
 
 export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
@@ -34,6 +35,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   onLoadPlantilla,
   fechaAuditoriaInicio,
   fechaAuditoriaCorte,
+  auditoriaDelegados,
 }) => {
   const [plantillasDisponibles, setPlantillasDisponibles] = useState<any[]>([]);
   const [plantillasModificadas, setPlantillasModificadas] = useState<
@@ -51,7 +53,12 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
     type: "info",
   });
 
-  const [delegados, setDelegados] = useState<User[]>([]);
+  const [allDelegados, setAllDelegados] = useState<User[]>([]);
+
+  // Filter delegados to only those selected in the audit
+  const delegados = auditoriaDelegados
+    ? allDelegados.filter((d) => auditoriaDelegados.includes(d.id))
+    : allDelegados;
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -61,7 +68,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
           userService.getDelegados(),
         ]);
         setPlantillasDisponibles(plantillas);
-        setDelegados(listaDelegados);
+        setAllDelegados(listaDelegados);
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
