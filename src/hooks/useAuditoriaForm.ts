@@ -168,12 +168,12 @@ export const useAuditoriaForm = () => {
       const day = String(d.getDate()).padStart(2, "0");
       return `${y}-${m}-${day}`;
     };
-    const mappedCategorias: Categoria[] = auditoriaCategorias.map((cat, catIndex) => ({
-      id: cat.id ? `existing-${cat.id}` : Date.now().toString() + '-' + catIndex,
+    const mappedCategorias: any[] = auditoriaCategorias.map((cat, catIndex) => ({
+      id: cat.id ? cat.id : Date.now().toString() + '-' + catIndex,
       nombre: cat.nombre,
       delegadoId: cat.delegado_id,
       subtareas: cat.subtareas ? cat.subtareas.map((st: any, stIndex: number) => ({
-        id: st.id ? `existing-${st.id}` : Date.now().toString() + '-' + stIndex,
+        id: st.id ? st.id : Date.now().toString() + '-' + stIndex,
         nombre: st.nombre,
         prioridad: st.prioridad || "",
         fechaSolicitud: formatDateToYYYYMMDD(st.fecha_solicitud),
