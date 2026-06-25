@@ -158,10 +158,31 @@ export const useAuditoriaForm = () => {
     }
   };
 
+  const handleLoadExistingAuditoriaCategorias = (auditoriaCategorias: any[]) => {
+    const mappedCategorias: Categoria[] = auditoriaCategorias.map((cat, catIndex) => ({
+      id: cat.id ? `existing-${cat.id}` : Date.now().toString() + '-' + catIndex,
+      nombre: cat.nombre,
+      delegadoId: cat.delegado_id,
+      subtareas: cat.subtareas ? cat.subtareas.map((st: any, stIndex: number) => ({
+        id: st.id ? `existing-${st.id}` : Date.now().toString() + '-' + stIndex,
+        nombre: st.nombre,
+        prioridad: st.prioridad || "",
+        fechaSolicitud: st.fecha_solicitud || "",
+        tiempoEntrega: st.tiempo_entrega || "",
+        observaciones: st.observaciones || "",
+        estadoInformacion: st.estado_informacion || "pendiente",
+        archivoNombre: st.archivo_nombre || "",
+        formatoArchivo: st.formato_archivo || "",
+      })) : []
+    }));
+    setCategorias(mappedCategorias);
+  };
+
   return {
     formData,
     setFormData,
     categorias,
+    setCategorias,
     delegados,
     handleInputChange,
     handleAddCategoria,
@@ -172,5 +193,6 @@ export const useAuditoriaForm = () => {
     handleRemoveSubtarea,
     handleSubtareaChange,
     handleLoadPlantilla,
+    handleLoadExistingAuditoriaCategorias,
   };
 };

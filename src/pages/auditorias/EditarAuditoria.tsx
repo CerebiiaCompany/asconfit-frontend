@@ -42,6 +42,7 @@ export const EditarAuditoria: React.FC = () => {
     handleRemoveSubtarea,
     handleSubtareaChange,
     handleLoadPlantilla,
+    handleLoadExistingAuditoriaCategorias,
   } = useAuditoriaForm();
 
   // Cargar auditoría existente
@@ -87,6 +88,10 @@ export const EditarAuditoria: React.FC = () => {
             fechaCorte: data.fecha_corte || "",
             empresaId: data.empresa_id,
           }));
+          // Cargar categorías y subtareas existentes
+          if (data.categorias && data.categorias.length > 0) {
+            handleLoadExistingAuditoriaCategorias(data.categorias);
+          }
         }
       } catch (error: any) {
         console.error("Error al cargar auditoría:", error);
