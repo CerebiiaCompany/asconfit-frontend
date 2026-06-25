@@ -81,7 +81,9 @@ export const AuditoriaDetalle: React.FC = () => {
   };
 
   // Verificar si el usuario actual puede editar la auditoría
-  const canEdit = user && (
+  const isAdmin = user?.role?.nombre?.toLowerCase() === 'admin';
+  const canEdit = user && auditoria && (
+    isAdmin ||
     auditoria.user_id === user.id ||
     auditoria.delegado_1_id === user.id ||
     auditoria.delegado_2_id === user.id
