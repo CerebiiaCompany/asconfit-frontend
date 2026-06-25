@@ -4,10 +4,14 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    message: string;
+    message?: string;
     type?: 'success' | 'error' | 'warning' | 'info';
     confirmText?: string;
+    cancelText?: string;
     onConfirm?: () => void;
+    onCancel?: () => void;
+    showCancel?: boolean;
+    children?: React.ReactNode;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -17,13 +21,24 @@ export const Modal: React.FC<ModalProps> = ({
     message,
     type = 'info',
     confirmText = 'Aceptar',
-    onConfirm
+    cancelText = 'Cancelar',
+    onConfirm,
+    onCancel,
+    showCancel = false,
+    children
 }) => {
     if (!isOpen) return null;
 
     const handleConfirm = () => {
         if (onConfirm) {
             onConfirm();
+        }
+        onClose();
+    };
+
+    const handleCancel = () => {
+        if (onCancel) {
+            onCancel();
         }
         onClose();
     };
@@ -89,29 +104,46 @@ export const Modal: React.FC<ModalProps> = ({
                     </svg>
                 </button>
 
-                {/* Icon */}
-                <div className="flex justify-center pt-8 pb-4">
-                    <div className={`${bgColor} rounded-full p-3`}>
-                        {icon}
+                {/* Icon - only if no children */}
+                {!children && (
+                    <div className="flex justify-center pt-8 pb-4">
+                        <div className={`${bgColor} rounded-full p-3`}>
+                            {icon}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Content */}
-                <div className="px-8 pb-8 text-center">
+                <div className={`px-8 pb-8 ${children ? 'pt-8' : 'text-center'}`}>
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
                         {title}
                     </h3>
-                    <p className="text-gray-600 mb-6">
-                        {message}
-                    </p>
+                    {message && (
+                        <p className="text-gray-600 mb-6">
+                            {message}
+                        </p>
+                    )}
+                    {children}
 
-                    {/* Button */}
-                    <button
-                        onClick={handleConfirm}
-                        className={`w-full px-6 py-3 ${buttonColor} text-white font-semibold rounded-lg transition-colors shadow-lg`}
-                    >
-                        {confirmText}
-                    </button>
+                    {/* Buttons */}
+                    <div className={`flex gap-3 mt-6 ${children ? 'justify-end' : ''}`}>
+                        {showCancel && (
+                            <button
+                                onClick={handleCancel}
+                                className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors shadow-lg flex-1"
+                            >
+                                {cancelText}
+                            </button>
+                        )}
+                        {onConfirm && (
+                            <button
+                                onClick={handleConfirm}
+                                className={`px-6 py-3 ${buttonColor} text-white font-semibold rounded-lg transition-colors shadow-lg flex-1`}
+                            >
+                                {confirmText}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

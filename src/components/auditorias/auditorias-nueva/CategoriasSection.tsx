@@ -52,6 +52,15 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
     message: "",
     type: "info",
   });
+  const [nuevaCategoriaModal, setNuevaCategoriaModal] = useState<{
+    isOpen: boolean;
+    categoriaId: string;
+    nombre: string;
+  }>({
+    isOpen: false,
+    categoriaId: "",
+    nombre: "",
+  });
 
   const [allDelegados, setAllDelegados] = useState<User[]>([]);
 
@@ -166,6 +175,48 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
         message={modal.message}
         type={modal.type}
       />
+      
+      <Modal
+        isOpen={nuevaCategoriaModal.isOpen}
+        onClose={() =>
+          setNuevaCategoriaModal({ ...nuevaCategoriaModal, isOpen: false })
+        }
+        title="Nueva Categoría"
+        showCancel={true}
+        cancelText="Cancelar"
+        confirmText="Crear"
+        onConfirm={() => {
+          if (nuevaCategoriaModal.nombre.trim()) {
+            onCategoriaChange(
+              nuevaCategoriaModal.categoriaId,
+              "nombre",
+              nuevaCategoriaModal.nombre.trim(),
+            );
+          }
+        }}
+        type="info"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre de la categoría
+            </label>
+            <input
+              type="text"
+              value={nuevaCategoriaModal.nombre}
+              onChange={(e) =>
+                setNuevaCategoriaModal({
+                  ...nuevaCategoriaModal,
+                  nombre: e.target.value,
+                })
+              }
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
+              placeholder="Ingrese el nombre de la categoría"
+              autoFocus
+            />
+          </div>
+        </div>
+      </Modal>
 
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -269,15 +320,11 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                               onChange={(e) => {
                                 const newValue = e.target.value;
                                 if (newValue === "nueva") {
-                                  const name = prompt(
-                                    "Nombre de la nueva categoría:",
-                                  );
-                                  if (name?.trim())
-                                    onCategoriaChange(
-                                      categoria.id,
-                                      "nombre",
-                                      name.trim(),
-                                    );
+                                  setNuevaCategoriaModal({
+                                    isOpen: true,
+                                    categoriaId: categoria.id,
+                                    nombre: "",
+                                  });
                                 } else {
                                   onCategoriaChange(
                                     categoria.id,
