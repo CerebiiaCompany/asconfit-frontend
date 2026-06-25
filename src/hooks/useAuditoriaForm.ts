@@ -159,6 +159,15 @@ export const useAuditoriaForm = () => {
   };
 
   const handleLoadExistingAuditoriaCategorias = (auditoriaCategorias: any[]) => {
+    const formatDateToYYYYMMDD = (dateStr: string | null | undefined) => {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
     const mappedCategorias: Categoria[] = auditoriaCategorias.map((cat, catIndex) => ({
       id: cat.id ? `existing-${cat.id}` : Date.now().toString() + '-' + catIndex,
       nombre: cat.nombre,
@@ -167,8 +176,8 @@ export const useAuditoriaForm = () => {
         id: st.id ? `existing-${st.id}` : Date.now().toString() + '-' + stIndex,
         nombre: st.nombre,
         prioridad: st.prioridad || "",
-        fechaSolicitud: st.fecha_solicitud || "",
-        tiempoEntrega: st.tiempo_entrega || "",
+        fechaSolicitud: formatDateToYYYYMMDD(st.fecha_solicitud),
+        tiempoEntrega: formatDateToYYYYMMDD(st.tiempo_entrega),
         observaciones: st.observaciones || "",
         estadoInformacion: st.estado_informacion || "pendiente",
         archivoNombre: st.archivo_nombre || "",
