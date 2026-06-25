@@ -87,7 +87,7 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "empresas",
     "perfil",
   ],
-  delegado: ["dashboard", "mis-tareas", "perfil"],
+  delegado: ["dashboard", "auditorias", "mis-tareas", "perfil"],
 };
 
 // Mapeo de rutas a IDs de menú (incluyendo rutas anidadas)
@@ -97,6 +97,7 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/auditorias": "auditorias",
   "/auditorias/nueva": "auditorias",
   "/auditorias/:id": "auditorias",
+  "/auditorias/:id/editar": "auditorias",
   "/auditorias/:id/informe-preliminar": "auditorias",
   "/auditorias/:id/matriz-riesgo": "auditorias",
   "/ai-analysis": "ai-analysis",
