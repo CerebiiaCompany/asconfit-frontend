@@ -367,6 +367,27 @@ export const MatrizRiesgo: React.FC = () => {
   return (
     <div className="py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        <button
+          type="button"
+          onClick={() => navigate("/auditorias")}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-orange-600"
+        >
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Volver a auditorías
+        </button>
+
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-medium text-orange-600">
@@ -699,7 +720,7 @@ export const MatrizRiesgo: React.FC = () => {
               disabled={savingAll}
               className="w-full rounded-3xl bg-orange-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-orange-300"
             >
-              {savingAll ? "Guardando todas..." : "Guardar todas las tareas"}
+              {savingAll ? "Guardando..." : "Guardar Matriz"}
             </button>
           </div>
         </div>
