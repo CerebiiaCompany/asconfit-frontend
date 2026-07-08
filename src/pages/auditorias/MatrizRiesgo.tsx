@@ -8,18 +8,43 @@ import { Auditoria, Subtarea } from "../../types/auditoria";
 const RISK_LABELS = {
   critical: { label: "Crítico", color: "bg-red-100 text-red-800" },
   high: { label: "Alto", color: "bg-orange-100 text-orange-800" },
-  moderate: { label: "Moderado", color: "bg-emerald-100 text-emerald-800" },
+  moderate: { label: "Moderado", color: "bg-amber-100 text-amber-800" },
+  low: { label: "Bajo", color: "bg-emerald-100 text-emerald-800" },
 };
 
-function getRiskLabel(value: number) {
-  if (value >= 8) return RISK_LABELS.critical;
-  if (value >= 6) return RISK_LABELS.high;
-  return RISK_LABELS.moderate;
+// NPR máximo posible: 10 × 10 × (11 − 1) = 1000. Se usa para dimensionar barras.
+const MAX_NPR = 1000;
+
+// NPR = gravedad × probabilidad × (11 − detección).
+// Debe coincidir con el cálculo del backend. La detección está en escala
+// invertida: 1 = difícil de detectar (peor), 10 = fácil de detectar (mejor).
+function computeNpr(gravedad: number, probabilidad: number, detencion: number) {
+  if (gravedad < 1 || probabilidad < 1 || detencion < 1) return 0;
+  return gravedad * probabilidad * (11 - detencion);
 }
 
-function getMetricColor(value: number) {
-  if (value >= 8) return "bg-red-500";
-  if (value >= 6) return "bg-amber-500";
+// Rangos alineados con getNivelRiesgo() del backend:
+// Bajo ≤ 100, Moderado ≤ 225, Alto ≤ 450, Crítico > 450.
+function getRiskLabel(npr: number) {
+  if (npr > 450) return RISK_LABELS.critical;
+  if (npr > 225) return RISK_LABELS.high;
+  if (npr > 100) return RISK_LABELS.moderate;
+  return RISK_LABELS.low;
+}
+
+function getNprColor(npr: number) {
+  if (npr > 450) return "bg-red-500";
+  if (npr > 225) return "bg-orange-500";
+  if (npr > 100) return "bg-amber-500";
+  return "bg-emerald-500";
+}
+
+// Color para las métricas individuales (1-10). Para la detección la escala se
+// invierte, ya que un valor bajo es peor (más difícil de detectar).
+function getMetricColor(value: number, inverted = false) {
+  const effective = inverted ? 11 - value : value;
+  if (effective >= 8) return "bg-red-500";
+  if (effective >= 6) return "bg-amber-500";
   return "bg-emerald-500";
 }
 
@@ -42,7 +67,7 @@ const SORT_OPTIONS = [
   { value: "gravity", label: "Gravedad" },
   { value: "probability", label: "Probabilidad" },
   { value: "detection", label: "Detención" },
-  { value: "risk", label: "Promedio riesgo" },
+  { value: "risk", label: "NPR (riesgo)" },
 ];
 
 const PRIORITY_OPTIONS = [
@@ -60,7 +85,6 @@ interface SubtareaRiskState {
   gravedad: number;
   probabilidad: number;
   detencion: number;
-  avgRisk: number;
   hasRisk: boolean;
   npr: number;
   nivel: string;
@@ -93,10 +117,10 @@ export const MatrizRiesgo: React.FC = () => {
             const gravedad = subtarea.gravedad_riesgo ?? 0;
             const probabilidad = subtarea.probabilidad_riesgo ?? 0;
             const detencion = subtarea.detencion_riesgo ?? 0;
-            const promedio =
-              gravedad || probabilidad || detencion
-                ? Number(((gravedad + probabilidad + detencion) / 3).toFixed(1))
-                : 0;
+            // Preferimos el NPR calculado por el backend; si no viene, lo
+            // reproducimos localmente con la misma fórmula.
+            const npr =
+              subtarea.npr ?? computeNpr(gravedad, probabilidad, detencion);
             flatSubtareas.push({
               id: subtarea.id,
               categoriaNombre: categoria.nombre,
@@ -105,13 +129,12 @@ export const MatrizRiesgo: React.FC = () => {
               gravedad,
               probabilidad,
               detencion,
-              avgRisk: promedio,
               hasRisk:
                 subtarea.gravedad_riesgo != null ||
                 subtarea.probabilidad_riesgo != null ||
                 subtarea.detencion_riesgo != null,
-              npr: promedio,
-              nivel: promedio ? getRiskLabel(promedio).label : "Sin datos",
+              npr,
+              nivel: subtarea.nivel_riesgo ?? (npr ? getRiskLabel(npr).label : "Sin datos"),
               originalGravedad: gravedad,
               originalProbabilidad: probabilidad,
               originalDetencion: detencion,
@@ -150,7 +173,7 @@ export const MatrizRiesgo: React.FC = () => {
       return [...filtered].sort((a, b) => b.detencion - a.detencion);
     }
     if (sortBy === "risk") {
-      return [...filtered].sort((a, b) => b.avgRisk - a.avgRisk);
+      return [...filtered].sort((a, b) => b.npr - a.npr);
     }
     return filtered;
   }, [subtareas, priorityFilter, sortBy]);
@@ -186,18 +209,15 @@ export const MatrizRiesgo: React.FC = () => {
     );
   }, [filteredSubtareas, totalTasks]);
 
-  const avgRiskGlobal = useMemo(() => {
+  const nprGlobal = useMemo(() => {
     if (!totalTasks) return 0;
-    return Number(
-      (
-        filteredSubtareas.reduce((sum, task) => sum + task.avgRisk, 0) /
-        totalTasks
-      ).toFixed(1),
+    return Math.round(
+      filteredSubtareas.reduce((sum, task) => sum + task.npr, 0) / totalTasks,
     );
   }, [filteredSubtareas, totalTasks]);
 
   const criticalTasks = useMemo(
-    () => filteredSubtareas.filter((task) => task.avgRisk >= 8).length,
+    () => filteredSubtareas.filter((task) => task.npr > 450).length,
     [filteredSubtareas],
   );
 
@@ -229,19 +249,15 @@ export const MatrizRiesgo: React.FC = () => {
       current.map((task) => {
         if (task.id !== subtareaId) return task;
         const updatedTask = { ...task, [field]: value } as SubtareaRiskState;
-        const avgRisk = Number(
-          (
-            (updatedTask.gravedad +
-              updatedTask.probabilidad +
-              updatedTask.detencion) /
-            3
-          ).toFixed(1),
+        const npr = computeNpr(
+          updatedTask.gravedad,
+          updatedTask.probabilidad,
+          updatedTask.detencion,
         );
         return {
           ...updatedTask,
-          npr: avgRisk,
-          avgRisk,
-          nivel: getRiskLabel(avgRisk).label,
+          npr,
+          nivel: npr ? getRiskLabel(npr).label : "Sin datos",
         };
       }),
     );
@@ -266,14 +282,15 @@ export const MatrizRiesgo: React.FC = () => {
       );
 
       const updated = response.subtarea;
-      const avgRisk = Number(
-        (
-          (updated.gravedad_riesgo +
-            updated.probabilidad_riesgo +
-            updated.detencion_riesgo) /
-          3
-        ).toFixed(1),
-      );
+      // El backend ya resuelve npr y nivel_riesgo; los usamos como fuente de
+      // verdad y solo hacemos fallback si no vinieran.
+      const npr =
+        updated.npr ??
+        computeNpr(
+          updated.gravedad_riesgo,
+          updated.probabilidad_riesgo,
+          updated.detencion_riesgo,
+        );
       setSubtareas((current) =>
         current.map((item) =>
           item.id === subtareaId
@@ -282,9 +299,8 @@ export const MatrizRiesgo: React.FC = () => {
                 gravedad: updated.gravedad_riesgo,
                 probabilidad: updated.probabilidad_riesgo,
                 detencion: updated.detencion_riesgo,
-                npr: avgRisk,
-                avgRisk,
-                nivel: getRiskLabel(avgRisk).label,
+                npr,
+                nivel: updated.nivel_riesgo ?? getRiskLabel(npr).label,
                 hasRisk: true,
                 originalGravedad: updated.gravedad_riesgo,
                 originalProbabilidad: updated.probabilidad_riesgo,
@@ -320,7 +336,7 @@ export const MatrizRiesgo: React.FC = () => {
     setSavingAll(true);
 
     try {
-      await Promise.all(
+      const responses = await Promise.all(
         filteredSubtareas.map((task) =>
           auditoriaService.updateSubtareaRiskMatrix(task.id, {
             gravedad_riesgo: task.gravedad,
@@ -329,7 +345,44 @@ export const MatrizRiesgo: React.FC = () => {
           }),
         ),
       );
-      addToast("Todas las tareas se guardaron correctamente.", "success");
+
+      // Sincronizamos el estado con los valores resueltos por el backend
+      // (npr y nivel_riesgo) y marcamos las tareas como guardadas.
+      const updatedById = new Map<number, any>();
+      responses.forEach((response) => {
+        const updated = response?.subtarea;
+        if (updated) {
+          updatedById.set(updated.id, updated);
+        }
+      });
+
+      setSubtareas((current) =>
+        current.map((item) => {
+          const updated = updatedById.get(item.id);
+          if (!updated) return item;
+          const npr =
+            updated.npr ??
+            computeNpr(
+              updated.gravedad_riesgo,
+              updated.probabilidad_riesgo,
+              updated.detencion_riesgo,
+            );
+          return {
+            ...item,
+            gravedad: updated.gravedad_riesgo,
+            probabilidad: updated.probabilidad_riesgo,
+            detencion: updated.detencion_riesgo,
+            npr,
+            nivel: updated.nivel_riesgo ?? getRiskLabel(npr).label,
+            hasRisk: true,
+            originalGravedad: updated.gravedad_riesgo,
+            originalProbabilidad: updated.probabilidad_riesgo,
+            originalDetencion: updated.detencion_riesgo,
+          };
+        }),
+      );
+
+      addToast("Matriz guardada correctamente.", "success");
     } catch (error) {
       console.error(error);
       addToast("Error al guardar las tareas.", "error");
@@ -397,9 +450,10 @@ export const MatrizRiesgo: React.FC = () => {
               Evaluación de riesgo por tarea
             </h1>
             <p className="mt-2 text-sm text-gray-500 max-w-2xl">
-              Aquí ves el nivel de riesgo de cada tarea de la auditoría. Ajusta
-              gravedad, probabilidad y detección, y guarda cada tarea para
-              actualizar la matriz.
+              Aquí ves el nivel de riesgo (NPR) de cada tarea de la auditoría.
+              El NPR se calcula como gravedad × probabilidad × (11 − detección).
+              En detección, 1 = difícil de detectar (peor) y 10 = fácil de
+              detectar (mejor).
             </p>
           </div>
           <button
@@ -427,7 +481,7 @@ export const MatrizRiesgo: React.FC = () => {
             <p className="mt-4 text-3xl font-semibold text-red-700">
               {criticalTasks}
             </p>
-            <p className="text-sm text-gray-500">tareas con promedio ≥ 8</p>
+            <p className="text-sm text-gray-500">tareas con NPR &gt; 450</p>
           </div>
           <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
             <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
@@ -451,17 +505,17 @@ export const MatrizRiesgo: React.FC = () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-                  Riesgo global
+                  NPR promedio
                 </p>
                 <p className="mt-4 text-3xl font-semibold text-gray-900">
-                  {avgRiskGlobal}
+                  {nprGlobal}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {getRiskLabel(avgRiskGlobal).label}
+                  {getRiskLabel(nprGlobal).label}
                 </p>
               </div>
               <div className="rounded-3xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700">
-                {getRiskLabel(avgRiskGlobal).label}
+                {getRiskLabel(nprGlobal).label}
               </div>
             </div>
           </div>
@@ -527,16 +581,19 @@ export const MatrizRiesgo: React.FC = () => {
                 <br />
                 (1-10)
               </div>
-              <div className="text-center">
-                Detención
+              <div
+                className="text-center"
+                title="Escala invertida: 1 = difícil de detectar (peor), 10 = fácil de detectar (mejor)"
+              >
+                Detección
                 <br />
-                (1-10)
+                (1=peor · 10=mejor)
               </div>
-              <div className="text-center">Promedio riesgo</div>
+              <div className="text-center">NPR</div>
             </div>
             <div className="divide-y divide-gray-200 bg-white">
               {filteredSubtareas.map((task) => {
-                const riskLabel = getRiskLabel(task.avgRisk);
+                const riskLabel = getRiskLabel(task.npr);
                 const isSaving = savingIds.includes(task.id);
                 const taskSaved = isTaskSaved(task);
                 const hasChanges = hasTaskChanged(task);
@@ -599,16 +656,19 @@ export const MatrizRiesgo: React.FC = () => {
                         label: "G",
                         value: task.gravedad,
                         field: "gravedad" as const,
+                        inverted: false,
                       },
                       {
                         label: "P",
                         value: task.probabilidad,
                         field: "probabilidad" as const,
+                        inverted: false,
                       },
                       {
                         label: "D",
                         value: task.detencion,
                         field: "detencion" as const,
+                        inverted: true,
                       },
                     ].map((item) => (
                       <div
@@ -649,7 +709,7 @@ export const MatrizRiesgo: React.FC = () => {
                         />
                         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
                           <div
-                            className={`${item.value ? getMetricColor(item.value) : "bg-slate-300"} h-2.5 rounded-full transition-all duration-200`}
+                            className={`${item.value ? getMetricColor(item.value, item.inverted) : "bg-slate-300"} h-2.5 rounded-full transition-all duration-200`}
                             style={{
                               width: `${item.value ? Math.max(0, Math.min(10, item.value)) * 10 : 5}%`,
                             }}
@@ -660,19 +720,19 @@ export const MatrizRiesgo: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-sm font-semibold text-gray-900">
-                          {task.avgRisk || "-"}
+                          {task.npr || "-"}
                         </span>
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${riskLabel.color}`}
                         >
-                          {task.avgRisk ? riskLabel.label : "Sin datos"}
+                          {task.npr ? riskLabel.label : "Sin datos"}
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-slate-100">
                         <div
-                          className={`h-2 rounded-full ${getMetricColor(task.avgRisk)}`}
+                          className={`h-2 rounded-full ${getNprColor(task.npr)}`}
                           style={{
-                            width: `${task.avgRisk ? task.avgRisk * 10 : 0}%`,
+                            width: `${task.npr ? Math.min(100, (task.npr / MAX_NPR) * 100) : 0}%`,
                           }}
                         />
                       </div>
@@ -708,9 +768,9 @@ export const MatrizRiesgo: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <span>Riesgo global</span>
+                  <span>NPR promedio</span>
                   <span className="font-semibold text-gray-900">
-                    {avgRiskGlobal}
+                    {nprGlobal}
                   </span>
                 </div>
               </div>
