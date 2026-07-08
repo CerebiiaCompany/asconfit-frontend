@@ -49,7 +49,32 @@ export interface UserProfile {
   especialidad_otros?: boolean;
 }
 
+export interface CreateDelegadoData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  role_id?: number;
+}
+
 export const userService = {
+  /**
+   * Crea un usuario delegado usando el endpoint público POST /register.
+   *
+   * IMPORTANTE: la respuesta incluye un access_token del NUEVO usuario. NO lo
+   * almacenamos deliberadamente para no reemplazar la sesión del admin que
+   * está creando el delegado desde el panel de administración.
+   */
+  async createDelegado(data: CreateDelegadoData): Promise<User> {
+    const response = await axios.post(`${API_URL}/register`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    return response.data.user;
+  },
+
   async getAllUsers(): Promise<User[]> {
     const response = await axios.get(`${API_URL}/users`, {
       headers: getAuthHeader(),

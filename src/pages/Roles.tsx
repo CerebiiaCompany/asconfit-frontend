@@ -10,8 +10,9 @@ import { useToast } from "../contexts/ToastContext";
 import { RoleForm } from "../components/Roles/RoleForm";
 import { RoleList } from "../components/Roles/RoleList";
 import { UserRoleAssignment } from "../components/Users/UserRoleAssignment";
+import { DelegadoForm } from "../components/Users/DelegadoForm";
 import { Modal } from "../components/Modal";
-import { authService } from "../services/authService";
+import { getRoleName } from "../types/role";
 
 export const Roles: React.FC = () => {
   const navigate = useNavigate();
@@ -41,7 +42,20 @@ export const Roles: React.FC = () => {
   } = useConfirmModal();
   const { activeTab, setActiveTab } = useTabs("users");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDelegadoForm, setShowDelegadoForm] = useState(false);
   const { addToast } = useToast();
+
+  const delegadoRole = roles.find(
+    (role) => getRoleName(role).toLowerCase() === "delegado",
+  );
+  const delegadoRoleId = delegadoRole?.id
+    ? Number(delegadoRole.id)
+    : undefined;
+
+  const handleDelegadoCreated = useCallback(async () => {
+    setShowDelegadoForm(false);
+    await loadUsers();
+  }, [loadUsers]);
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -153,9 +167,30 @@ export const Roles: React.FC = () => {
           {/* Users Tab */}
           {activeTab === "users" && (
             <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Usuarios
-              </h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Usuarios
+                </h3>
+                <button
+                  onClick={() => setShowDelegadoForm(true)}
+                  className="inline-flex items-center gap-2 bg-primary-orange text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Agregar Delegado
+                </button>
+              </div>
               <UserRoleAssignment
                 users={users}
                 roles={roles}
@@ -211,6 +246,19 @@ export const Roles: React.FC = () => {
         confirmText={confirmText}
         onConfirm={handleConfirm}
       />
+
+      {/* Create Delegado Modal */}
+      <Modal
+        isOpen={showDelegadoForm}
+        onClose={() => setShowDelegadoForm(false)}
+        title="Agregar Delegado"
+      >
+        <DelegadoForm
+          roleId={delegadoRoleId}
+          onClose={() => setShowDelegadoForm(false)}
+          onSuccess={handleDelegadoCreated}
+        />
+      </Modal>
     </div>
   );
 };
