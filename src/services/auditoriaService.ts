@@ -178,11 +178,17 @@ export const auditoriaService = {
     return response.data;
   },
 
-  async getOverdueStats(): Promise<any> {
+  async getOverdueStats(params?: {
+    empresa_id?: number;
+    delegado_id?: number;
+    fecha_desde?: string;
+    fecha_hasta?: string;
+  }): Promise<any> {
     const response = await axios.get(
       `${API_URL}/auditorias/estadisticas-atrasos`,
       {
         headers: getAuthHeader(),
+        params,
       },
     );
     return response.data;
@@ -198,10 +204,15 @@ export const auditoriaService = {
     return response.data;
   },
 
-  async getCumplimientoStats(): Promise<any> {
+  async getCumplimientoStats(params?: {
+    empresa_id?: number;
+    delegado_id?: number;
+    fecha_desde?: string;
+    fecha_hasta?: string;
+  }): Promise<any> {
     const response = await axios.get(
       `${API_URL}/auditorias/estadisticas-cumplimiento`,
-      { headers: getAuthHeader() },
+      { headers: getAuthHeader(), params },
     );
     return response.data;
   },

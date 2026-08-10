@@ -47,10 +47,23 @@ export const findingService = {
     delete: (auditoriaId: number, id: number) =>
         api.delete<{ message: string }>(`/auditorias/${auditoriaId}/findings/${id}`),
 
-    getStats: () =>
-        api.get<{
+    getStats: (params?: {
+        empresa_id?: number;
+        delegado_id?: number;
+        fecha_desde?: string;
+        fecha_hasta?: string;
+    }) => {
+        const query = params
+            ? "?" + new URLSearchParams(
+                Object.entries(params)
+                    .filter(([, v]) => v !== undefined && v !== "")
+                    .map(([k, v]) => [k, String(v)])
+            ).toString()
+            : "";
+        return api.get<{
             this_month: number;
             by_severity: { critico: number; grave: number; leve: number };
             total: number;
-        }>(`/findings/estadisticas`),
+        }>(`/findings/estadisticas${query}`);
+    },
 };

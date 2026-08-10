@@ -15,6 +15,7 @@ import {
     Legend,
 } from "recharts";
 import { auditoriaService } from "../../services/auditoriaService";
+import { DashboardFilter } from "../../hooks/useDashboardFilters";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 interface GlobalStats {
@@ -129,17 +130,18 @@ const BarTooltip: React.FC<any> = ({ active, payload, label }) => {
 };
 
 // ─── Componente principal ─────────────────────────────────────────────────────
-export const CumplimientoStats: React.FC = () => {
+export const CumplimientoStats: React.FC<{ filters?: DashboardFilter }> = ({ filters = {} }) => {
     const [data, setData] = useState<CumplimientoData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true);
         auditoriaService
-            .getCumplimientoStats()
+            .getCumplimientoStats(filters)
             .then(setData)
             .catch(console.error)
             .finally(() => setLoading(false));
-    }, []);
+    }, [filters.empresa_id, filters.delegado_id, filters.fecha_desde, filters.fecha_hasta]);
 
     if (loading) {
         return (
