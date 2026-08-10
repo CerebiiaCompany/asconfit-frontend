@@ -16,16 +16,10 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/dashboard.png",
   },
   {
-    id: "empresas",
-    path: "/empresas/ver",
-    label: "Encargos",
-    icon: "/building.png",
-  },
-  {
-    id: "roles",
-    path: "/roles",
-    label: "Administración",
-    icon: "/adminstracion.png",
+    id: "auditorias",
+    path: "/auditorias",
+    label: "Auditorias",
+    icon: "/Search.png",
   },
   {
     id: "mis-tareas",
@@ -34,10 +28,10 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/mytask.png",
   },
   {
-    id: "auditorias",
-    path: "/auditorias",
-    label: "Auditorias",
-    icon: "/Search.png",
+    id: "empresas",
+    path: "/empresas/ver",
+    label: "Encargos",
+    icon: "/building.png",
   },
   {
     id: "hallazgos",
@@ -50,6 +44,12 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     path: "/ai-analysis",
     label: "Análisis IA",
     icon: "/ai-analysis.png",
+  },
+  {
+    id: "roles",
+    path: "/roles",
+    label: "Administración",
+    icon: "/adminstracion.png",
   },
   {
     id: "papelera",
