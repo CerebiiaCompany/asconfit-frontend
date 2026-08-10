@@ -12,7 +12,7 @@ import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/
 import { FormActions } from "../../components/auditorias/auditorias-nueva/FormActions";
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaForm } from "../../hooks/useAuditoriaForm";
-import { useAuditoriaValidation } from "../../hooks/useAuditoriaValidation";
+import { useAuditoriaValidation, AuditoriaErrors } from "../../hooks/useAuditoriaValidation";
 import { auditoriaService } from "../../services/auditoriaService";
 
 export const NuevaAuditoria: React.FC = () => {
@@ -21,6 +21,7 @@ export const NuevaAuditoria: React.FC = () => {
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const [searchConcepto, setSearchConcepto] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<AuditoriaErrors>({});
   const [modal, setModal] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -49,7 +50,39 @@ export const NuevaAuditoria: React.FC = () => {
     handleLoadPlantilla,
   } = useAuditoriaForm();
 
+  const { validateForm } = useAuditoriaValidation();
+
+  // Limpia el error del campo cuando el usuario lo modifica
+  const handleInputChangeWithClear = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name } = e.target;
+    if (fieldErrors[name as keyof AuditoriaErrors]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[name as keyof AuditoriaErrors];
+        return next;
+      });
+    }
+    handleInputChange(e);
+  };
+
+  const handleDelegateChangeWithClear = (index: number, value: number | null) => {
+    if (index === 0 && fieldErrors.delegado0) {
+      setFieldErrors((prev) => { const n = { ...prev }; delete n.delegado0; return n; });
+    }
+    handleDelegateChange(index, value);
+  };
+
   const handleSelectEmpresa = (empresa: any) => {
+    // Al seleccionar empresa, limpiar errores de todos los campos de empresa
+    setFieldErrors((prev) => {
+      const n = { ...prev };
+      delete n.empresa; delete n.nit; delete n.razonSocial;
+      delete n.direccion; delete n.responsable; delete n.actividadEconomica;
+      delete n.contacto;
+      return n;
+    });
     setFormData((prev) => ({
       ...prev,
       empresa: empresa.razon_social || "",
@@ -63,18 +96,37 @@ export const NuevaAuditoria: React.FC = () => {
     }));
   };
 
-  const { validateForm } = useAuditoriaValidation();
-
   const handleSubmit = async () => {
-    // Validar formulario
     const validation = validateForm(formData, categorias, delegados);
+
+    // Siempre actualizar errores de campo (incluso si hay error de categoría)
+    setFieldErrors(validation.errors);
+
     if (!validation.isValid) {
-      setModal({
-        isOpen: true,
-        type: "error",
-        title: "Campos incompletos",
-        message: validation.message,
-      });
+      // Si hay errores en campos básicos, hacer scroll al primero visible
+      const hasFieldErrors = Object.keys(validation.errors).length > 0;
+      if (hasFieldErrors) {
+        // Scroll suave hacia arriba para que el usuario vea los campos en rojo
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // Si el error es de categoría/subtarea, mostrar modal
+      if (validation.modalMessage) {
+        setModal({
+          isOpen: true,
+          type: "error",
+          title: "Campos incompletos",
+          message: validation.modalMessage,
+        });
+      } else {
+        // Error sólo de campos, mostrar toast breve en modal
+        setModal({
+          isOpen: true,
+          type: "error",
+          title: "Campos incompletos",
+          message: "Completa todos los campos obligatorios marcados en rojo antes de continuar.",
+        });
+      }
       return;
     }
 
@@ -88,6 +140,7 @@ export const NuevaAuditoria: React.FC = () => {
       };
 
       await auditoriaService.createAuditoria(auditoriaData);
+      setFieldErrors({});
       setModal({
         isOpen: true,
         type: "success",
@@ -137,25 +190,40 @@ export const NuevaAuditoria: React.FC = () => {
         <div className="bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8">
           <EmpresaSection
             formData={formData}
-            onInputChange={handleInputChange}
+            onInputChange={handleInputChangeWithClear}
+            errors={fieldErrors}
           />
 
-          <PTSection value={formData.pt} onChange={handleInputChange} />
+          <PTSection
+            value={formData.pt}
+            onChange={handleInputChangeWithClear}
+          />
 
           <TipoAuditoriaSection
             value={formData.tipoAuditoria}
-            onChange={handleInputChange}
+            onChange={handleInputChangeWithClear}
+            errors={fieldErrors}
           />
 
           <FechasSection
             fechaInicial={formData.fechaInicial}
             fechaCorte={formData.fechaCorte}
-            onInputChange={handleInputChange}
+            onInputChange={handleInputChangeWithClear}
+            onFechaInicialChange={(val) => {
+              setFieldErrors((prev) => { const n = { ...prev }; delete n.fechaInicial; return n; });
+              handleInputChange({ target: { name: "fechaInicial", value: val } } as any);
+            }}
+            onFechaCorteChange={(val) => {
+              setFieldErrors((prev) => { const n = { ...prev }; delete n.fechaCorte; return n; });
+              handleInputChange({ target: { name: "fechaCorte", value: val } } as any);
+            }}
+            errors={fieldErrors}
           />
 
           <DelegadosSection
             selectedDelegados={delegados}
-            onDelegateChange={handleDelegateChange}
+            onDelegateChange={handleDelegateChangeWithClear}
+            errors={fieldErrors}
           />
 
           <CategoriasSection
