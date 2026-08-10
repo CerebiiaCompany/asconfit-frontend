@@ -8,6 +8,7 @@ import { FounderBanner } from './VideoPlayerCard';
 import { OverdueStats } from './OverdueStats';
 import { FindingsStats } from './FindingsStats';
 import { ProductivityStats } from './ProductivityStats';
+import { CumplimientoStats } from './CumplimientoStats';
 
 interface HomeViewProps {
     user: User | null;
@@ -22,9 +23,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ user }) => {
                 {/* Row 1 */}
                 <ActivitySchedule />
                 <OverdueStats />
-                {/* Row 2 */}
+                {/* Row 2: Cumplimiento ocupa las 2 columnas */}
+                <CumplimientoStats />
+                {/* Row 3 */}
                 <FindingsStats />
-                 {/* Row 1 
+                {/* Row 1 
                 <ProductivityStats />
                
                 <AnnouncementUploader />

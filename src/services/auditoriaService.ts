@@ -197,4 +197,12 @@ export const auditoriaService = {
     );
     return response.data;
   },
+
+  async getCumplimientoStats(): Promise<any> {
+    const response = await axios.get(
+      `${API_URL}/auditorias/estadisticas-cumplimiento`,
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
 };
