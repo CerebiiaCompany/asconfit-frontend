@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auditoria } from "../../../types/auditoria";
+import { CronogramaAuditoria } from "./CronogramaAuditoria";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface AuditoriaCardProps {
   auditoria: Auditoria;
@@ -16,6 +18,12 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
   onRiskMatrix,
 }) => {
   const navigate = useNavigate();
+  const [showCronograma, setShowCronograma] = useState(false);
+
+  // ¿tiene subtareas con fechas?
+  const hasTasks = auditoria.categorias?.some((cat) =>
+    cat.subtareas?.some((s) => s.fecha_solicitud || s.tiempo_entrega),
+  );
   // Formatear fecha
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "Planeación";
@@ -376,18 +384,9 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
               className="border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               title="Mover a papelera"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
           )}
@@ -395,52 +394,57 @@ export const AuditoriaCard: React.FC<AuditoriaCardProps> = ({
             <button
               onClick={() => onRiskMatrix(auditoria.id)}
               className="bg-orange-50 border border-orange-300 text-orange-700 hover:bg-orange-100 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-              title="Abrir matriz de riesgo"
             >
               Matriz de riesgo
             </button>
           )}
           <button
-            onClick={() =>
-              navigate(`/auditorias/${auditoria.id}/informe-preliminar`)
-            }
+            onClick={() => navigate(`/auditorias/${auditoria.id}/informe-preliminar`)}
             className="bg-gray-50 border-2 border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Crear Informe
           </button>
+          {hasTasks && (
+            <button
+              onClick={() => setShowCronograma((p) => !p)}
+              className="bg-sky-50 border border-sky-300 text-sky-700 hover:bg-sky-100 px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              {showCronograma ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+              Cronograma
+            </button>
+          )}
           <button
             onClick={() => onViewComplete(auditoria.id)}
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
           >
             Ver auditoría
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
+
+        {/* Cronograma expandible */}
+        {showCronograma && hasTasks && (
+          <div className="mt-4 border-t border-gray-100 pt-3">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <svg className="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm font-semibold text-gray-700">Cronograma de trabajo</span>
+              <span className="text-xs text-gray-400 ml-auto">
+                {auditoria.tipo_auditoria ?? "Auditoría"} ·{" "}
+                {auditoria.empresa?.razon_social ?? auditoria.razon_social}
+              </span>
+            </div>
+            <CronogramaAuditoria auditoria={auditoria} />
+          </div>
+        )}
       </div>
     </div>
   );
