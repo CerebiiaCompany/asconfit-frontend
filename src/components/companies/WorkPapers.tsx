@@ -12,8 +12,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-// Carga el PDF como blob para evitar problemas de CORS con el worker de pdf.js
-function usePdfBlob(url: string) {
+// El endpoint de documentos requiere autenticación (Bearer token), así que no
+// se puede usar directo en <a href>, <img src> ni <iframe src> — el navegador
+// no manda el header en esos casos. Se descarga con fetch (sí lleva el token)
+// y se muestra como blob: URL.
+function useAuthedBlobUrl(url: string) {
   const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
   React.useEffect(() => {
     let objectUrl: string;
@@ -31,7 +34,7 @@ function usePdfBlob(url: string) {
 }
 
 function PdfPreview({ url }: { url: string }) {
-  const blobUrl = usePdfBlob(url);
+  const blobUrl = useAuthedBlobUrl(url);
   if (!blobUrl) return <div className="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400"><FileText className="w-8 h-8" /><span className="text-xs">PDF</span></div>;
   return (
     <Document
@@ -42,6 +45,12 @@ function PdfPreview({ url }: { url: string }) {
       <Page pageNumber={1} width={200} renderTextLayer={false} renderAnnotationLayer={false} />
     </Document>
   );
+}
+
+function ImagePreview({ url, alt }: { url: string; alt: string }) {
+  const blobUrl = useAuthedBlobUrl(url);
+  if (!blobUrl) return <div className="flex items-center justify-center w-full h-full text-gray-300 text-xs">Cargando...</div>;
+  return <img src={blobUrl} alt={alt} className="w-full h-full object-cover" />;
 }
 
 interface WorkPapersProps {
@@ -267,6 +276,28 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
     setDocToDelete(docId);
   };
 
+  // El endpoint de documentos requiere autenticación, así que no se puede
+  // abrir con un <a target="_blank"> normal (el navegador no manda el
+  // token). Se abre una pestaña en blanco de inmediato (para no chocar con
+  // el bloqueador de pop-ups) y se redirige al blob ya descargado con fetch.
+  const handleViewDocument = async (doc: Documento, e: React.MouseEvent) => {
+    e.preventDefault();
+    const newTab = window.open('', '_blank');
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(doc.url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('No se pudo obtener el documento');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      if (newTab) newTab.location.href = blobUrl;
+    } catch {
+      newTab?.close();
+      addToast('No se pudo abrir el documento', 'error');
+    }
+  };
+
   const confirmDelete = async () => {
     if (!docToDelete) return;
     try {
@@ -421,16 +452,16 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
 
           {/* Documentos */}
           {filteredDocs.map((doc) => (
-            <a
+            <div
               key={doc.id}
-              href={doc.storageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col h-56 group relative"
+              role="button"
+              tabIndex={0}
+              onClick={(e) => handleViewDocument(doc, e)}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col h-56 group relative cursor-pointer"
             >
               <div className="flex-1 bg-white border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.06)] rounded-sm mb-4 flex items-center justify-center relative hover:bg-gray-50 transition-colors cursor-pointer mx-2 mt-2 group-hover:bg-orange-50 overflow-hidden">
                 {['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(doc.extension.toLowerCase()) ? (
-                  <img src={doc.storageUrl} alt={doc.nombre_original} className="w-full h-full object-cover" />
+                  <ImagePreview url={doc.storageUrl} alt={doc.nombre_original} />
                 ) : doc.extension.toLowerCase() === 'pdf' ? (
                   <PdfPreview url={doc.url} />
                 ) : (
@@ -462,7 +493,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
                   )}
                 </div>
               </div>
-            </a>
+            </div>
           ))}
 
           {/* Empty state */}
