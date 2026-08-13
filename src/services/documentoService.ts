@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
-const BASE_URL = API_URL.replace(/\/api\/?$/, '');
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('auth_token');
@@ -84,7 +83,7 @@ export const documentoService = {
         return response.data.map((doc: Documento) => ({
             ...doc,
             url: `${API_URL}/documentos/${doc.id}/file`,
-            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
+            storageUrl: `${API_URL}/documentos/${doc.id}/file`,
         }));
     },
 
@@ -104,7 +103,7 @@ export const documentoService = {
         return {
             ...doc,
             url: `${API_URL}/documentos/${doc.id}/file`,
-            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
+            storageUrl: `${API_URL}/documentos/${doc.id}/file`,
         };
     },
 
@@ -118,7 +117,7 @@ export const documentoService = {
         return response.data.map((doc: Documento) => ({
             ...doc,
             url: `${API_URL}/documentos/${doc.id}/file`,
-            storageUrl: BASE_URL + '/storage/' + doc.ruta_archivo,
+            storageUrl: `${API_URL}/documentos/${doc.id}/file`,
         }));
     },
 
