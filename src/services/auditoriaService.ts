@@ -216,4 +216,13 @@ export const auditoriaService = {
     );
     return response.data;
   },
+
+  async updateSubtareaNombre(subtareaId: number, nombre: string): Promise<{ message: string; subtarea: { id: number; nombre: string } }> {
+    const response = await axios.patch(
+      `${API_URL}/auditorias/subtareas/${subtareaId}/nombre`,
+      { nombre },
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
 };

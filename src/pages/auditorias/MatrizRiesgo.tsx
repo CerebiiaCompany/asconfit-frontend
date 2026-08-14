@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auditoriaService } from "../../services/auditoriaService";
 import { useToast } from "../../contexts/ToastContext";
@@ -103,6 +103,43 @@ export const MatrizRiesgo: React.FC = () => {
   const [savingAll, setSavingAll] = useState(false);
   const [savingIds, setSavingIds] = useState<number[]>([]);
   const [subtareas, setSubtareas] = useState<SubtareaRiskState[]>([]);
+
+  // ── edición inline del nombre de subtarea ─────────────────────────────────
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingNombre, setEditingNombre] = useState("");
+  const [savingNombre, setSavingNombre] = useState(false);
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingId !== null) editInputRef.current?.focus();
+  }, [editingId]);
+
+  const startEditNombre = useCallback((task: SubtareaRiskState) => {
+    setEditingId(task.id);
+    setEditingNombre(task.nombre);
+  }, []);
+
+  const cancelEditNombre = useCallback(() => {
+    setEditingId(null);
+    setEditingNombre("");
+  }, []);
+
+  const saveEditNombre = useCallback(async (taskId: number) => {
+    const trimmed = editingNombre.trim();
+    if (!trimmed) { cancelEditNombre(); return; }
+    setSavingNombre(true);
+    try {
+      await auditoriaService.updateSubtareaNombre(taskId, trimmed);
+      setSubtareas(prev =>
+        prev.map(t => t.id === taskId ? { ...t, nombre: trimmed } : t)
+      );
+      setEditingId(null);
+    } catch {
+      // mantener el valor original si falla
+    } finally {
+      setSavingNombre(false);
+    }
+  }, [editingNombre, cancelEditNombre]);
 
   useEffect(() => {
     const fetchAuditoria = async () => {
@@ -295,17 +332,17 @@ export const MatrizRiesgo: React.FC = () => {
         current.map((item) =>
           item.id === subtareaId
             ? {
-                ...item,
-                gravedad: updated.gravedad_riesgo,
-                probabilidad: updated.probabilidad_riesgo,
-                detencion: updated.detencion_riesgo,
-                npr,
-                nivel: updated.nivel_riesgo ?? getRiskLabel(npr).label,
-                hasRisk: true,
-                originalGravedad: updated.gravedad_riesgo,
-                originalProbabilidad: updated.probabilidad_riesgo,
-                originalDetencion: updated.detencion_riesgo,
-              }
+              ...item,
+              gravedad: updated.gravedad_riesgo,
+              probabilidad: updated.probabilidad_riesgo,
+              detencion: updated.detencion_riesgo,
+              npr,
+              nivel: updated.nivel_riesgo ?? getRiskLabel(npr).label,
+              hasRisk: true,
+              originalGravedad: updated.gravedad_riesgo,
+              originalProbabilidad: updated.probabilidad_riesgo,
+              originalDetencion: updated.detencion_riesgo,
+            }
             : item,
         ),
       );
@@ -605,17 +642,66 @@ export const MatrizRiesgo: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center justify-between gap-4">
                         <p className="font-semibold text-gray-900">
-                          {task.nombre}
+                          {editingId === task.id ? (
+                            /* ── modo edición ── */
+                            <span className="flex items-center gap-2">
+                              <input
+                                ref={editInputRef}
+                                type="text"
+                                value={editingNombre}
+                                onChange={e => setEditingNombre(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === "Enter") { e.preventDefault(); saveEditNombre(task.id); }
+                                  if (e.key === "Escape") { cancelEditNombre(); }
+                                }}
+                                disabled={savingNombre}
+                                className="flex-1 rounded-lg border border-orange-400 bg-white px-2 py-1 text-sm font-semibold text-gray-900 outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => saveEditNombre(task.id)}
+                                disabled={savingNombre || !editingNombre.trim()}
+                                className="rounded-full bg-orange-500 hover:bg-orange-600 text-white p-1 transition disabled:opacity-40"
+                                title="Guardar nombre"
+                              >
+                                {savingNombre
+                                  ? <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                                  : <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                }
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditNombre}
+                                disabled={savingNombre}
+                                className="rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 p-1 transition disabled:opacity-40"
+                                title="Cancelar"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                              </button>
+                            </span>
+                          ) : (
+                            /* ── modo lectura ── */
+                            <span className="flex items-center gap-1.5 group">
+                              <span>{task.nombre}</span>
+                              <button
+                                type="button"
+                                onClick={() => startEditNombre(task)}
+                                className="opacity-0 group-hover:opacity-100 rounded p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all"
+                                title="Editar nombre"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>
+                              </button>
+                            </span>
+                          )}
                         </p>
                         <div className="flex items-center gap-2">
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                              taskSaved
-                                ? "bg-emerald-100 text-emerald-700"
-                                : hasChanges
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-slate-100 text-slate-700"
-                            }`}
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${taskSaved
+                              ? "bg-emerald-100 text-emerald-700"
+                              : hasChanges
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-slate-100 text-slate-700"
+                              }`}
                           >
                             {taskSaved
                               ? "Guardado"
@@ -640,13 +726,12 @@ export const MatrizRiesgo: React.FC = () => {
                     </div>
                     <div className="hidden sm:flex items-center justify-center">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                          task.prioridad === "alta"
-                            ? "bg-red-100 text-red-700"
-                            : task.prioridad === "media"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-emerald-100 text-emerald-700"
-                        }`}
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${task.prioridad === "alta"
+                          ? "bg-red-100 text-red-700"
+                          : task.prioridad === "media"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-emerald-100 text-emerald-700"
+                          }`}
                       >
                         {task.prioridad || "N/A"}
                       </span>
