@@ -204,6 +204,55 @@ export const auditoriaService = {
     return response.data;
   },
 
+  async updateSubtareaNombre(subtareaId: number, nombre: string): Promise<{ message: string; subtarea: { id: number; nombre: string } }> {
+    const response = await axios.patch(
+      `${API_URL}/auditorias/subtareas/${subtareaId}/nombre`,
+      { nombre },
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
+
+  async getRiesgoItems(subtareaId: number): Promise<any[]> {
+    const response = await axios.get(
+      `${API_URL}/auditorias/subtareas/${subtareaId}/riesgo-items`,
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
+
+  async createRiesgoItem(subtareaId: number, data: {
+    nombre: string; prioridad?: string;
+    gravedad_riesgo?: number; probabilidad_riesgo?: number; detencion_riesgo?: number;
+  }): Promise<{ message: string; item: any }> {
+    const response = await axios.post(
+      `${API_URL}/auditorias/subtareas/${subtareaId}/riesgo-items`,
+      data,
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
+
+  async updateRiesgoItem(itemId: number, data: {
+    nombre?: string; prioridad?: string;
+    gravedad_riesgo?: number; probabilidad_riesgo?: number; detencion_riesgo?: number;
+  }): Promise<{ message: string; item: any }> {
+    const response = await axios.put(
+      `${API_URL}/auditorias/subtareas/riesgo-items/${itemId}`,
+      data,
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
+
+  async deleteRiesgoItem(itemId: number): Promise<{ message: string }> {
+    const response = await axios.delete(
+      `${API_URL}/auditorias/subtareas/riesgo-items/${itemId}`,
+      { headers: getAuthHeader() },
+    );
+    return response.data;
+  },
+
   async getCumplimientoStats(params?: {
     empresa_id?: number;
     delegado_id?: number;
@@ -213,15 +262,6 @@ export const auditoriaService = {
     const response = await axios.get(
       `${API_URL}/auditorias/estadisticas-cumplimiento`,
       { headers: getAuthHeader(), params },
-    );
-    return response.data;
-  },
-
-  async updateSubtareaNombre(subtareaId: number, nombre: string): Promise<{ message: string; subtarea: { id: number; nombre: string } }> {
-    const response = await axios.patch(
-      `${API_URL}/auditorias/subtareas/${subtareaId}/nombre`,
-      { nombre },
-      { headers: getAuthHeader() },
     );
     return response.data;
   },
