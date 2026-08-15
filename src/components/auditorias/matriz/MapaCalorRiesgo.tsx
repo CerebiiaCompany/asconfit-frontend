@@ -2,7 +2,7 @@ import React from "react";
 
 export interface HeatMapTask {
   id: number;
-  numIndex: number; // Número ordinal (1, 2, 3...)
+  numIndex: string | number; // Soporta números simples (1, 2) e índices jerárquicos ("1.1", "1.2")
   nombre: string;
   categoriaNombre?: string;
   gravedad: number; // 1 - 10
@@ -43,16 +43,14 @@ const IMPACTO_LABELS = [
   { level: 5, label: "Catastrófico" },
 ];
 
-// Determina el color de la celda de la matriz 5x5 (y: Probabilidad 1-5, x: Impacto 1-5)
-function getCellStyle(probLevel: number, impLevel: number): { bg: string; border: string; text: string } {
-  // Verde: Riesgo Bajo
+// Determina el color de fondo sólido colorido de las celdas de la matriz 5x5
+function getCellStyle(probLevel: number, impLevel: number) {
   const isGreen =
     (probLevel === 1 && impLevel <= 3) ||
     (probLevel === 2 && impLevel <= 2) ||
     (probLevel === 3 && impLevel === 1) ||
     (probLevel === 4 && impLevel === 1);
 
-  // Rojo: Riesgo Crítico / Muy Alto
   const isRed =
     (probLevel === 5 && impLevel >= 3) ||
     (probLevel === 4 && impLevel >= 4) ||
@@ -61,23 +59,22 @@ function getCellStyle(probLevel: number, impLevel: number): { bg: string; border
 
   if (isGreen) {
     return {
-      bg: "bg-emerald-500/90",
-      border: "border-emerald-600",
+      bg: "bg-emerald-500",
+      border: "border-emerald-600/80",
       text: "text-white",
     };
   }
   if (isRed) {
     return {
-      bg: "bg-red-600/90",
-      border: "border-red-700",
+      bg: "bg-rose-600",
+      border: "border-rose-700/80",
       text: "text-white",
     };
   }
-  // Amarillo / Naranja: Riesgo Moderado - Alto
   return {
-    bg: "bg-amber-400/95",
-    border: "border-amber-500",
-    text: "text-gray-900",
+    bg: "bg-amber-400",
+    border: "border-amber-500/80",
+    text: "text-slate-900",
   };
 }
 
@@ -85,7 +82,6 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
   tasks,
   selectedTaskId,
   onSelectTask,
-  isPrintView = false,
 }) => {
   // Agrupa las tareas por celda (probLevel, impLevel)
   const cellTasksMap = React.useMemo(() => {
@@ -101,52 +97,58 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
   }, [tasks]);
 
   return (
-    <div className={`w-full select-none ${isPrintView ? "p-1" : "p-4 bg-white rounded-3xl border border-gray-200 shadow-sm"}`}>
+    <div className="w-full select-none bg-white p-2">
+      {/* Header del Mapa de Calor */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            Mapa de Calor de Riesgos (5x5)
+          <h3 className="text-xl font-black text-slate-900 tracking-tight">
+            Mapa de Calor de Riesgos (5×5)
           </h3>
-          <p className="text-xs text-gray-500">
-            Distribución visual de tareas según su Probabilidad (Eje Y) e Impacto (Eje X).
+          <p className="text-xs text-slate-500 font-medium">
+            Evaluación gráfica bidimensional: Probabilidad (Eje Vertical) vs. Impacto / Gravedad (Eje Horizontal).
           </p>
         </div>
-        <div className="flex items-center gap-4 text-xs font-medium">
+
+        {/* Leyenda de Colores */}
+        <div className="flex items-center gap-3 border border-slate-200 rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 bg-white">
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded bg-emerald-500 border border-emerald-600 inline-block"></span>
-            <span className="text-gray-600">Bajo</span>
+            <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block shadow-xs"></span>
+            <span>Bajo</span>
           </div>
+          <span className="text-slate-300">•</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded bg-amber-400 border border-amber-500 inline-block"></span>
-            <span className="text-gray-600">Moderado/Alto</span>
+            <span className="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block shadow-xs"></span>
+            <span>Moderado / Alto</span>
           </div>
+          <span className="text-slate-300">•</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded bg-red-600 border border-red-700 inline-block"></span>
-            <span className="text-gray-600">Crítico</span>
+            <span className="w-3.5 h-3.5 rounded-full bg-rose-600 inline-block shadow-xs"></span>
+            <span>Crítico</span>
           </div>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {/* Eje Y: Etiqueta Vertical "Probabilidad" */}
-        <div className="flex items-center justify-center">
-          <div className="bg-gray-900 text-white font-bold text-xs uppercase tracking-widest rounded-xl px-2 py-8 [writing-mode:vertical-lr] rotate-180 flex items-center justify-center shadow-sm">
-            Probabilidad
-          </div>
+      {/* Grilla 5x5 y Ejes */}
+      <div className="flex gap-3 items-stretch">
+        {/* Eje Y: Etiqueta Vertical "PROBABILIDAD" */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl px-2 py-8 flex items-center justify-center">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] [writing-mode:vertical-lr] rotate-180">
+            PROBABILIDAD
+          </span>
         </div>
 
-        <div className="flex-1 flex flex-col gap-1.5">
+        <div className="flex-1 flex flex-col gap-2">
           {/* Matriz 5x5 + Etiquetas del Eje Y */}
-          <div className="grid grid-cols-[110px_1fr] gap-2">
+          <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
             {PROBABILIDAD_LABELS.map(({ level, label }) => (
               <React.Fragment key={level}>
                 {/* Etiqueta del nivel de Probabilidad */}
-                <div className="flex items-center justify-end pr-2 text-xs font-semibold text-gray-700 italic">
+                <div className="text-right pr-3 text-xs font-bold text-slate-700 italic">
                   {label}
                 </div>
 
                 {/* Fila de 5 celdas de Impacto (1 a 5) */}
-                <div className="grid grid-cols-5 gap-1.5">
+                <div className="grid grid-cols-5 gap-2">
                   {IMPACTO_LABELS.map(({ level: impLevel }) => {
                     const key = `${level}-${impLevel}`;
                     const cellTasks = cellTasksMap.get(key) || [];
@@ -155,10 +157,10 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                     return (
                       <div
                         key={key}
-                        className={`min-h-[58px] p-1.5 rounded-xl border ${style.bg} ${style.border} flex flex-wrap items-center justify-center gap-1.5 transition-all relative group shadow-sm`}
+                        className={`min-h-[58px] p-1.5 rounded-2xl ${style.bg} ${style.border} flex flex-wrap items-center justify-center gap-1.5 relative shadow-xs`}
                       >
                         {cellTasks.length === 0 ? (
-                          <span className="text-[10px] text-white/30 font-mono select-none">
+                          <span className={`text-xs select-none font-mono ${style.text} opacity-40`}>
                             -
                           </span>
                         ) : (
@@ -169,11 +171,10 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                                 key={t.id}
                                 type="button"
                                 onClick={() => onSelectTask?.(t.id)}
-                                title={`#${t.numIndex} - ${t.nombre} (G:${t.gravedad}, P:${t.probabilidad})`}
-                                className={`w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 border-2 ${isSelected
-                                    ? "border-white ring-2 ring-orange-500 scale-110 z-10"
-                                    : "border-gray-800"
-                                  }`}
+                                title={`#${t.numIndex} - ${t.nombre}`}
+                                className={`px-1.5 min-w-[28px] h-7 rounded-full bg-white border-2 border-slate-900 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 ${
+                                  isSelected ? "ring-2 ring-orange-500 scale-110" : ""
+                                }`}
                               >
                                 {t.numIndex}
                               </button>
@@ -189,22 +190,24 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
           </div>
 
           {/* Eje X: Etiquetas de Niveles de Impacto */}
-          <div className="grid grid-cols-[110px_1fr] gap-2 mt-1">
+          <div className="grid grid-cols-[100px_1fr] gap-2 mt-1">
             <div></div>
-            <div className="grid grid-cols-5 gap-1.5 text-center">
+            <div className="grid grid-cols-5 gap-2 text-center">
               {IMPACTO_LABELS.map(({ level, label }) => (
-                <div key={level} className="text-[11px] font-bold text-gray-700 italic truncate px-0.5">
+                <div key={level} className="text-[11px] font-bold text-slate-700 italic">
                   {label}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Eje X: Etiqueta Horizontal "Impacto / Gravedad" */}
-          <div className="grid grid-cols-[110px_1fr] gap-2 mt-1">
+          {/* Eje X: Etiqueta Horizontal "IMPACTO / GRAVEDAD" */}
+          <div className="grid grid-cols-[100px_1fr] gap-2 mt-1">
             <div></div>
-            <div className="bg-gray-900 text-white font-bold text-xs uppercase tracking-widest rounded-xl py-1.5 text-center shadow-sm">
-              Impacto / Gravedad
+            <div className="bg-slate-50 border border-slate-200/80 rounded-full py-2 text-center">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
+                IMPACTO / GRAVEDAD
+              </span>
             </div>
           </div>
         </div>

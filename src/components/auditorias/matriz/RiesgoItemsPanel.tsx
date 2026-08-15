@@ -53,9 +53,12 @@ const apiToState = (raw: any): ItemState => {
 };
 
 /* ─── componente ─────────────────────────────────────────────────────────── */
-interface Props { subtareaId: number; }
+interface Props { 
+    subtareaId: number; 
+    onItemsUpdated?: () => void;
+}
 
-export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
+export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId, onItemsUpdated }) => {
     const [items, setItems] = useState<ItemState[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -95,22 +98,24 @@ export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
                 detencion_riesgo: item.d > 0 ? item.d : undefined,
             });
             setItems(prev => prev.map(i => i.id === id ? { ...apiToState(res.item), dirty: false } : i));
+            onItemsUpdated?.();
         } catch (err: any) {
             console.error("Error guardando ítem de riesgo:", err);
         } finally {
             setItems(prev => prev.map(i => i.id === id ? { ...i, saving: false } : i));
         }
-    }, [items]);
+    }, [items, onItemsUpdated]);
 
     /* eliminar ítem */
     const deleteItem = useCallback(async (id: number) => {
         try {
             await auditoriaService.deleteRiesgoItem(id);
             setItems(prev => prev.filter(i => i.id !== id));
+            onItemsUpdated?.();
         } catch (err: any) {
             console.error("Error eliminando ítem:", err);
         }
-    }, []);
+    }, [onItemsUpdated]);
 
     /* agregar nuevo ítem — solo con nombre, G/P/D se editan después */
     const addItem = useCallback(async () => {
@@ -122,13 +127,14 @@ export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
             const res = await auditoriaService.createRiesgoItem(subtareaId, { nombre });
             setItems(prev => [...prev, apiToState(res.item)]);
             setNewNombre("");
+            onItemsUpdated?.();
         } catch (err: any) {
             console.error("Error creando ítem de riesgo:", err);
             setError("No se pudo agregar el ítem: " + (err?.response?.data?.message ?? err?.message ?? "error desconocido"));
         } finally {
             setAdding(false);
         }
-    }, [newNombre, subtareaId]);
+    }, [newNombre, subtareaId, onItemsUpdated]);
 
     /* ── render ── */
     if (loading) {
@@ -143,16 +149,15 @@ export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
     return (
         <div className="mt-3 border-t border-orange-100 pt-3 space-y-3">
             <p className="text-[10px] font-bold uppercase tracking-widest text-orange-500">
-                Ítems de riesgo ({items.length})
+                Sub-Riesgos Específicos ({items.length})
             </p>
 
             {error && (
                 <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
             )}
 
-            {/* lista de ítems existentes */}
             {items.length === 0 && (
-                <p className="text-xs text-gray-400 italic">Sin ítems. Agrega uno abajo.</p>
+                <p className="text-xs text-gray-400 italic">Sin sub-riesgos registrados. Agrega uno abajo.</p>
             )}
 
             {items.map(item => {
@@ -259,7 +264,7 @@ export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
                     value={newNombre}
                     onChange={e => setNewNombre(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addItem(); } }}
-                    placeholder="Nombre del ítem de riesgo…"
+                    placeholder="Nombre del sub-riesgo…"
                     className="flex-1 rounded-lg border border-dashed border-orange-300 bg-white px-3 py-1.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300"
                 />
                 <button
@@ -278,7 +283,7 @@ export const RiesgoItemsPanel: React.FC<Props> = ({ subtareaId }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
                     )}
-                    {adding ? "Agregando…" : "Agregar riesgo"}
+                    {adding ? "Agregando…" : "Agregar sub-riesgo"}
                 </button>
             </div>
         </div>

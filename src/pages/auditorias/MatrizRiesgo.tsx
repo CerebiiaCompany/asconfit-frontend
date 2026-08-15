@@ -15,7 +15,6 @@ const RISK_LABELS = {
   low: { label: "Bajo", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
 };
 
-// NPR máximo posible: 10 × 10 × (11 − 1) = 1000. Se usa para dimensionar barras.
 const MAX_NPR = 1000;
 
 function computeNpr(gravedad: number, probabilidad: number, detencion: number) {
@@ -28,13 +27,6 @@ function getRiskLabel(npr: number) {
   if (npr > 225) return RISK_LABELS.high;
   if (npr > 100) return RISK_LABELS.moderate;
   return RISK_LABELS.low;
-}
-
-function getNprColor(npr: number) {
-  if (npr > 450) return "bg-rose-500";
-  if (npr > 225) return "bg-orange-500";
-  if (npr > 100) return "bg-amber-500";
-  return "bg-emerald-500";
 }
 
 function getMetricColor(value: number, inverted = false) {
@@ -92,6 +84,7 @@ export const MatrizRiesgo: React.FC = () => {
   const [savingAll, setSavingAll] = useState(false);
   const [savingIds, setSavingIds] = useState<number[]>([]);
   const [subtareas, setSubtareas] = useState<SubtareaRiskState[]>([]);
+  const [subRiesgosMap, setSubRiesgosMap] = useState<Map<number, any[]>>(new Map());
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [showHeatMap, setShowHeatMap] = useState(true);
@@ -115,6 +108,23 @@ export const MatrizRiesgo: React.FC = () => {
       next.has(taskId) ? next.delete(taskId) : next.add(taskId);
       return next;
     });
+  }, []);
+
+  const fetchSubRiesgos = useCallback(async (subtareaIds: number[]) => {
+    const map = new Map<number, any[]>();
+    await Promise.all(
+      subtareaIds.map(async (subId) => {
+        try {
+          const items = await auditoriaService.getRiesgoItems(subId);
+          if (items && items.length > 0) {
+            map.set(subId, items);
+          }
+        } catch {
+          // ignore error
+        }
+      })
+    );
+    setSubRiesgosMap(map);
   }, []);
 
   const startEditNombre = useCallback((task: SubtareaRiskState) => {
@@ -153,8 +163,11 @@ export const MatrizRiesgo: React.FC = () => {
         setAuditoria(data);
 
         const flatSubtareas: SubtareaRiskState[] = [];
+        const taskIds: number[] = [];
+
         data.categorias?.forEach((categoria: any) => {
           categoria.subtareas?.forEach((subtarea: Subtarea) => {
+            taskIds.push(subtarea.id);
             const gravedad = subtarea.gravedad_riesgo ?? 0;
             const probabilidad = subtarea.probabilidad_riesgo ?? 0;
             const detencion = subtarea.detencion_riesgo ?? 0;
@@ -181,6 +194,11 @@ export const MatrizRiesgo: React.FC = () => {
         });
 
         setSubtareas(flatSubtareas);
+
+        // Cargar sub-riesgos de las tareas
+        if (taskIds.length > 0) {
+          fetchSubRiesgos(taskIds);
+        }
       } catch (error) {
         console.error(error);
         addToast("No se pudo cargar la auditoría.", "error");
@@ -190,7 +208,7 @@ export const MatrizRiesgo: React.FC = () => {
     };
 
     fetchAuditoria();
-  }, [id, addToast]);
+  }, [id, addToast, fetchSubRiesgos]);
 
   const filteredSubtareas = useMemo(() => {
     let result = subtareas.filter((task) => {
@@ -268,19 +286,51 @@ export const MatrizRiesgo: React.FC = () => {
     task.detencion >= 1 &&
     task.detencion <= 10;
 
+  // Mapea tanto las tareas principales (1, 2...) como sus SUB-RIESGOS (1.1, 1.2...) para el Mapa de Calor 5x5 y Exportación PDF
   const mappedSubtareasForHeatMap: HeatMapTask[] = useMemo(() => {
-    return filteredSubtareas.map((t, idx) => ({
-      id: t.id,
-      numIndex: idx + 1,
-      nombre: t.nombre,
-      categoriaNombre: t.categoriaNombre,
-      gravedad: t.gravedad,
-      probabilidad: t.probabilidad,
-      detencion: t.detencion,
-      npr: t.npr,
-      nivel: t.nivel,
-    }));
-  }, [filteredSubtareas]);
+    const list: HeatMapTask[] = [];
+
+    filteredSubtareas.forEach((t, tIdx) => {
+      const taskNumber = tIdx + 1;
+      const subItems = subRiesgosMap.get(t.id) || [];
+
+      // 1. Tarea Principal (ej: #1, #2)
+      list.push({
+        id: t.id,
+        numIndex: taskNumber,
+        nombre: t.nombre,
+        categoriaNombre: t.categoriaNombre,
+        gravedad: t.gravedad,
+        probabilidad: t.probabilidad,
+        detencion: t.detencion,
+        npr: t.npr,
+        nivel: t.nivel,
+      });
+
+      // 2. Sub-Riesgos Específicos Jerárquicos (ej: #1.1, #1.2)
+      subItems.forEach((subItem, sIdx) => {
+        const g = subItem.gravedad_riesgo ?? subItem.g ?? 0;
+        const p = subItem.probabilidad_riesgo ?? subItem.p ?? 0;
+        const d = subItem.detencion_riesgo ?? subItem.d ?? 0;
+        const npr = subItem.npr ?? computeNpr(g, p, d);
+        const nivel = subItem.nivel_riesgo ?? (npr ? getRiskLabel(npr).label : "Sin datos");
+
+        list.push({
+          id: -(subItem.id + 100000), // ID virtual único
+          numIndex: `${taskNumber}.${sIdx + 1}`,
+          nombre: `Sub-riesgo: ${subItem.nombre}`,
+          categoriaNombre: `${t.categoriaNombre} • ${t.nombre}`,
+          gravedad: g,
+          probabilidad: p,
+          detencion: d,
+          npr,
+          nivel,
+        });
+      });
+    });
+
+    return list;
+  }, [filteredSubtareas, subRiesgosMap]);
 
   const updateSubtareaField = (
     subtareaId: number,
@@ -495,7 +545,7 @@ export const MatrizRiesgo: React.FC = () => {
               Matriz de Evaluación de Riesgos (NPR)
             </h1>
             <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-              El NPR (Número de Prioridad de Riesgo) se calcula como: <strong className="text-slate-700">Gravedad × Probabilidad × (11 − Detección)</strong>.
+              El NPR (Número de Prioridad de Riesgo) se calcula como: <strong className="text-slate-700">Gravedad × Probabilidad × (11 − Detección)</strong>. 
               Valora la gravedad del impacto, la frecuencia estimada y la capacidad de detección oportuna.
             </p>
           </div>
@@ -578,11 +628,11 @@ export const MatrizRiesgo: React.FC = () => {
           </div>
         </div>
 
-        {/* Componente Mapa de Calor 5x5 */}
+        {/* Componente Mapa de Calor 5x5 (Incluye Tareas #1, #2 y Sub-Riesgos #1.1, #1.2) */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              Mapa de Calor de Riesgos (5×5)
+              <span>🔥</span> Mapa de Calor de Riesgos (5×5)
             </h2>
             <button
               type="button"
@@ -597,7 +647,8 @@ export const MatrizRiesgo: React.FC = () => {
             <MapaCalorRiesgo
               tasks={mappedSubtareasForHeatMap}
               onSelectTask={(taskId) => {
-                const elem = document.getElementById(`task-row-${taskId}`);
+                const targetId = taskId < 0 ? subtareas.find(s => (subRiesgosMap.get(s.id) || []).some(item => -(item.id + 100000) === taskId))?.id || taskId : taskId;
+                const elem = document.getElementById(`task-row-${targetId}`);
                 elem?.scrollIntoView({ behavior: "smooth", block: "center" });
               }}
             />
@@ -610,7 +661,7 @@ export const MatrizRiesgo: React.FC = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900">
-                Tareas de Auditoría
+                Tareas de Auditoría y Sub-Riesgos
               </h2>
               <p className="text-xs text-slate-500">
                 Ajusta Gravedad (G), Probabilidad (P) y Detección (D) para recalcular el riesgo automáticamente.
@@ -678,10 +729,10 @@ export const MatrizRiesgo: React.FC = () => {
               </div>
             ) : (
               filteredSubtareas.map((task, idx) => {
-                const riskLabel = getRiskLabel(task.npr);
                 const isSaving = savingIds.includes(task.id);
                 const taskSaved = isTaskSaved(task);
                 const hasChanges = hasTaskChanged(task);
+                const subItemsCount = (subRiesgosMap.get(task.id) || []).length;
 
                 return (
                   <div
@@ -696,7 +747,7 @@ export const MatrizRiesgo: React.FC = () => {
                           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-black shrink-0">
                             {idx + 1}
                           </span>
-
+                          
                           {editingId === task.id ? (
                             <span className="flex items-center gap-2 flex-1">
                               <input
@@ -755,16 +806,17 @@ export const MatrizRiesgo: React.FC = () => {
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={expandedItems.has(task.id) ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
                             </svg>
-                            {expandedItems.has(task.id) ? "Ocultar Sub-riesgos" : "Ver Sub-riesgos"}
+                            {expandedItems.has(task.id) ? "Ocultar Sub-riesgos" : `Sub-riesgos (${subItemsCount})`}
                           </button>
                         </div>
                       </div>
 
                       {/* Columna 2: Prioridad y Estado */}
                       <div className="flex flex-col items-center gap-1.5">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${task.prioridad === "alta" ? "bg-red-100 text-red-700" :
-                            task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
-                          }`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          task.prioridad === "alta" ? "bg-red-100 text-red-700" :
+                          task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                        }`}>
                           {task.prioridad || "Normal"}
                         </span>
                         {hasChanges ? (
@@ -839,7 +891,10 @@ export const MatrizRiesgo: React.FC = () => {
                     {/* Sub-ítems de riesgo expandibles */}
                     {expandedItems.has(task.id) && (
                       <div className="pt-3 border-t border-slate-100">
-                        <RiesgoItemsPanel subtareaId={task.id} />
+                        <RiesgoItemsPanel
+                          subtareaId={task.id}
+                          onItemsUpdated={() => fetchSubRiesgos(subtareas.map(s => s.id))}
+                        />
                       </div>
                     )}
                   </div>
