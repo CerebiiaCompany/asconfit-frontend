@@ -5,6 +5,8 @@ import { useToast } from "../../contexts/ToastContext";
 import { LoadingState } from "../../components/common/LoadingState";
 import { Auditoria, Subtarea } from "../../types/auditoria";
 import { RiesgoItemsPanel } from "../../components/auditorias/matriz/RiesgoItemsPanel";
+import { MapaCalorRiesgo, HeatMapTask } from "../../components/auditorias/matriz/MapaCalorRiesgo";
+import { PdfMatrizRiesgoModal } from "../../components/auditorias/matriz/PdfMatrizRiesgoModal";
 
 const RISK_LABELS = {
   critical: { label: "Crítico", color: "bg-red-100 text-red-800" },
@@ -106,6 +108,8 @@ export const MatrizRiesgo: React.FC = () => {
   const [subtareas, setSubtareas] = useState<SubtareaRiskState[]>([]);
   // ── sub-ítems de riesgo expandidos por subtarea ───────────────────────────
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [showHeatMap, setShowHeatMap] = useState(true);
   const toggleExpand = useCallback((id: number) => {
     setExpandedItems(prev => {
       const next = new Set(prev);
@@ -267,6 +271,20 @@ export const MatrizRiesgo: React.FC = () => {
     () => filteredSubtareas.filter((task) => task.npr > 450).length,
     [filteredSubtareas],
   );
+
+  const mappedSubtareasForHeatMap: HeatMapTask[] = useMemo(() => {
+    return filteredSubtareas.map((t, idx) => ({
+      id: t.id,
+      numIndex: idx + 1,
+      nombre: t.nombre,
+      categoriaNombre: t.categoriaNombre,
+      gravedad: t.gravedad,
+      probabilidad: t.probabilidad,
+      detencion: t.detencion,
+      npr: t.npr,
+      nivel: t.nivel,
+    }));
+  }, [filteredSubtareas]);
 
   const hasTaskChanged = (task: SubtareaRiskState) => {
     return (
@@ -503,12 +521,24 @@ export const MatrizRiesgo: React.FC = () => {
               detectar (mejor).
             </p>
           </div>
-          <button
-            onClick={() => navigate(`/auditorias/${auditoria.id}`)}
-            className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition"
-          >
-            Volver a auditoría
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsPdfModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition hover:shadow-lg"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Exportar PDF
+            </button>
+            <button
+              onClick={() => navigate(`/auditorias/${auditoria.id}`)}
+              className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition"
+            >
+              Volver a auditoría
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-5">
@@ -566,6 +596,32 @@ export const MatrizRiesgo: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Mapa de Calor 5x5 */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+              <span>🔥</span> Mapa de Calor (5x5)
+            </h2>
+            <button
+              type="button"
+              onClick={() => setShowHeatMap((prev) => !prev)}
+              className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition"
+            >
+              {showHeatMap ? "Ocultar Mapa" : "Mostrar Mapa"}
+            </button>
+          </div>
+
+          {showHeatMap && (
+            <MapaCalorRiesgo
+              tasks={mappedSubtareasForHeatMap}
+              onSelectTask={(taskId) => {
+                const elem = document.getElementById(`task-row-${taskId}`);
+                elem?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }}
+            />
+          )}
         </div>
 
         <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -639,7 +695,7 @@ export const MatrizRiesgo: React.FC = () => {
               <div className="text-center">NPR</div>
             </div>
             <div className="divide-y divide-gray-200 bg-white">
-              {filteredSubtareas.map((task) => {
+              {filteredSubtareas.map((task, idx) => {
                 const riskLabel = getRiskLabel(task.npr);
                 const isSaving = savingIds.includes(task.id);
                 const taskSaved = isTaskSaved(task);
@@ -647,6 +703,7 @@ export const MatrizRiesgo: React.FC = () => {
                 return (
                   <React.Fragment key={task.id}>
                     <div
+                      id={`task-row-${task.id}`}
                       className="grid min-w-full gap-0 px-5 py-5 text-sm items-center sm:grid-cols-[3fr_120px_120px_120px_120px_120px]"
                     >
                       <div className="space-y-2">
@@ -691,9 +748,12 @@ export const MatrizRiesgo: React.FC = () => {
                               </span>
                             ) : (
                               /* ── modo lectura ── */
-                              <span className="flex items-center gap-1.5 group">
-                                <span>{task.nombre}</span>
-                                <button
+                            <span className="flex items-center gap-2 group">
+                              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold shrink-0">
+                                {idx + 1}
+                              </span>
+                              <span>{task.nombre}</span>
+                              <button
                                   type="button"
                                   onClick={() => startEditNombre(task)}
                                   className="opacity-0 group-hover:opacity-100 rounded p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all"
@@ -899,6 +959,24 @@ export const MatrizRiesgo: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {auditoria && (
+        <PdfMatrizRiesgoModal
+          isOpen={isPdfModalOpen}
+          onClose={() => setIsPdfModalOpen(false)}
+          auditoria={auditoria}
+          subtareas={mappedSubtareasForHeatMap}
+          stats={{
+            totalTasks,
+            criticalTasks,
+            avgGravedad,
+            avgProbabilidad,
+            avgDetencion,
+            nprGlobal,
+            nprLabel: getRiskLabel(nprGlobal),
+          }}
+        />
+      )}
     </div>
   );
 };
