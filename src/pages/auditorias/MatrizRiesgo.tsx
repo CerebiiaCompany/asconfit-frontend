@@ -602,7 +602,7 @@ export const MatrizRiesgo: React.FC = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
-              <span>🔥</span> Mapa de Calor (5x5)
+              Mapa de Calor (5x5)
             </h2>
             <button
               type="button"
@@ -748,12 +748,12 @@ export const MatrizRiesgo: React.FC = () => {
                               </span>
                             ) : (
                               /* ── modo lectura ── */
-                            <span className="flex items-center gap-2 group">
-                              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold shrink-0">
-                                {idx + 1}
-                              </span>
-                              <span>{task.nombre}</span>
-                              <button
+                              <span className="flex items-center gap-2 group">
+                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold shrink-0">
+                                  {idx + 1}
+                                </span>
+                                <span>{task.nombre}</span>
+                                <button
                                   type="button"
                                   onClick={() => startEditNombre(task)}
                                   className="opacity-0 group-hover:opacity-100 rounded p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all"

@@ -105,7 +105,7 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <span>🔥</span> Mapa de Calor de Riesgos (5x5)
+            Mapa de Calor de Riesgos (5x5)
           </h3>
           <p className="text-xs text-gray-500">
             Distribución visual de tareas según su Probabilidad (Eje Y) e Impacto (Eje X).
@@ -170,11 +170,10 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                                 type="button"
                                 onClick={() => onSelectTask?.(t.id)}
                                 title={`#${t.numIndex} - ${t.nombre} (G:${t.gravedad}, P:${t.probabilidad})`}
-                                className={`w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 border-2 ${
-                                  isSelected
+                                className={`w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 border-2 ${isSelected
                                     ? "border-white ring-2 ring-orange-500 scale-110 z-10"
                                     : "border-gray-800"
-                                }`}
+                                  }`}
                               >
                                 {t.numIndex}
                               </button>
