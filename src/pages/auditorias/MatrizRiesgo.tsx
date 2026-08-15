@@ -9,25 +9,20 @@ import { MapaCalorRiesgo, HeatMapTask } from "../../components/auditorias/matriz
 import { PdfMatrizRiesgoModal } from "../../components/auditorias/matriz/PdfMatrizRiesgoModal";
 
 const RISK_LABELS = {
-  critical: { label: "Crítico", color: "bg-red-100 text-red-800" },
-  high: { label: "Alto", color: "bg-orange-100 text-orange-800" },
-  moderate: { label: "Moderado", color: "bg-amber-100 text-amber-800" },
-  low: { label: "Bajo", color: "bg-emerald-100 text-emerald-800" },
+  critical: { label: "Crítico", color: "bg-rose-100 text-rose-800 border-rose-200" },
+  high: { label: "Alto", color: "bg-orange-100 text-orange-800 border-orange-200" },
+  moderate: { label: "Moderado", color: "bg-amber-100 text-amber-800 border-amber-200" },
+  low: { label: "Bajo", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
 };
 
 // NPR máximo posible: 10 × 10 × (11 − 1) = 1000. Se usa para dimensionar barras.
 const MAX_NPR = 1000;
 
-// NPR = gravedad × probabilidad × (11 − detección).
-// Debe coincidir con el cálculo del backend. La detección está en escala
-// invertida: 1 = difícil de detectar (peor), 10 = fácil de detectar (mejor).
 function computeNpr(gravedad: number, probabilidad: number, detencion: number) {
   if (gravedad < 1 || probabilidad < 1 || detencion < 1) return 0;
   return gravedad * probabilidad * (11 - detencion);
 }
 
-// Rangos alineados con getNivelRiesgo() del backend:
-// Bajo ≤ 100, Moderado ≤ 225, Alto ≤ 450, Crítico > 450.
 function getRiskLabel(npr: number) {
   if (npr > 450) return RISK_LABELS.critical;
   if (npr > 225) return RISK_LABELS.high;
@@ -36,45 +31,36 @@ function getRiskLabel(npr: number) {
 }
 
 function getNprColor(npr: number) {
-  if (npr > 450) return "bg-red-500";
+  if (npr > 450) return "bg-rose-500";
   if (npr > 225) return "bg-orange-500";
   if (npr > 100) return "bg-amber-500";
   return "bg-emerald-500";
 }
 
-// Color para las métricas individuales (1-10). Para la detección la escala se
-// invierte, ya que un valor bajo es peor (más difícil de detectar).
 function getMetricColor(value: number, inverted = false) {
   const effective = inverted ? 11 - value : value;
-  if (effective >= 8) return "bg-red-500";
+  if (effective >= 8) return "bg-rose-500";
   if (effective >= 6) return "bg-amber-500";
   return "bg-emerald-500";
 }
 
 function normalizeRiskValue(value: number) {
-  if (value === 0) {
-    return 0;
-  }
-
-  if (value < 1) {
-    return 1;
-  }
-  if (value > 10) {
-    return 10;
-  }
+  if (value === 0) return 0;
+  if (value < 1) return 1;
+  if (value > 10) return 10;
   return value;
 }
 
 const SORT_OPTIONS = [
   { value: "default", label: "Orden predeterminado" },
-  { value: "gravity", label: "Gravedad" },
-  { value: "probability", label: "Probabilidad" },
-  { value: "detection", label: "Detención" },
-  { value: "risk", label: "NPR (riesgo)" },
+  { value: "gravity", label: "Mayor Gravedad" },
+  { value: "probability", label: "Mayor Probabilidad" },
+  { value: "detection", label: "Dificultad Detección" },
+  { value: "risk", label: "Mayor NPR (Riesgo)" },
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: "all", label: "Todas" },
+  { value: "all", label: "Todas las prioridades" },
   { value: "alta", label: "Alta" },
   { value: "media", label: "Media" },
   { value: "baja", label: "Baja" },
@@ -106,19 +92,14 @@ export const MatrizRiesgo: React.FC = () => {
   const [savingAll, setSavingAll] = useState(false);
   const [savingIds, setSavingIds] = useState<number[]>([]);
   const [subtareas, setSubtareas] = useState<SubtareaRiskState[]>([]);
-  // ── sub-ítems de riesgo expandidos por subtarea ───────────────────────────
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [showHeatMap, setShowHeatMap] = useState(true);
-  const toggleExpand = useCallback((id: number) => {
-    setExpandedItems(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("default");
+  const [priorityFilter, setPriorityFilter] = useState("all");
 
-  // ── edición inline del nombre de subtarea ─────────────────────────────────
+  // Edición inline del nombre
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingNombre, setEditingNombre] = useState("");
   const [savingNombre, setSavingNombre] = useState(false);
@@ -127,6 +108,14 @@ export const MatrizRiesgo: React.FC = () => {
   useEffect(() => {
     if (editingId !== null) editInputRef.current?.focus();
   }, [editingId]);
+
+  const toggleExpand = useCallback((taskId: number) => {
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      next.has(taskId) ? next.delete(taskId) : next.add(taskId);
+      return next;
+    });
+  }, []);
 
   const startEditNombre = useCallback((task: SubtareaRiskState) => {
     setEditingId(task.id);
@@ -147,13 +136,14 @@ export const MatrizRiesgo: React.FC = () => {
       setSubtareas(prev =>
         prev.map(t => t.id === taskId ? { ...t, nombre: trimmed } : t)
       );
+      addToast("Nombre de la tarea actualizado.", "success");
       setEditingId(null);
     } catch {
-      // mantener el valor original si falla
+      addToast("Error al actualizar el nombre.", "error");
     } finally {
       setSavingNombre(false);
     }
-  }, [editingNombre, cancelEditNombre]);
+  }, [editingNombre, cancelEditNombre, addToast]);
 
   useEffect(() => {
     const fetchAuditoria = async () => {
@@ -168,10 +158,7 @@ export const MatrizRiesgo: React.FC = () => {
             const gravedad = subtarea.gravedad_riesgo ?? 0;
             const probabilidad = subtarea.probabilidad_riesgo ?? 0;
             const detencion = subtarea.detencion_riesgo ?? 0;
-            // Preferimos el NPR calculado por el backend; si no viene, lo
-            // reproducimos localmente con la misma fórmula.
-            const npr =
-              subtarea.npr ?? computeNpr(gravedad, probabilidad, detencion);
+            const npr = subtarea.npr ?? computeNpr(gravedad, probabilidad, detencion);
             flatSubtareas.push({
               id: subtarea.id,
               categoriaNombre: categoria.nombre,
@@ -205,72 +192,81 @@ export const MatrizRiesgo: React.FC = () => {
     fetchAuditoria();
   }, [id, addToast]);
 
-  const [sortBy, setSortBy] = useState("default");
-  const [priorityFilter, setPriorityFilter] = useState("all");
-
   const filteredSubtareas = useMemo(() => {
-    const filtered = subtareas.filter((task) => {
-      if (priorityFilter === "all") return true;
-      return task.prioridad === priorityFilter;
+    let result = subtareas.filter((task) => {
+      if (priorityFilter !== "all" && task.prioridad !== priorityFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          task.nombre.toLowerCase().includes(q) ||
+          task.categoriaNombre.toLowerCase().includes(q)
+        );
+      }
+      return true;
     });
 
     if (sortBy === "gravity") {
-      return [...filtered].sort((a, b) => b.gravedad - a.gravedad);
+      result = [...result].sort((a, b) => b.gravedad - a.gravedad);
+    } else if (sortBy === "probability") {
+      result = [...result].sort((a, b) => b.probabilidad - a.probabilidad);
+    } else if (sortBy === "detection") {
+      result = [...result].sort((a, b) => a.detencion - b.detencion);
+    } else if (sortBy === "risk") {
+      result = [...result].sort((a, b) => b.npr - a.npr);
     }
-    if (sortBy === "probability") {
-      return [...filtered].sort((a, b) => b.probabilidad - a.probabilidad);
-    }
-    if (sortBy === "detection") {
-      return [...filtered].sort((a, b) => b.detencion - a.detencion);
-    }
-    if (sortBy === "risk") {
-      return [...filtered].sort((a, b) => b.npr - a.npr);
-    }
-    return filtered;
-  }, [subtareas, priorityFilter, sortBy]);
+
+    return result;
+  }, [subtareas, priorityFilter, searchQuery, sortBy]);
 
   const totalTasks = filteredSubtareas.length;
   const avgGravedad = useMemo(() => {
     if (!totalTasks) return 0;
-    return Number(
-      (
-        filteredSubtareas.reduce((sum, task) => sum + task.gravedad, 0) /
-        totalTasks
-      ).toFixed(1),
-    );
+    return Number((filteredSubtareas.reduce((sum, task) => sum + task.gravedad, 0) / totalTasks).toFixed(1));
   }, [filteredSubtareas, totalTasks]);
 
   const avgProbabilidad = useMemo(() => {
     if (!totalTasks) return 0;
-    return Number(
-      (
-        filteredSubtareas.reduce((sum, task) => sum + task.probabilidad, 0) /
-        totalTasks
-      ).toFixed(1),
-    );
+    return Number((filteredSubtareas.reduce((sum, task) => sum + task.probabilidad, 0) / totalTasks).toFixed(1));
   }, [filteredSubtareas, totalTasks]);
 
   const avgDetencion = useMemo(() => {
     if (!totalTasks) return 0;
-    return Number(
-      (
-        filteredSubtareas.reduce((sum, task) => sum + task.detencion, 0) /
-        totalTasks
-      ).toFixed(1),
-    );
+    return Number((filteredSubtareas.reduce((sum, task) => sum + task.detencion, 0) / totalTasks).toFixed(1));
   }, [filteredSubtareas, totalTasks]);
 
   const nprGlobal = useMemo(() => {
     if (!totalTasks) return 0;
-    return Math.round(
-      filteredSubtareas.reduce((sum, task) => sum + task.npr, 0) / totalTasks,
-    );
+    return Math.round(filteredSubtareas.reduce((sum, task) => sum + task.npr, 0) / totalTasks);
   }, [filteredSubtareas, totalTasks]);
 
   const criticalTasks = useMemo(
     () => filteredSubtareas.filter((task) => task.npr > 450).length,
     [filteredSubtareas],
   );
+
+  const hasTaskChanged = (task: SubtareaRiskState) => {
+    return (
+      task.gravedad !== task.originalGravedad ||
+      task.probabilidad !== task.originalProbabilidad ||
+      task.detencion !== task.originalDetencion
+    );
+  };
+
+  const hasAnyUnsavedChanges = useMemo(
+    () => subtareas.some(hasTaskChanged),
+    [subtareas]
+  );
+
+  const isTaskSaved = (task: SubtareaRiskState) =>
+    task.hasRisk && !hasTaskChanged(task);
+
+  const isValidRiskTask = (task: SubtareaRiskState) =>
+    task.gravedad >= 1 &&
+    task.gravedad <= 10 &&
+    task.probabilidad >= 1 &&
+    task.probabilidad <= 10 &&
+    task.detencion >= 1 &&
+    task.detencion <= 10;
 
   const mappedSubtareasForHeatMap: HeatMapTask[] = useMemo(() => {
     return filteredSubtareas.map((t, idx) => ({
@@ -285,25 +281,6 @@ export const MatrizRiesgo: React.FC = () => {
       nivel: t.nivel,
     }));
   }, [filteredSubtareas]);
-
-  const hasTaskChanged = (task: SubtareaRiskState) => {
-    return (
-      task.gravedad !== task.originalGravedad ||
-      task.probabilidad !== task.originalProbabilidad ||
-      task.detencion !== task.originalDetencion
-    );
-  };
-
-  const isTaskSaved = (task: SubtareaRiskState) =>
-    task.hasRisk && !hasTaskChanged(task);
-
-  const isValidRiskTask = (task: SubtareaRiskState) =>
-    task.gravedad >= 1 &&
-    task.gravedad <= 10 &&
-    task.probabilidad >= 1 &&
-    task.probabilidad <= 10 &&
-    task.detencion >= 1 &&
-    task.detencion <= 10;
 
   const updateSubtareaField = (
     subtareaId: number,
@@ -328,6 +305,14 @@ export const MatrizRiesgo: React.FC = () => {
     );
   };
 
+  const stepFieldValue = (subtareaId: number, field: "gravedad" | "probabilidad" | "detencion", delta: number) => {
+    const task = subtareas.find(t => t.id === subtareaId);
+    if (!task) return;
+    const currentVal = task[field] || 1;
+    const newVal = Math.min(10, Math.max(1, currentVal + delta));
+    updateSubtareaField(subtareaId, field, newVal);
+  };
+
   const handleSaveSubtarea = async (subtareaId: number) => {
     const task = subtareas.find((item) => item.id === subtareaId);
     if (!task) return;
@@ -336,6 +321,7 @@ export const MatrizRiesgo: React.FC = () => {
       addToast("Los valores deben estar entre 1 y 10.", "error");
       return;
     }
+    setSavingIds((current) => [...current, subtareaId]);
     try {
       const response = await auditoriaService.updateSubtareaRiskMatrix(
         subtareaId,
@@ -347,8 +333,6 @@ export const MatrizRiesgo: React.FC = () => {
       );
 
       const updated = response.subtarea;
-      // El backend ya resuelve npr y nivel_riesgo; los usamos como fuente de
-      // verdad y solo hacemos fallback si no vinieran.
       const npr =
         updated.npr ??
         computeNpr(
@@ -375,10 +359,10 @@ export const MatrizRiesgo: React.FC = () => {
         ),
       );
 
-      addToast("Riesgo guardado para la tarea.", "success");
+      addToast("Riesgo guardado.", "success");
     } catch (error) {
       console.error(error);
-      addToast("Error al guardar el riesgo de la tarea.", "error");
+      addToast("Error al guardar el riesgo.", "error");
     } finally {
       setSavingIds((current) => current.filter((id) => id !== subtareaId));
     }
@@ -411,8 +395,6 @@ export const MatrizRiesgo: React.FC = () => {
         ),
       );
 
-      // Sincronizamos el estado con los valores resueltos por el backend
-      // (npr y nivel_riesgo) y marcamos las tareas como guardadas.
       const updatedById = new Map<number, any>();
       responses.forEach((response) => {
         const updated = response?.subtarea;
@@ -450,12 +432,17 @@ export const MatrizRiesgo: React.FC = () => {
       addToast("Matriz guardada correctamente.", "success");
     } catch (error) {
       console.error(error);
-      addToast("Error al guardar las tareas.", "error");
+      addToast("Error al guardar la matriz.", "error");
     } finally {
       setSavingAll(false);
-      setSavingIds([]);
     }
   };
+
+  const nombreEmpresa =
+    auditoria?.empresa?.razon_social ||
+    auditoria?.empresa?.nombre ||
+    auditoria?.razon_social ||
+    "Auditoría";
 
   if (loading) {
     return <LoadingState message="Cargando matriz de riesgo..." />;
@@ -464,8 +451,8 @@ export const MatrizRiesgo: React.FC = () => {
   if (!auditoria) {
     return (
       <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 text-center max-w-xl">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-3">
+        <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-8 text-center max-w-xl">
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
             Auditoría no encontrada
           </h1>
           <p className="text-gray-500 mb-6">
@@ -473,7 +460,7 @@ export const MatrizRiesgo: React.FC = () => {
           </p>
           <button
             onClick={() => navigate("/auditorias")}
-            className="inline-flex items-center justify-center rounded-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 font-semibold shadow-sm transition"
+            className="inline-flex items-center justify-center rounded-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 font-semibold shadow-md transition"
           >
             Volver a auditorías
           </button>
@@ -483,49 +470,41 @@ export const MatrizRiesgo: React.FC = () => {
   }
 
   return (
-    <div className="py-6 px-4 sm:px-6 lg:px-8">
+    <div className="py-6 px-4 sm:px-6 lg:px-8 bg-slate-50/50 min-h-screen">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Navegación Superior */}
         <button
           type="button"
           onClick={() => navigate("/auditorias")}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-orange-600"
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-orange-600 transition-colors uppercase tracking-wider"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
           Volver a auditorías
         </button>
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-medium text-orange-600">
-              Matriz de riesgo por tarea
-            </p>
-            <h1 className="text-3xl font-semibold text-gray-900">
-              Evaluación de riesgo por tarea
+        {/* Tarjeta de Encabezado Principal (Hero Banner) */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="space-y-2 relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 border border-orange-200/80 text-[10px] font-bold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+              {nombreEmpresa}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Matriz de Evaluación de Riesgos (NPR)
             </h1>
-            <p className="mt-2 text-sm text-gray-500 max-w-2xl">
-              Aquí ves el nivel de riesgo (NPR) de cada tarea de la auditoría.
-              El NPR se calcula como gravedad × probabilidad × (11 − detección).
-              En detección, 1 = difícil de detectar (peor) y 10 = fácil de
-              detectar (mejor).
+            <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
+              El NPR (Número de Prioridad de Riesgo) se calcula como: <strong className="text-slate-700">Gravedad × Probabilidad × (11 − Detección)</strong>.
+              Valora la gravedad del impacto, la frecuencia estimada y la capacidad de detección oportuna.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex flex-wrap items-center gap-3 relative z-10">
             <button
               type="button"
               onClick={() => setIsPdfModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition hover:shadow-lg"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/20 transition-all transform active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -533,81 +512,82 @@ export const MatrizRiesgo: React.FC = () => {
               Exportar PDF
             </button>
             <button
-              onClick={() => navigate(`/auditorias/${auditoria.id}`)}
-              className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition"
+              onClick={handleSaveAll}
+              disabled={savingAll}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95"
             >
-              Volver a auditoría
+              {savingAll ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Guardar Todo
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => navigate(`/auditorias/${auditoria.id}`)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold shadow-sm transition"
+            >
+              Ver Auditoría
             </button>
           </div>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-5">
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-              Tareas evaluadas
-            </p>
-            <p className="mt-4 text-3xl font-semibold text-gray-900">
-              {totalTasks}
-            </p>
-            <p className="text-sm text-gray-500">en esta vista</p>
+        {/* Dashboard de Tarjetas KPI */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tareas Evaluadas</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{totalTasks}</p>
+            <p className="text-[11px] text-slate-400 font-medium">en vista actual</p>
           </div>
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-              Riesgo crítico
-            </p>
-            <p className="mt-4 text-3xl font-semibold text-red-700">
-              {criticalTasks}
-            </p>
-            <p className="text-sm text-gray-500">tareas con NPR &gt; 450</p>
+          <div className="bg-white rounded-2xl border border-rose-200/80 p-4 shadow-sm bg-gradient-to-b from-rose-50/30 to-white">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Riesgo Crítico</p>
+            <p className="mt-2 text-2xl font-black text-rose-700">{criticalTasks}</p>
+            <p className="text-[11px] text-rose-500 font-medium">tareas con NPR &gt; 450</p>
           </div>
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-              Gravedad promedio
-            </p>
-            <p className="mt-4 text-3xl font-semibold text-gray-900">
-              {avgGravedad}
-            </p>
-            <p className="text-sm text-gray-500">sobre 10</p>
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Prom. Gravedad</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{avgGravedad} <span className="text-xs font-normal text-slate-400">/10</span></p>
+            <div className="h-1.5 w-full bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className={`h-full ${getMetricColor(avgGravedad)}`} style={{ width: `${avgGravedad * 10}%` }}></div>
+            </div>
           </div>
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-              Probabilidad promedio
-            </p>
-            <p className="mt-4 text-3xl font-semibold text-gray-900">
-              {avgProbabilidad}
-            </p>
-            <p className="text-sm text-gray-500">sobre 10</p>
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Prom. Probabilidad</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{avgProbabilidad} <span className="text-xs font-normal text-slate-400">/10</span></p>
+            <div className="h-1.5 w-full bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className={`h-full ${getMetricColor(avgProbabilidad)}`} style={{ width: `${avgProbabilidad * 10}%` }}></div>
+            </div>
           </div>
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div className="flex items-start justify-between gap-4">
+          <div className="bg-white rounded-2xl border border-orange-200/80 p-4 shadow-sm bg-gradient-to-b from-orange-50/30 to-white">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-gray-500">
-                  NPR promedio
-                </p>
-                <p className="mt-4 text-3xl font-semibold text-gray-900">
-                  {nprGlobal}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {getRiskLabel(nprGlobal).label}
-                </p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-orange-600">NPR Global</p>
+                <p className="mt-2 text-2xl font-black text-orange-950">{nprGlobal}</p>
               </div>
-              <div className="rounded-3xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700">
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${getRiskLabel(nprGlobal).color}`}>
                 {getRiskLabel(nprGlobal).label}
-              </div>
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Mapa de Calor 5x5 */}
+        {/* Componente Mapa de Calor 5x5 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
-              Mapa de Calor (5x5)
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              Mapa de Calor de Riesgos (5×5)
             </h2>
             <button
               type="button"
               onClick={() => setShowHeatMap((prev) => !prev)}
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition"
+              className="text-xs font-bold text-orange-600 hover:text-orange-700 transition"
             >
               {showHeatMap ? "Ocultar Mapa" : "Mostrar Mapa"}
             </button>
@@ -624,341 +604,269 @@ export const MatrizRiesgo: React.FC = () => {
           )}
         </div>
 
-        <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Sección de Tareas y Filtros */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-sm space-y-5">
+          {/* Barra de Búsqueda y Filtros */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-5">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Tareas de auditoría
+              <h2 className="text-lg font-bold text-slate-900">
+                Tareas de Auditoría
               </h2>
-              <p className="text-sm text-gray-500">
-                Filtra y ordena para revisar las tareas con mayor riesgo.
+              <p className="text-xs text-slate-500">
+                Ajusta Gravedad (G), Probabilidad (P) y Detección (D) para recalcular el riesgo automáticamente.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="min-w-[180px]">
-                <label className="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">
-                  Ordenar por
-                </label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Caja de Búsqueda */}
+              <div className="relative min-w-[200px]">
+                <input
+                  type="text"
+                  placeholder="Buscar tarea..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-full border border-gray-300 bg-slate-50 focus:bg-white outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition"
+                />
+                <svg className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </div>
-              <div className="min-w-[160px]">
-                <label className="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">
-                  Prioridad
-                </label>
-                <select
-                  value={priorityFilter}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-                >
-                  {PRIORITY_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+
+              {/* Filtro Prioridad */}
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="rounded-full border border-gray-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 outline-none focus:border-orange-500"
+              >
+                {PRIORITY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Ordenar Por */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="rounded-full border border-gray-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 outline-none focus:border-orange-500"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-3xl border border-gray-200">
-            <div className="grid min-w-full gap-0 bg-orange-500 px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.2em] text-white sm:grid-cols-[3fr_120px_120px_120px_120px_120px]">
-              <div>Tarea de auditoría</div>
-              <div className="hidden sm:block">Prioridad</div>
-              <div className="text-center">
-                Gravedad
-                <br />
-                (1-10)
+          {/* Encabezado de Columnas */}
+          <div className="hidden sm:grid sm:grid-cols-[2.5fr_100px_110px_110px_110px_110px] gap-2 bg-slate-100/80 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider text-slate-500 items-center">
+            <div>Tarea de Auditoría</div>
+            <div className="text-center">Prioridad</div>
+            <div className="text-center" title="Impacto del riesgo (1-10)">Gravedad (G)</div>
+            <div className="text-center" title="Frecuencia (1-10)">Probab. (P)</div>
+            <div className="text-center" title="Facilidad de detección (1=peor, 10=mejor)">Detec. (D)</div>
+            <div className="text-center">NPR / Nivel</div>
+          </div>
+
+          {/* Lista de Filas de Tareas */}
+          <div className="space-y-3">
+            {filteredSubtareas.length === 0 ? (
+              <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-gray-300 text-slate-400 text-xs">
+                No se encontraron tareas coincidiendo con los filtros.
               </div>
-              <div className="text-center">
-                Probabilidad
-                <br />
-                (1-10)
-              </div>
-              <div
-                className="text-center"
-                title="Escala invertida: 1 = difícil de detectar (peor), 10 = fácil de detectar (mejor)"
-              >
-                Detección
-                <br />
-                (1=peor · 10=mejor)
-              </div>
-              <div className="text-center">NPR</div>
-            </div>
-            <div className="divide-y divide-gray-200 bg-white">
-              {filteredSubtareas.map((task, idx) => {
+            ) : (
+              filteredSubtareas.map((task, idx) => {
                 const riskLabel = getRiskLabel(task.npr);
                 const isSaving = savingIds.includes(task.id);
                 const taskSaved = isTaskSaved(task);
                 const hasChanges = hasTaskChanged(task);
+
                 return (
-                  <React.Fragment key={task.id}>
-                    <div
-                      id={`task-row-${task.id}`}
-                      className="grid min-w-full gap-0 px-5 py-5 text-sm items-center sm:grid-cols-[3fr_120px_120px_120px_120px_120px]"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex flex-wrap items-center justify-between gap-4">
-                          <p className="font-semibold text-gray-900">
-                            {editingId === task.id ? (
-                              /* ── modo edición ── */
-                              <span className="flex items-center gap-2">
-                                <input
-                                  ref={editInputRef}
-                                  type="text"
-                                  value={editingNombre}
-                                  onChange={e => setEditingNombre(e.target.value)}
-                                  onKeyDown={e => {
-                                    if (e.key === "Enter") { e.preventDefault(); saveEditNombre(task.id); }
-                                    if (e.key === "Escape") { cancelEditNombre(); }
-                                  }}
-                                  disabled={savingNombre}
-                                  className="flex-1 rounded-lg border border-orange-400 bg-white px-2 py-1 text-sm font-semibold text-gray-900 outline-none focus:ring-2 focus:ring-orange-300 disabled:opacity-60"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => saveEditNombre(task.id)}
-                                  disabled={savingNombre || !editingNombre.trim()}
-                                  className="rounded-full bg-orange-500 hover:bg-orange-600 text-white p-1 transition disabled:opacity-40"
-                                  title="Guardar nombre"
-                                >
-                                  {savingNombre
-                                    ? <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                                    : <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                                  }
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={cancelEditNombre}
-                                  disabled={savingNombre}
-                                  className="rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 p-1 transition disabled:opacity-40"
-                                  title="Cancelar"
-                                >
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
-                              </span>
-                            ) : (
-                              /* ── modo lectura ── */
-                              <span className="flex items-center gap-2 group">
-                                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold shrink-0">
-                                  {idx + 1}
-                                </span>
-                                <span>{task.nombre}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => startEditNombre(task)}
-                                  className="opacity-0 group-hover:opacity-100 rounded p-0.5 text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all"
-                                  title="Editar nombre"
-                                >
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>
-                                </button>
-                              </span>
-                            )}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs font-semibold ${taskSaved
-                                ? "bg-emerald-100 text-emerald-700"
-                                : hasChanges
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-slate-100 text-slate-700"
-                                }`}
-                            >
-                              {taskSaved
-                                ? "Guardado"
-                                : hasChanges
-                                  ? "Con cambios"
-                                  : "Pendiente"}
+                  <div
+                    key={task.id}
+                    id={`task-row-${task.id}`}
+                    className={`rounded-2xl border ${hasChanges ? "border-orange-300 bg-orange-50/20" : "border-slate-200/80 bg-white"} p-4 transition-all shadow-sm hover:shadow-md space-y-3`}
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-[2.5fr_100px_110px_110px_110px_110px] gap-3 items-center">
+                      {/* Columna 1: Nombre de Tarea e Información */}
+                      <div className="space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-black shrink-0">
+                            {idx + 1}
+                          </span>
+
+                          {editingId === task.id ? (
+                            <span className="flex items-center gap-2 flex-1">
+                              <input
+                                ref={editInputRef}
+                                type="text"
+                                value={editingNombre}
+                                onChange={e => setEditingNombre(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === "Enter") { e.preventDefault(); saveEditNombre(task.id); }
+                                  if (e.key === "Escape") cancelEditNombre();
+                                }}
+                                disabled={savingNombre}
+                                className="flex-1 rounded-lg border border-orange-400 bg-white px-2 py-1 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-orange-300"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => saveEditNombre(task.id)}
+                                disabled={savingNombre || !editingNombre.trim()}
+                                className="rounded-full bg-orange-500 text-white p-1 transition hover:bg-orange-600 disabled:opacity-40"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditNombre}
+                                className="rounded-full bg-gray-200 text-gray-600 p-1 transition hover:bg-gray-300"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                              </button>
                             </span>
+                          ) : (
+                            <span className="flex items-center gap-1.5 group font-bold text-slate-900 text-sm">
+                              <span>{task.nombre}</span>
+                              <button
+                                type="button"
+                                onClick={() => startEditNombre(task)}
+                                className="opacity-0 group-hover:opacity-100 rounded p-1 text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-all"
+                                title="Editar nombre"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>
+                              </button>
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="text-[11px] font-medium text-slate-500">
+                            Cat: <span className="font-semibold text-slate-700">{task.categoriaNombre}</span>
+                          </span>
+                          <span className="text-slate-300">•</span>
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(task.id)}
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600 hover:text-orange-700 transition"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={expandedItems.has(task.id) ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                            </svg>
+                            {expandedItems.has(task.id) ? "Ocultar Sub-riesgos" : "Ver Sub-riesgos"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Columna 2: Prioridad y Estado */}
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${task.prioridad === "alta" ? "bg-red-100 text-red-700" :
+                            task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                          }`}>
+                          {task.prioridad || "Normal"}
+                        </span>
+                        {hasChanges ? (
+                          <button
+                            type="button"
+                            onClick={() => handleSaveSubtarea(task.id)}
+                            disabled={isSaving}
+                            className="px-2.5 py-1 rounded-full bg-orange-600 hover:bg-orange-700 text-white text-[10px] font-bold transition shadow-xs"
+                          >
+                            {isSaving ? "Guardando" : "Guardar"}
+                          </button>
+                        ) : taskSaved ? (
+                          <span className="text-[10px] font-bold text-emerald-600">✓ Guardado</span>
+                        ) : null}
+                      </div>
+
+                      {/* Columnas de Métricas: Gravedad (G), Probabilidad (P), Detección (D) */}
+                      {[
+                        { field: "gravedad" as const, label: "G", val: task.gravedad, inverted: false },
+                        { field: "probabilidad" as const, label: "P", val: task.probabilidad, inverted: false },
+                        { field: "detencion" as const, label: "D", val: task.detencion, inverted: true },
+                      ].map(({ field, label, val, inverted }) => (
+                        <div key={label} className="bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 flex flex-col items-center gap-1.5">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+                          <div className="flex items-center gap-1">
                             <button
-                              onClick={() => handleSaveSubtarea(task.id)}
-                              disabled={
-                                isSaving || !hasChanges || !isValidRiskTask(task)
-                              }
-                              className="rounded-full bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-orange-300"
+                              type="button"
+                              onClick={() => stepFieldValue(task.id, field, -1)}
+                              className="w-5 h-5 rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 text-xs font-bold flex items-center justify-center shadow-xs"
                             >
-                              {isSaving ? "Guardando" : "Guardar"}
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              min={1}
+                              max={10}
+                              value={val || ""}
+                              onChange={(e) => updateSubtareaField(task.id, field, e.target.value === "" ? 0 : normalizeRiskValue(Number(e.target.value)))}
+                              className="w-8 text-center text-xs font-extrabold text-slate-900 bg-transparent outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => stepFieldValue(task.id, field, 1)}
+                              className="w-5 h-5 rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 text-xs font-bold flex items-center justify-center shadow-xs"
+                            >
+                              +
                             </button>
                           </div>
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          Categoría: {task.categoriaNombre}
-                        </p>
-                        {/* botón sub-ítems de riesgo */}
-                        <button
-                          type="button"
-                          onClick={() => toggleExpand(task.id)}
-                          className="inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:text-orange-700 transition-colors"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d={expandedItems.has(task.id) ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
-                          </svg>
-                          {expandedItems.has(task.id) ? "Ocultar riesgos" : "Ver / agregar riesgos"}
-                        </button>
-                      </div>
-                      <div className="hidden sm:flex items-center justify-center">
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${task.prioridad === "alta"
-                            ? "bg-red-100 text-red-700"
-                            : task.prioridad === "media"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-emerald-100 text-emerald-700"
-                            }`}
-                        >
-                          {task.prioridad || "N/A"}
-                        </span>
-                      </div>
-                      {[
-                        {
-                          label: "G",
-                          value: task.gravedad,
-                          field: "gravedad" as const,
-                          inverted: false,
-                        },
-                        {
-                          label: "P",
-                          value: task.probabilidad,
-                          field: "probabilidad" as const,
-                          inverted: false,
-                        },
-                        {
-                          label: "D",
-                          value: task.detencion,
-                          field: "detencion" as const,
-                          inverted: true,
-                        },
-                      ].map((item) => (
-                        <div
-                          key={item.label}
-                          className="flex flex-col items-center gap-2 rounded-3xl bg-slate-50 px-3 py-3 text-center"
-                        >
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                            {item.label}
-                          </span>
-                          <input
-                            type="number"
-                            min={1}
-                            max={10}
-                            step={1}
-                            inputMode="numeric"
-                            value={item.value || ""}
-                            onChange={(e) =>
-                              updateSubtareaField(
-                                task.id,
-                                item.field,
-                                e.target.value === ""
-                                  ? 0
-                                  : normalizeRiskValue(Number(e.target.value)),
-                              )
-                            }
-                            onBlur={(e) => {
-                              const rawValue =
-                                e.target.value === ""
-                                  ? 0
-                                  : Number(e.target.value);
-                              updateSubtareaField(
-                                task.id,
-                                item.field,
-                                normalizeRiskValue(rawValue),
-                              );
-                            }}
-                            className="w-16 rounded-full border border-gray-200 bg-white px-2 py-2 text-center text-sm font-semibold text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
-                          />
-                          <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                          <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
                             <div
-                              className={`${item.value ? getMetricColor(item.value, item.inverted) : "bg-slate-300"} h-2.5 rounded-full transition-all duration-200`}
-                              style={{
-                                width: `${item.value ? Math.max(0, Math.min(10, item.value)) * 10 : 5}%`,
-                              }}
-                            />
+                              className={`h-full ${getMetricColor(val, inverted)}`}
+                              style={{ width: `${Math.max(0, Math.min(10, val)) * 10}%` }}
+                            ></div>
                           </div>
                         </div>
                       ))}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-semibold text-gray-900">
-                            {task.npr || "-"}
-                          </span>
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${riskLabel.color}`}
-                          >
-                            {task.npr ? riskLabel.label : "Sin datos"}
-                          </span>
-                        </div>
-                        <div className="h-2 rounded-full bg-slate-100">
-                          <div
-                            className={`h-2 rounded-full ${getNprColor(task.npr)}`}
-                            style={{
-                              width: `${task.npr ? Math.min(100, (task.npr / MAX_NPR) * 100) : 0}%`,
-                            }}
-                          />
-                        </div>
+
+                      {/* Columna NPR */}
+                      <div className="bg-white border border-slate-200/80 p-2.5 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">NPR</span>
+                        <span className="text-base font-black text-slate-900 mt-0.5">{task.npr || "-"}</span>
+                        <span className={`mt-0.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                          task.npr > 450 ? "bg-rose-100 text-rose-800 border border-rose-200" :
+                          task.npr > 225 ? "bg-orange-100 text-orange-800 border border-orange-200" :
+                          task.npr > 100 ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                        }`}>
+                          {task.nivel}
+                        </span>
                       </div>
                     </div>
-                    {/* ── sub-ítems de riesgo expandibles ── */}
+
+                    {/* Sub-ítems de riesgo expandibles */}
                     {expandedItems.has(task.id) && (
-                      <div className="col-span-full px-5 pb-4">
+                      <div className="pt-3 border-t border-slate-100">
                         <RiesgoItemsPanel subtareaId={task.id} />
                       </div>
                     )}
-                  </React.Fragment>
+                  </div>
                 );
-              })}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Resumen rápido
-              </h3>
-              <div className="mt-5 space-y-3 text-sm text-gray-600">
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <span>Promedio gravedad</span>
-                  <span className="font-semibold text-gray-900">
-                    {avgGravedad}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <span>Promedio probabilidad</span>
-                  <span className="font-semibold text-gray-900">
-                    {avgProbabilidad}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <span>Promedio detección</span>
-                  <span className="font-semibold text-gray-900">
-                    {avgDetencion}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <span>NPR promedio</span>
-                  <span className="font-semibold text-gray-900">
-                    {nprGlobal}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={handleSaveAll}
-              disabled={savingAll}
-              className="w-full rounded-3xl bg-orange-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-orange-300"
-            >
-              {savingAll ? "Guardando..." : "Guardar Matriz"}
-            </button>
+              })
+            )}
           </div>
         </div>
       </div>
+
+      {/* Notificación flotante si hay cambios sin guardar */}
+      {hasAnyUnsavedChanges && (
+        <div className="fixed bottom-6 right-6 z-40 bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl border border-slate-700 flex items-center gap-4 animate-bounce">
+          <span className="text-xs font-semibold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+            Tienes cambios no guardados en la matriz
+          </span>
+          <button
+            type="button"
+            onClick={handleSaveAll}
+            disabled={savingAll}
+            className="px-4 py-1.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition shadow-sm"
+          >
+            {savingAll ? "Guardando..." : "Guardar Ahora"}
+          </button>
+        </div>
+      )}
 
       {auditoria && (
         <PdfMatrizRiesgoModal
