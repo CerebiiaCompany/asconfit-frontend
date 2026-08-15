@@ -419,14 +419,17 @@ export const MatrizRiesgo: React.FC = () => {
   };
 
   const handleSaveAll = async () => {
-    if (!filteredSubtareas.length) return;
+    const tasksToSave = subtareas.filter((task) => hasTaskChanged(task));
 
-    const invalidTask = filteredSubtareas.find(
-      (task) => !isValidRiskTask(task),
-    );
+    if (tasksToSave.length === 0) {
+      addToast("No hay cambios pendientes por guardar.", "info");
+      return;
+    }
+
+    const invalidTask = tasksToSave.find((task) => !isValidRiskTask(task));
     if (invalidTask) {
       addToast(
-        "Todas las tareas deben tener valores entre 1 y 10 antes de guardar.",
+        "Las tareas modificadas deben tener valores válidos entre 1 y 10 antes de guardar.",
         "error",
       );
       return;
@@ -436,7 +439,7 @@ export const MatrizRiesgo: React.FC = () => {
 
     try {
       const responses = await Promise.all(
-        filteredSubtareas.map((task) =>
+        tasksToSave.map((task) =>
           auditoriaService.updateSubtareaRiskMatrix(task.id, {
             gravedad_riesgo: task.gravedad,
             probabilidad_riesgo: task.probabilidad,
@@ -545,7 +548,7 @@ export const MatrizRiesgo: React.FC = () => {
               Matriz de Evaluación de Riesgos (NPR)
             </h1>
             <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-              El NPR (Número de Prioridad de Riesgo) se calcula como: <strong className="text-slate-700">Gravedad × Probabilidad × (11 − Detección)</strong>. 
+              El NPR (Número de Prioridad de Riesgo) se calcula como: <strong className="text-slate-700">Gravedad × Probabilidad × (11 − Detección)</strong>.
               Valora la gravedad del impacto, la frecuencia estimada y la capacidad de detección oportuna.
             </p>
           </div>
@@ -632,7 +635,7 @@ export const MatrizRiesgo: React.FC = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span>🔥</span> Mapa de Calor de Riesgos (5×5)
+              Mapa de Calor de Riesgos (5×5)
             </h2>
             <button
               type="button"
@@ -747,7 +750,7 @@ export const MatrizRiesgo: React.FC = () => {
                           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-black shrink-0">
                             {idx + 1}
                           </span>
-                          
+
                           {editingId === task.id ? (
                             <span className="flex items-center gap-2 flex-1">
                               <input
@@ -813,10 +816,9 @@ export const MatrizRiesgo: React.FC = () => {
 
                       {/* Columna 2: Prioridad y Estado */}
                       <div className="flex flex-col items-center gap-1.5">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                          task.prioridad === "alta" ? "bg-red-100 text-red-700" :
-                          task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
-                        }`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${task.prioridad === "alta" ? "bg-red-100 text-red-700" :
+                            task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                          }`}>
                           {task.prioridad || "Normal"}
                         </span>
                         {hasChanges ? (
@@ -878,11 +880,10 @@ export const MatrizRiesgo: React.FC = () => {
                       <div className="bg-white border border-slate-200/80 p-2.5 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">NPR</span>
                         <span className="text-base font-black text-slate-900 mt-0.5">{task.npr || "-"}</span>
-                        <span className={`mt-0.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                          task.npr > 450 ? "bg-rose-100 text-rose-800 border border-rose-200" :
-                          task.npr > 225 ? "bg-orange-100 text-orange-800 border border-orange-200" :
-                          task.npr > 100 ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                        }`}>
+                        <span className={`mt-0.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${task.npr > 450 ? "bg-rose-100 text-rose-800 border border-rose-200" :
+                            task.npr > 225 ? "bg-orange-100 text-orange-800 border border-orange-200" :
+                              task.npr > 100 ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          }`}>
                           {task.nivel}
                         </span>
                       </div>
