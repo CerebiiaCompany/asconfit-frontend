@@ -70,8 +70,8 @@ function validate(formData: Empresa): FormErrors {
 const inputClass = (err?: string) =>
   `w-full px-4 py-2 border rounded text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 ${err ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-orange-500'}`;
 
-const selectClass = (err?: string) =>
-  `w-full px-4 py-2 border rounded text-sm appearance-none focus:outline-none focus:ring-1 bg-white cursor-pointer ${err ? 'border-red-400 focus:ring-red-400 text-gray-800' : 'border-gray-300 focus:ring-orange-500 text-gray-400'}`;
+const selectClass = (err?: string, hasValue?: boolean) =>
+  `w-full px-4 py-2 border rounded text-sm appearance-none focus:outline-none focus:ring-1 bg-white cursor-pointer ${err ? 'border-red-400 focus:ring-red-400 text-gray-800' : 'border-gray-300 focus:ring-orange-500'} ${hasValue ? 'text-gray-800' : 'text-gray-400'}`;
 
 const ErrMsg: React.FC<{ msg?: string }> = ({ msg }) =>
   msg ? <p className="text-red-500 text-xs mt-1">{msg}</p> : null;
@@ -197,7 +197,7 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
           <div className="relative">
             <label className="block text-sm font-medium text-gray-600 mb-1.5">Tipo de sociedad</label>
             <select name="tipo_sociedad" value={f.tipo_sociedad} onChange={handleChange} onBlur={handleBlur}
-              className={selectClass(er.tipo_sociedad)}>
+              className={selectClass(er.tipo_sociedad, !!f.tipo_sociedad)}>
               <option value="">Selecciona el tipo</option>
               <option value="sas" className="text-gray-800">S.A.S</option>
               <option value="ltda" className="text-gray-800">LTDA</option>
@@ -221,7 +221,7 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
           <div className="relative">
             <label className="block text-sm font-medium text-gray-600 mb-1.5">Estado de la empresa</label>
             <select name="estado" value={f.estado} onChange={handleChange} onBlur={handleBlur}
-              className={selectClass(er.estado)}>
+              className={selectClass(er.estado, !!f.estado)}>
               <option value="">Activa o Inactiva</option>
               <option value="activa" className="text-gray-800">Activa</option>
               <option value="inactiva" className="text-gray-800">Inactiva</option>
@@ -244,7 +244,7 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
           <div className="relative">
             <label className="block text-sm font-medium text-gray-600 mb-1.5">Tipo de documento</label>
             <select name="tipo_documento" value={f.tipo_documento} onChange={handleChange} onBlur={handleBlur}
-              className={selectClass(er.tipo_documento)}>
+              className={selectClass(er.tipo_documento, !!f.tipo_documento)}>
               <option value="">Selecciona el tipo</option>
               <option value="CC" className="text-gray-800">CC - Cédula de Ciudadanía</option>
               <option value="CE" className="text-gray-800">CE - Cédula de Extranjería</option>
