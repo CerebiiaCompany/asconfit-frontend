@@ -169,7 +169,7 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                           WebkitPrintColorAdjust: "exact",
                           printColorAdjust: "exact",
                         }}
-                        className={`min-h-[58px] p-1.5 rounded-2xl ${style.bg} ${style.border} flex flex-wrap items-center justify-center gap-1.5 relative shadow-xs`}
+                        className={`h-[64px] p-1.5 rounded-2xl ${style.bg} ${style.border} flex flex-wrap content-center items-center justify-center gap-0.5 relative shadow-xs overflow-hidden`}
                       >
                         {cellTasks.length === 0 ? (
                           <span className={`text-xs select-none font-mono ${style.text} opacity-40`}>
@@ -178,12 +178,13 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                         ) : (
                           cellTasks.map((t) => {
                             const isSelected = selectedTaskId === t.id;
+                            const compact = cellTasks.length > 3;
                             return (
                               <button
                                 key={t.id}
                                 type="button"
                                 onClick={() => onSelectTask?.(t.id)}
-                                title={`#${t.numIndex} - ${t.nombre}`}
+                                title={`#${t.numIndex} — ${t.nombre}`}
                                 style={{
                                   backgroundColor: "#ffffff",
                                   borderColor: "#0f172a",
@@ -191,9 +192,13 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                                   WebkitPrintColorAdjust: "exact",
                                   printColorAdjust: "exact",
                                 }}
-                                className={`px-1.5 min-w-[28px] h-7 rounded-full bg-white border-2 border-slate-900 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 ${
-                                  isSelected ? "ring-2 ring-orange-500 scale-110" : ""
-                                }`}
+                                className={`
+                                  ${compact ? "px-1 min-w-[20px] h-[18px] text-[7px]" : "px-1.5 min-w-[26px] h-6 text-[9px]"}
+                                  rounded-full bg-white border border-slate-900 text-slate-900
+                                  font-black flex items-center justify-center shadow-sm
+                                  hover:scale-110 transition-transform
+                                  ${isSelected ? "ring-2 ring-orange-500 scale-110" : ""}
+                                `}
                               >
                                 {t.numIndex}
                               </button>

@@ -64,10 +64,11 @@ export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
         const bg = getCellHex(prob, imp);
         const key = `${prob}-${imp}`;
         const tasks = cellMap[key] ?? [];
+        const compact = tasks.length > 3;
         const badges = tasks.map(t =>
-          `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:50%;background:#ffffff;border:2px solid #0f172a;color:#0f172a;font-size:9px;font-weight:900;padding:0 3px;margin:2px;">${t.numIndex}</span>`
+          `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:${compact ? '18px' : '24px'};height:${compact ? '18px' : '24px'};border-radius:50%;background:#ffffff;border:1.5px solid #0f172a;color:#0f172a;font-size:${compact ? '7px' : '9px'};font-weight:900;padding:0 2px;margin:1px;">${t.numIndex}</span>`
         ).join("");
-        cells += `<td style="background:${bg};-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:12px;min-height:52px;height:52px;text-align:center;vertical-align:middle;padding:4px;">${badges || '<span style="color:rgba(255,255,255,0.4);font-size:12px;">–</span>'}</td>`;
+        cells += `<td style="background:${bg};-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:10px;width:${100 / 5}%;height:58px;max-height:58px;overflow:hidden;text-align:center;vertical-align:middle;padding:3px;"><div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px;max-height:52px;overflow:hidden;">${badges || '<span style="color:rgba(255,255,255,0.4);font-size:11px;">–</span>'}</div></td>`;
       }
       gridRows += `<tr>${cells}</tr>`;
     }
