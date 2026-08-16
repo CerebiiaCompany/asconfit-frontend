@@ -133,26 +133,9 @@ export const AuditoriaDetalle: React.FC = () => {
     );
   }
 
-  // Generar eventos del calendario basados en la auditoría y subtareas
+  // Generar eventos del calendario — solo fechas de subtareas
   const calendarEvents: CalendarEvent[] = [];
 
-  // Eventos de la auditoría
-  if (auditoria.fecha_inicial) {
-    calendarEvents.push({
-      date: auditoria.fecha_inicial,
-      title: 'Fecha Inicial Auditoría',
-      color: 'bg-orange-500'
-    });
-  }
-  if (auditoria.fecha_corte) {
-    calendarEvents.push({
-      date: auditoria.fecha_corte,
-      title: 'Fecha Corte Auditoría',
-      color: 'bg-green-500'
-    });
-  }
-
-  // Eventos de las subtareas (requerimientos)
   auditoria.categorias?.forEach((categoria: any) => {
     categoria.subtareas?.forEach((subtarea: any) => {
       if (subtarea.fecha_solicitud) {
