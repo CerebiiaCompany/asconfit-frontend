@@ -125,14 +125,23 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
     const updated = { ...formData, [name]: filtered };
     setFormData(updated);
     if (touched[name as keyof Empresa]) {
-      setErrors(validate(updated));
+      const allErrors = validate(updated);
+      setErrors(prev => ({
+        ...prev,
+        [name]: allErrors[name as keyof Empresa],
+      }));
     }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
-    setErrors(validate(formData));
+    // Solo mostrar error del campo que perdió foco, no de todos
+    const allErrors = validate(formData);
+    setErrors(prev => ({
+      ...prev,
+      [name]: allErrors[name as keyof Empresa],
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
