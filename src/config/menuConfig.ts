@@ -16,6 +16,18 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/dashboard.png",
   },
   {
+    id: "perfil",
+    path: "/perfil",
+    label: "Perfil",
+    icon: "/profile.png",
+  },
+  {
+    id: "empresas",
+    path: "/empresas/ver",
+    label: "Mis Encargos",
+    icon: "/building.png",
+  },
+  {
     id: "auditorias",
     path: "/auditorias",
     label: "Auditorias",
@@ -24,15 +36,10 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
   {
     id: "mis-tareas",
     path: "/mis-tareas",
-    label: "Mis Encargos",
+    label: "Mis Tareas",
     icon: "/mytask.png",
   },
-  {
-    id: "empresas",
-    path: "/empresas/ver",
-    label: "Encargos",
-    icon: "/building.png",
-  },
+
   {
     id: "hallazgos",
     path: "/hallazgos",
@@ -46,23 +53,19 @@ export const ALL_MENU_ITEMS: MenuItem[] = [
     icon: "/ai-analysis.png",
   },
   {
-    id: "roles",
-    path: "/roles",
-    label: "Administración",
-    icon: "/adminstracion.png",
-  },
-  {
     id: "papelera",
     path: "/papelera",
     label: "Papelera",
     icon: "/bin.png",
   },
   {
-    id: "perfil",
-    path: "/perfil",
-    label: "Perfil",
-    icon: "/profile.png",
+    id: "roles",
+    path: "/roles",
+    label: "Administración",
+    icon: "/adminstracion.png",
   },
+
+
 ];
 
 // Configuración de menús por rol
