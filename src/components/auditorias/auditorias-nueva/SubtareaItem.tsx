@@ -95,7 +95,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
         />
       </div>
 
-      {/* Formato y Subir Archivo */}
+      {/* Formato de archivo + botón eliminar */}
       <div className="mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-end">
         <div className="flex-1">
           <label className="block text-sm text-gray-600 mb-2">
@@ -111,31 +111,6 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             <option value="excel">Excel</option>
             <option value="word">Word</option>
           </select>
-        </div>
-        <div className="flex-1">
-          <span className="text-sm text-gray-600 block mb-2">
-            {subtarea.archivoNombre || "Sin adjunto"}
-          </span>
-          <button
-            type="button"
-            disabled={!subtarea.formatoArchivo}
-            className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center gap-2"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-            Subir archivo
-          </button>
         </div>
         <button
           type="button"
