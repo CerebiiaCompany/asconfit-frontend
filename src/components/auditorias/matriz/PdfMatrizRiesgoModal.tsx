@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { MapaCalorRiesgo, HeatMapTask } from "./MapaCalorRiesgo";
+import { MapaCalorRiesgo, HeatMapTask, getGridLevel } from "./MapaCalorRiesgo";
 import { Auditoria } from "../../../types/auditoria";
 
 interface PdfMatrizRiesgoModalProps {
@@ -7,78 +7,188 @@ interface PdfMatrizRiesgoModalProps {
   onClose: () => void;
   auditoria: Auditoria;
   subtareas: HeatMapTask[];
-  stats: {
-    totalTasks: number;
-    criticalTasks: number;
-    avgGravedad: number;
-    avgProbabilidad: number;
-    avgDetencion: number;
-    nprGlobal: number;
-    nprLabel: { label: string; color: string };
-  };
+  stats?: any;
 }
+
+// Colores de celda para el HTML imprimible
+function getCellHex(probLevel: number, impLevel: number): string {
+  const isGreen =
+    (probLevel === 1 && impLevel <= 3) ||
+    (probLevel === 2 && impLevel <= 2) ||
+    (probLevel === 3 && impLevel === 1) ||
+    (probLevel === 4 && impLevel === 1);
+  const isRed =
+    (probLevel === 5 && impLevel >= 3) ||
+    (probLevel === 4 && impLevel >= 4) ||
+    (probLevel === 3 && impLevel >= 4) ||
+    (probLevel === 2 && impLevel === 5);
+  if (isGreen) return "#10b981";
+  if (isRed) return "#e11d48";
+  return "#fbbf24";
+}
+
+const PROB_LABELS = ["", "Improbable", "Posible", "Ocasional", "Moderado", "Constante"];
+const IMP_LABELS = ["", "Insignificante", "Menor", "Crítica", "Mayor", "Catastrófico"];
 
 export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
   isOpen,
   onClose,
   auditoria,
   subtareas,
-  stats,
 }) => {
-  const printRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   if (!isOpen) return null;
 
-  const handlePrint = () => {
-    window.print();
+  /* Construye el HTML completo que irá dentro del iframe para imprimir */
+  const buildPrintHtml = (): string => {
+    const empresa = auditoria.empresa?.razon_social ?? auditoria.razon_social ?? "Auditoría";
+    const nit = auditoria.empresa?.nit ?? auditoria.nit ?? "";
+    const tipo = auditoria.tipo_auditoria ?? "";
+
+    // Agrupar tareas por celda
+    const cellMap: Record<string, HeatMapTask[]> = {};
+    subtareas.forEach(t => {
+      const imp = getGridLevel(t.gravedad);
+      const prob = getGridLevel(t.probabilidad);
+      const key = `${prob}-${imp}`;
+      if (!cellMap[key]) cellMap[key] = [];
+      cellMap[key].push(t);
+    });
+
+    /* Generar la grilla 5×5 como HTML puro */
+    let gridRows = "";
+    for (let prob = 5; prob >= 1; prob--) {
+      let cells = `<td style="width:90px;text-align:right;padding-right:8px;font-size:10px;font-weight:bold;font-style:italic;color:#334155;">${PROB_LABELS[prob]}</td>`;
+      for (let imp = 1; imp <= 5; imp++) {
+        const bg = getCellHex(prob, imp);
+        const key = `${prob}-${imp}`;
+        const tasks = cellMap[key] ?? [];
+        const badges = tasks.map(t =>
+          `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:50%;background:#ffffff;border:2px solid #0f172a;color:#0f172a;font-size:9px;font-weight:900;padding:0 3px;margin:2px;">${t.numIndex}</span>`
+        ).join("");
+        cells += `<td style="background:${bg};-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:12px;min-height:52px;height:52px;text-align:center;vertical-align:middle;padding:4px;">${badges || '<span style="color:rgba(255,255,255,0.4);font-size:12px;">–</span>'}</td>`;
+      }
+      gridRows += `<tr>${cells}</tr>`;
+    }
+
+    /* Leyenda */
+    const legend = `
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;padding:8px 16px;border:1px solid #e2e8f0;border-radius:999px;background:#fff;width:fit-content;">
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#334155;">
+          <span style="width:12px;height:12px;border-radius:50%;background:#10b981;display:inline-block;"></span> Bajo
+        </span>
+        <span style="color:#cbd5e1;">•</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#334155;">
+          <span style="width:12px;height:12px;border-radius:50%;background:#fbbf24;display:inline-block;"></span> Moderado / Alto
+        </span>
+        <span style="color:#cbd5e1;">•</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#334155;">
+          <span style="width:12px;height:12px;border-radius:50%;background:#e11d48;display:inline-block;"></span> Crítico
+        </span>
+      </div>`;
+
+    /* Etiquetas eje X */
+    const xLabels = IMP_LABELS.slice(1).map(l =>
+      `<td style="text-align:center;font-size:10px;font-weight:700;font-style:italic;color:#334155;">${l}</td>`
+    ).join("");
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mapa de Calor – ${empresa}</title>
+  <style>
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:20px;background:#fff;color:#0f172a;}
+    @page{size:A4 landscape;margin:12mm;}
+    table{border-collapse:separate;border-spacing:6px;width:100%;}
+  </style>
+</head>
+<body>
+  <div style="margin-bottom:20px;">
+    <h1 style="font-size:18px;font-weight:900;color:#0f172a;margin:0 0 4px;">Mapa de Calor de Riesgos (5×5)</h1>
+    <p style="font-size:11px;color:#64748b;margin:0 0 2px;">${empresa}${nit ? ` — NIT ${nit}` : ""}${tipo ? ` — ${tipo}` : ""}</p>
+    <p style="font-size:10px;color:#94a3b8;margin:0;">Probabilidad (Eje Vertical) vs. Impacto / Gravedad (Eje Horizontal)</p>
+  </div>
+
+  ${legend}
+
+  <div style="display:flex;gap:12px;align-items:stretch;">
+    <!-- Etiqueta eje Y vertical -->
+    <div style="display:flex;align-items:center;justify-content:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 6px;">
+      <span style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.3em;writing-mode:vertical-lr;transform:rotate(180deg);">PROBABILIDAD</span>
+    </div>
+
+    <div style="flex:1;">
+      <table>
+        <tbody>${gridRows}</tbody>
+        <tfoot>
+          <tr>
+            <td style="width:90px;"></td>
+            ${xLabels}
+          </tr>
+          <tr>
+            <td></td>
+            <td colspan="5" style="text-align:center;padding-top:8px;">
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:999px;padding:6px 0;font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.3em;">
+                IMPACTO / GRAVEDAD
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</body>
+</html>`;
   };
 
-  const currentDate = new Date().toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const nombreEmpresa =
-    auditoria.empresa?.razon_social ||
-    auditoria.empresa?.nombre ||
-    auditoria.razon_social ||
-    (auditoria as any).empresa_nombre ||
-    "N/A";
+  const handlePrint = () => {
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (!win) return;
+    win.document.write(buildPrintHtml());
+    win.document.close();
+    // Esperar a que cargue y luego imprimir
+    win.onload = () => {
+      win.focus();
+      win.print();
+      // Cerrar la ventana después de imprimir
+      win.onafterprint = () => win.close();
+    };
+  };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 print:p-0 print:bg-white print:static print:inset-auto">
-      {/* Modal Card Container */}
-      <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 w-full max-w-5xl overflow-hidden flex flex-col max-h-[92vh] print:max-h-none print:shadow-none print:border-none print:w-full print:rounded-none">
-        
-        {/* Modal Top Action Bar (Hidden during Print) */}
-        <div className="px-6 py-4 bg-gray-900 text-white flex items-center justify-between print:hidden">
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-200 w-full max-w-4xl overflow-hidden flex flex-col max-h-[94vh]">
+
+        {/* Cabecera */}
+        <div className="px-6 py-4 bg-white border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold">
+            <div className="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">
               PDF
             </div>
             <div>
-              <h2 className="text-base font-bold">Exportar Matriz de Riesgo (PDF)</h2>
-              <p className="text-xs text-gray-400">
-                Vista previa del informe impreso con Mapa de Calor 5x5
-              </p>
+              <h2 className="text-base font-bold text-gray-900">Exportar Matriz de Riesgo</h2>
+              <p className="text-xs text-gray-500">Vista previa — solo se imprime el Mapa de Calor 5×5</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold shadow-md transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-sm transition-all active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
-              Imprimir / Descargar PDF
+              Descargar PDF / Imprimir
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition"
+              className="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
               title="Cerrar"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,173 +198,15 @@ export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
           </div>
         </div>
 
-        {/* Printable Content Area */}
-        <div
-          ref={printRef}
-          className="p-8 overflow-y-auto flex-1 space-y-6 bg-white text-gray-900 print:p-4 print:overflow-visible"
-        >
-          {/* Estilos CSS específicos para la impresión limpia */}
-          <style>{`
-            @media print {
-              body * {
-                visibility: hidden;
-              }
-              .print\\:static, .print\\:static * {
-                visibility: visible;
-              }
-              .print\\:static {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-              }
-              @page {
-                size: A4 portrait;
-                margin: 12mm;
-              }
-            }
-          `}</style>
-
-          {/* Encabezado del Documento */}
-          <div className="border-b-2 border-orange-500 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-orange-600 uppercase tracking-widest">
-                <span>ASCONFIT</span>
-                <span>•</span>
-                <span>Informe de Evaluación de Riesgos</span>
-              </div>
-              <h1 className="text-2xl font-black text-gray-900 mt-1">
-                {(auditoria as any).titulo || auditoria.tipo_auditoria || auditoria.razon_social || "Matriz de Riesgo de Auditoría"}
-              </h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Empresa: <strong className="text-gray-800">{nombreEmpresa}</strong> | 
-                Tipo: <strong className="text-gray-800">{auditoria.tipo_auditoria || "Auditoría"}</strong>
-              </p>
-            </div>
-            <div className="text-right text-xs text-gray-500">
-              <p className="font-semibold text-gray-700">Fecha de Informe:</p>
-              <p className="font-medium text-gray-900">{currentDate}</p>
-              <p className="mt-1 text-[11px] text-gray-400">ID Auditoría: #{auditoria.id}</p>
-            </div>
-          </div>
-
-          {/* Resumen de Métricas */}
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-            <div className="bg-slate-50 p-3 rounded-2xl border border-gray-200 text-center">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Tareas</p>
-              <p className="text-xl font-black text-gray-900 mt-1">{stats.totalTasks}</p>
-            </div>
-            <div className="bg-red-50 p-3 rounded-2xl border border-red-200 text-center">
-              <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Críticas</p>
-              <p className="text-xl font-black text-red-700 mt-1">{stats.criticalTasks}</p>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-2xl border border-gray-200 text-center">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Prom. Gravedad</p>
-              <p className="text-xl font-black text-gray-900 mt-1">{stats.avgGravedad}</p>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-2xl border border-gray-200 text-center">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Prom. Probabilidad</p>
-              <p className="text-xl font-black text-gray-900 mt-1">{stats.avgProbabilidad}</p>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-2xl border border-gray-200 text-center">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Prom. Detección</p>
-              <p className="text-xl font-black text-gray-900 mt-1">{stats.avgDetencion}</p>
-            </div>
-            <div className="bg-orange-50 p-3 rounded-2xl border border-orange-200 text-center">
-              <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider">NPR Promedio</p>
-              <p className="text-xl font-black text-orange-900 mt-1">{stats.nprGlobal}</p>
-            </div>
-          </div>
-
-          {/* Sección 1: Mapa de Calor 5x5 */}
-          <div className="break-inside-avoid">
-            <MapaCalorRiesgo tasks={subtareas} isPrintView={true} />
-          </div>
-
-          {/* Sección 2: Tabla Leyenda y Detalle de Tareas */}
-          <div className="space-y-3 break-before-auto">
-            <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="text-base font-bold text-gray-900">
-                📋 Leyenda y Registro Detallado de Tareas
-              </h3>
-              <span className="text-xs text-gray-500">
-                Los números coinciden con la ubicación en el Mapa de Calor
-              </span>
-            </div>
-
-            <div className="overflow-hidden rounded-2xl border border-gray-200">
-              <table className="min-w-full divide-y divide-gray-200 text-xs">
-                <thead className="bg-gray-900 text-white font-bold uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="px-3 py-2.5 text-center w-12">#</th>
-                    <th className="px-4 py-2.5 text-left">Tarea / Categoría</th>
-                    <th className="px-3 py-2.5 text-center w-16">Gravedad</th>
-                    <th className="px-3 py-2.5 text-center w-16">Probab.</th>
-                    <th className="px-3 py-2.5 text-center w-16">Detec.</th>
-                    <th className="px-3 py-2.5 text-center w-20">NPR</th>
-                    <th className="px-4 py-2.5 text-center w-24">Nivel Riesgo</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {subtareas.map((task) => (
-                    <tr key={task.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-3 py-2.5 text-center font-black">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-900 text-white text-xs">
-                          {task.numIndex}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <p className="font-bold text-gray-900">{task.nombre}</p>
-                        {task.categoriaNombre && (
-                          <p className="text-[10px] text-gray-500">Cat: {task.categoriaNombre}</p>
-                        )}
-                      </td>
-                      <td className="px-3 py-2.5 text-center font-semibold text-gray-700">
-                        {task.gravedad}
-                      </td>
-                      <td className="px-3 py-2.5 text-center font-semibold text-gray-700">
-                        {task.probabilidad}
-                      </td>
-                      <td className="px-3 py-2.5 text-center font-semibold text-gray-700">
-                        {task.detencion}
-                      </td>
-                      <td className="px-3 py-2.5 text-center font-black text-gray-900">
-                        {task.npr || "-"}
-                      </td>
-                      <td className="px-4 py-2.5 text-center">
-                        <span
-                          className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                            task.npr > 450
-                              ? "bg-red-100 text-red-800 border border-red-200"
-                              : task.npr > 225
-                              ? "bg-orange-100 text-orange-800 border border-orange-200"
-                              : task.npr > 100
-                              ? "bg-amber-100 text-amber-800 border border-amber-200"
-                              : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                          }`}
-                        >
-                          {task.nivel || "Bajo"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Pie de página institucional */}
-          <div className="pt-6 border-t border-gray-200 flex justify-between items-end text-xs text-gray-500">
-            <div>
-              <p className="font-semibold text-gray-700">ASCONFIT - Auditoría y Control Fiscal</p>
-              <p className="text-[10px] text-gray-400">Documento generado automáticamente</p>
-            </div>
-            <div className="text-right border-t border-gray-300 pt-2 w-48">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest text-center">Firma Responsable</p>
-            </div>
+        {/* Vista previa del mapa */}
+        <div className="bg-slate-100/60 p-4 sm:p-6 overflow-y-auto flex-1">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full">
+            <MapaCalorRiesgo tasks={subtareas} />
           </div>
         </div>
 
+        {/* Iframe oculto — no se usa */}
+        <iframe ref={iframeRef} title="print-frame" className="hidden" />
       </div>
     </div>
   );

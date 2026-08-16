@@ -2,7 +2,7 @@ import React from "react";
 
 export interface HeatMapTask {
   id: number;
-  numIndex: string | number; // Soporta números simples (1, 2) e índices jerárquicos ("1.1", "1.2")
+  numIndex: string | number;
   nombre: string;
   categoriaNombre?: string;
   gravedad: number; // 1 - 10
@@ -62,6 +62,8 @@ function getCellStyle(probLevel: number, impLevel: number) {
       bg: "bg-emerald-500",
       border: "border-emerald-600/80",
       text: "text-white",
+      hexBg: "#10b981",
+      hexBorder: "#059669",
     };
   }
   if (isRed) {
@@ -69,12 +71,16 @@ function getCellStyle(probLevel: number, impLevel: number) {
       bg: "bg-rose-600",
       border: "border-rose-700/80",
       text: "text-white",
+      hexBg: "#e11d48",
+      hexBorder: "#be123c",
     };
   }
   return {
     bg: "bg-amber-400",
     border: "border-amber-500/80",
     text: "text-slate-900",
+    hexBg: "#fbbf24",
+    hexBorder: "#f59e0b",
   };
 }
 
@@ -97,7 +103,7 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
   }, [tasks]);
 
   return (
-    <div className="w-full select-none bg-white p-2">
+    <div className="w-full select-none bg-white p-2 print:p-0">
       {/* Header del Mapa de Calor */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -112,17 +118,17 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
         {/* Leyenda de Colores */}
         <div className="flex items-center gap-3 border border-slate-200 rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 bg-white">
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block shadow-xs"></span>
+            <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block shadow-xs" style={{ backgroundColor: "#10b981" }}></span>
             <span>Bajo</span>
           </div>
           <span className="text-slate-300">•</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block shadow-xs"></span>
+            <span className="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block shadow-xs" style={{ backgroundColor: "#fbbf24" }}></span>
             <span>Moderado / Alto</span>
           </div>
           <span className="text-slate-300">•</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-full bg-rose-600 inline-block shadow-xs"></span>
+            <span className="w-3.5 h-3.5 rounded-full bg-rose-600 inline-block shadow-xs" style={{ backgroundColor: "#e11d48" }}></span>
             <span>Crítico</span>
           </div>
         </div>
@@ -157,6 +163,12 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                     return (
                       <div
                         key={key}
+                        style={{
+                          backgroundColor: style.hexBg,
+                          borderColor: style.hexBorder,
+                          WebkitPrintColorAdjust: "exact",
+                          printColorAdjust: "exact",
+                        }}
                         className={`min-h-[58px] p-1.5 rounded-2xl ${style.bg} ${style.border} flex flex-wrap items-center justify-center gap-1.5 relative shadow-xs`}
                       >
                         {cellTasks.length === 0 ? (
@@ -172,6 +184,13 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
                                 type="button"
                                 onClick={() => onSelectTask?.(t.id)}
                                 title={`#${t.numIndex} - ${t.nombre}`}
+                                style={{
+                                  backgroundColor: "#ffffff",
+                                  borderColor: "#0f172a",
+                                  color: "#0f172a",
+                                  WebkitPrintColorAdjust: "exact",
+                                  printColorAdjust: "exact",
+                                }}
                                 className={`px-1.5 min-w-[28px] h-7 rounded-full bg-white border-2 border-slate-900 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-md transition-transform hover:scale-110 ${
                                   isSelected ? "ring-2 ring-orange-500 scale-110" : ""
                                 }`}
