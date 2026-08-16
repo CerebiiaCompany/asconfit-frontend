@@ -16,26 +16,13 @@ export const ActivitySchedule: React.FC = () => {
         return palette[auditId % palette.length];
     };
 
-    // Obtener todas las tareas programadas (inicio de auditoría + subtareas)
+    // Solo subtareas con fecha de entrega
     const allActivities = auditorias.flatMap((audit) => {
         const auditColor = getAuditColor(audit.id);
         const tipoLabel = audit.tipo_auditoria ? ` - ${audit.tipo_auditoria}` : '';
         const activities: any[] = [];
 
-        // 1. Agregar el inicio de la auditoría
-        if (audit.fecha_inicial) {
-            activities.push({
-                id: `audit-${audit.id}`,
-                auditId: audit.id,
-                date: audit.fecha_inicial,
-                title: `Inicio: ${audit.empresa?.razon_social || audit.razon_social || 'Auditoría'}${tipoLabel}`,
-                colorClass: auditColor,
-                empresa: audit.empresa?.razon_social || audit.razon_social,
-                tipo: audit.tipo_auditoria
-            });
-        }
-
-        // 2. Agregar todas las subtareas que tengan fecha de entrega
+        // Solo subtareas que tengan fecha de entrega
         audit.categorias?.forEach(cat => {
             cat.subtareas?.forEach(sub => {
                 if (sub.tiempo_entrega) {
