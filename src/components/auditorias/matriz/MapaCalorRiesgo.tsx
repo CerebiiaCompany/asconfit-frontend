@@ -92,13 +92,15 @@ export const MapaCalorRiesgo: React.FC<MapaCalorRiesgoProps> = ({
   // Agrupa las tareas por celda (probLevel, impLevel)
   const cellTasksMap = React.useMemo(() => {
     const map = new Map<string, HeatMapTask[]>();
-    tasks.forEach((t) => {
-      const imp = getGridLevel(t.gravedad);
-      const prob = getGridLevel(t.probabilidad);
-      const key = `${prob}-${imp}`;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(t);
-    });
+    tasks
+      .filter(t => t.gravedad > 0 && t.probabilidad > 0 && t.detencion > 0)
+      .forEach((t) => {
+        const imp = getGridLevel(t.gravedad);
+        const prob = getGridLevel(t.probabilidad);
+        const key = `${prob}-${imp}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(t);
+      });
     return map;
   }, [tasks]);
 

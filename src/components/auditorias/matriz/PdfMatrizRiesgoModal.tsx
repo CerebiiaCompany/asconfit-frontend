@@ -46,15 +46,17 @@ export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
     const nit = auditoria.empresa?.nit ?? auditoria.nit ?? "";
     const tipo = auditoria.tipo_auditoria ?? "";
 
-    // Agrupar tareas por celda
+    // Agrupar tareas por celda — solo incluir las que tienen G, P y D configurados
     const cellMap: Record<string, HeatMapTask[]> = {};
-    subtareas.forEach(t => {
-      const imp = getGridLevel(t.gravedad);
-      const prob = getGridLevel(t.probabilidad);
-      const key = `${prob}-${imp}`;
-      if (!cellMap[key]) cellMap[key] = [];
-      cellMap[key].push(t);
-    });
+    subtareas
+      .filter(t => t.gravedad > 0 && t.probabilidad > 0 && t.detencion > 0)
+      .forEach(t => {
+        const imp = getGridLevel(t.gravedad);
+        const prob = getGridLevel(t.probabilidad);
+        const key = `${prob}-${imp}`;
+        if (!cellMap[key]) cellMap[key] = [];
+        cellMap[key].push(t);
+      });
 
     /* Generar la grilla 5×5 como HTML puro */
     let gridRows = "";
