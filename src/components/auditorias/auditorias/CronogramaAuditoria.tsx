@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import * as ExcelJS from "exceljs";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const ExcelJS = require("exceljs");
 import { Auditoria, Subtarea, Categoria } from "../../../types/auditoria";
 
 /* ─── helpers de fecha ─────────────────────────────────────────────────────── */
@@ -88,12 +89,10 @@ const exportToExcel = async (auditoria: Auditoria, tasks: TaskRow[]) => {
     const EVEN_BG = argb("FFF5F5F5");
     const ODD_BG = argb("FFFFFFFF");
 
-    const medB = (c: ExcelJS.Color): Partial<ExcelJS.Border> => ({ style: "medium", color: c });
-    const thnB = (c: ExcelJS.Color): Partial<ExcelJS.Border> => ({ style: "thin", color: c });
+    const medB = (c: any) => ({ style: "medium", color: c });
+    const thnB = (c: any) => ({ style: "thin", color: c });
     const allMed = { top: medB(DARK), bottom: medB(DARK), left: medB(DARK), right: medB(DARK) };
-
-    const fill = (fgColor: ExcelJS.Color): ExcelJS.Fill =>
-        ({ type: "pattern", pattern: "solid", fgColor });
+    const fill = (fgColor: any) => ({ type: "pattern", pattern: "solid", fgColor });
 
     /* Workbook */
     const wb = new ExcelJS.Workbook();
@@ -264,12 +263,12 @@ const exportToExcel = async (auditoria: Auditoria, tasks: TaskRow[]) => {
                 cpCell.fill = fill(pHit ? GREEN : (i % 2 === 0 ? EVEN_BG : ODD_BG));
                 cpCell.border = { top: thnB(MID), bottom: thnB(MID), left: lB, right: rB };
 
-                /* Fila E */
+                /* Fila E — naranja con x solo si está aprobada, vacía si no */
                 const ceCell = ws.getCell(rE, col);
                 const eHit = inSlot(t.hasta, m.year, m.month, w);
                 const eAprov = eHit && t.estado === "aprobado";
-                ceCell.fill = fill(eHit ? (eAprov ? GREEN : ORANGE) : (i % 2 === 0 ? EVEN_BG : ODD_BG));
-                if (eHit && !eAprov) {
+                ceCell.fill = fill(eAprov ? ORANGE : (i % 2 === 0 ? EVEN_BG : ODD_BG));
+                if (eAprov) {
                     ceCell.value = "x";
                     ceCell.font = { bold: true, size: 8, color: WHITE };
                     ceCell.alignment = { horizontal: "center", vertical: "middle" };
