@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import ExcelJS from "exceljs";
+import * as ExcelJS from "exceljs";
 import { Auditoria, Subtarea, Categoria } from "../../../types/auditoria";
 
 /* ─── helpers de fecha ─────────────────────────────────────────────────────── */
