@@ -664,7 +664,7 @@ export const MatrizRiesgo: React.FC = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-5">
             <div>
               <h2 className="text-lg font-bold text-slate-900">
-                Tareas de Auditoría y Sub-Riesgos
+                Riesgos
               </h2>
               <p className="text-xs text-slate-500">
                 Ajusta Gravedad (G), Probabilidad (P) y Detección (D) para recalcular el riesgo automáticamente.
@@ -716,7 +716,7 @@ export const MatrizRiesgo: React.FC = () => {
 
           {/* Encabezado de Columnas */}
           <div className="hidden sm:grid sm:grid-cols-[2.5fr_100px_110px_110px_110px_110px] gap-2 bg-slate-100/80 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider text-slate-500 items-center">
-            <div>Tarea de Auditoría</div>
+            <div> Riesgos</div>
             <div className="text-center">Prioridad</div>
             <div className="text-center" title="Impacto del riesgo (1-10)">Gravedad (G)</div>
             <div className="text-center" title="Frecuencia (1-10)">Probab. (P)</div>
@@ -817,7 +817,7 @@ export const MatrizRiesgo: React.FC = () => {
                       {/* Columna 2: Prioridad y Estado */}
                       <div className="flex flex-col items-center gap-1.5">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${task.prioridad === "alta" ? "bg-red-100 text-red-700" :
-                            task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
+                          task.prioridad === "media" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
                           }`}>
                           {task.prioridad || "Normal"}
                         </span>
@@ -881,8 +881,8 @@ export const MatrizRiesgo: React.FC = () => {
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">NPR</span>
                         <span className="text-base font-black text-slate-900 mt-0.5">{task.npr || "-"}</span>
                         <span className={`mt-0.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${task.npr > 450 ? "bg-rose-100 text-rose-800 border border-rose-200" :
-                            task.npr > 225 ? "bg-orange-100 text-orange-800 border border-orange-200" :
-                              task.npr > 100 ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          task.npr > 225 ? "bg-orange-100 text-orange-800 border border-orange-200" :
+                            task.npr > 100 ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-emerald-100 text-emerald-800 border border-emerald-200"
                           }`}>
                           {task.nivel}
                         </span>
