@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ExcelJS = require("exceljs");
 import { Auditoria, Subtarea, Categoria } from "../../../types/auditoria";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-commonjs
+const ExcelJS = require("exceljs") as any;
 
 /* ─── helpers de fecha ─────────────────────────────────────────────────────── */
 const parseDate = (s?: string): Date | null => {
