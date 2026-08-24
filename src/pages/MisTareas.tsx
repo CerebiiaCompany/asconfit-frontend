@@ -110,7 +110,7 @@ export const MisTareas: React.FC = () => {
           </div>
           <p className="text-gray-600">
             {auditoriaSeleccionada === null
-              ? "Selecciona una auditoría para ver sus encargos"
+              ? "Selecciona una auditoría para ver sus tareas"
               : "Aquí puedes ver y subir archivos para los encargos asignados"}
           </p>
         </div>
