@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Modal } from "../../components/Modal";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/CategoriasSection";
 import { FormActions } from "../../components/auditorias/auditorias-nueva/FormActions";
@@ -8,6 +7,7 @@ import { useUser } from "../../hooks/useUser";
 import { useAuditoriaForm } from "../../hooks/useAuditoriaForm";
 import { useAuditoriaValidation } from "../../hooks/useAuditoriaValidation";
 import { auditoriaService } from "../../services/auditoriaService";
+import { useToast } from "../../contexts/ToastContext";
 
 export const EditarAuditoria: React.FC = () => {
   const navigate = useNavigate();
@@ -19,18 +19,7 @@ export const EditarAuditoria: React.FC = () => {
   const [canEdit, setCanEdit] = useState(false);
   const [auditoria, setAuditoria] = useState<any>(null);
   const [errors, setErrors] = useState<any>({});
-
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: "success" | "error" | "warning";
-    title: string;
-    message: string;
-  }>({
-    isOpen: false,
-    type: "success",
-    title: "",
-    message: "",
-  });
+  const { addToast } = useToast();
 
   const {
     formData,
@@ -99,12 +88,7 @@ export const EditarAuditoria: React.FC = () => {
           data.delegado_2_id === user.id;
 
         if (!tienePermiso) {
-          setModal({
-            isOpen: true,
-            type: "error",
-            title: "Acceso denegado",
-            message: "No tienes permiso para editar esta auditoría",
-          });
+          addToast("No tienes permiso para editar esta auditoría", "error");
           setCanEdit(false);
         } else {
           setCanEdit(true);
@@ -140,12 +124,7 @@ export const EditarAuditoria: React.FC = () => {
         }
       } catch (error: any) {
         console.error("Error al cargar auditoría:", error);
-        setModal({
-          isOpen: true,
-          type: "error",
-          title: "Error",
-          message: "No se pudo cargar la auditoría",
-        });
+        addToast("No se pudo cargar la auditoría", "error");
       } finally {
         setIsLoading(false);
       }
@@ -164,23 +143,13 @@ export const EditarAuditoria: React.FC = () => {
     
     if (!validationResult.isValid) {
       setErrors(validationResult.errors);
-      setModal({
-        isOpen: true,
-        type: "warning",
-        title: "Campos incompletos",
-        message: validationResult.modalMessage || "Completa todos los campos obligatorios marcados en rojo",
-      });
+      addToast(validationResult.modalMessage || "Completa todos los campos obligatorios marcados en rojo", "warning");
       return;
     }
 
     // Validar que al menos tenga una categoría para agregar
     if (categorias.length === 0) {
-      setModal({
-        isOpen: true,
-        type: "warning",
-        title: "Sin cambios",
-        message: "Debes agregar al menos una categoría para actualizar",
-      });
+      addToast("Debes agregar al menos una categoría para actualizar", "warning");
       return;
     }
 
@@ -194,32 +163,16 @@ export const EditarAuditoria: React.FC = () => {
       };
 
       await auditoriaService.updateAuditoria(id, updateData);
-      setModal({
-        isOpen: true,
-        type: "success",
-        title: "¡Éxito!",
-        message: "Auditoría actualizada exitosamente",
-      });
+      addToast("Auditoría actualizada exitosamente", "success");
+      navigate(`/auditorias/${id}`);
     } catch (error: any) {
       console.error("Error al actualizar auditoría:", error);
-      setModal({
-        isOpen: true,
-        type: "error",
-        title: "Error",
-        message:
-          error.response?.data?.message || "Error al actualizar la auditoría",
-      });
+      addToast(error.response?.data?.message || "Error al actualizar la auditoría", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCloseModal = () => {
-    setModal({ ...modal, isOpen: false });
-    if (modal.type === "success") {
-      navigate(`/auditorias/${id}`);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -233,20 +186,8 @@ export const EditarAuditoria: React.FC = () => {
   }
 
   if (!canEdit) {
-    return (
-      <div className="pb-12 px-4 sm:px-6 lg:px-8">
-        <Modal
-          isOpen={modal.isOpen}
-          onClose={() => {
-            setModal({ ...modal, isOpen: false });
-            navigate("/auditorias");
-          }}
-          title={modal.title}
-          message={modal.message}
-          type={modal.type}
-        />
-      </div>
-    );
+    navigate("/auditorias");
+    return null;
   }
 
   const breadcrumbItems = [
@@ -309,14 +250,6 @@ export const EditarAuditoria: React.FC = () => {
           />
         </div>
       </div>
-
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={handleCloseModal}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-      />
     </div>
   );
 };
