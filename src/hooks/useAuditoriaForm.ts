@@ -74,7 +74,7 @@ export const useAuditoriaForm = () => {
           const newSubtarea: Subtarea = {
             id: Date.now().toString(),
             nombre: "",
-            prioridad: "",
+            prioridad: "media",
             fechaSolicitud: "",
             tiempoEntrega: "",
             observaciones: "",
@@ -139,7 +139,7 @@ export const useAuditoriaForm = () => {
               (req: any, index: number) => ({
                 id: `${Date.now()}-${index}`,
                 nombre: req.nombre,
-                prioridad: "",
+                prioridad: "media",
                 fechaSolicitud: "",
                 tiempoEntrega: "",
                 observaciones: "",
