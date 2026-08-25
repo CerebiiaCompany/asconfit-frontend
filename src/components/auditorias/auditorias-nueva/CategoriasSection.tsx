@@ -22,6 +22,7 @@ interface CategoriasSectionProps {
   fechaAuditoriaInicio: string;
   fechaAuditoriaCorte: string;
   auditoriaDelegados?: number[];
+  errors?: any;
 }
 
 export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
@@ -36,6 +37,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   fechaAuditoriaInicio,
   fechaAuditoriaCorte,
   auditoriaDelegados,
+  errors = {},
 }) => {
   const [plantillasDisponibles, setPlantillasDisponibles] = useState<any[]>([]);
   const [plantillasModificadas, setPlantillasModificadas] = useState<
@@ -278,7 +280,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                       e.target.value,
                                     )
                                   }
-                                  className="flex-1 px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm font-medium"
+                                  className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-white text-sm font-medium ${errors[`${categoria.id}_nombre`] ? 'border-red-500 focus:ring-red-500' : 'border-orange-300 focus:ring-orange-500'}`}
                                   placeholder="Categoría personalizada"
                                 />
                                 <button
@@ -318,7 +320,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                     onLoadPlantilla(categoria.id, newValue);
                                 }
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm"
+                              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-[#F3F3F3] text-sm ${errors[`${categoria.id}_nombre`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                             >
                               <option value="">Selecciona una categoría</option>
                               {plantillasDisponibles.map((p) => (
@@ -350,7 +352,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                               Number(e.target.value),
                             )
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-white text-sm ${errors[`${categoria.id}_delegadoId`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-orange-500'}`}
                           required
                         >
                           <option value="">Seleccione delegado</option>
@@ -460,6 +462,8 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                               }
                               fechaAuditoriaInicio={fechaAuditoriaInicio}
                               fechaAuditoriaCorte={fechaAuditoriaCorte}
+                              errors={errors}
+                              categoriaId={categoria.id}
                             />
                           ))}
                         </div>

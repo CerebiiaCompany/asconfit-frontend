@@ -18,6 +18,8 @@ export interface AuditoriaErrors {
   delegado0?: string;
   // CategoriasSection — errores de categorías/subtareas (se muestran en modal)
   categorias?: string;
+  // Errores dinámicos para subtareas (formato: categoriaId_subtareaId_campo)
+  [key: string]: string | undefined;
 }
 
 interface ValidationResult {
@@ -65,59 +67,32 @@ export const useAuditoriaValidation = () => {
         const categoria = categorias[i];
 
         if (!categoria.nombre?.trim()) {
-          return {
-            isValid: false,
-            errors,
-            modalMessage: `La categoría ${i + 1} debe tener un nombre`,
-          };
+          errors[`${categoria.id}_nombre`] = "Campo obligatorio";
         }
 
         if (!categoria.delegadoId) {
-          return {
-            isValid: false,
-            errors,
-            modalMessage: `Selecciona un delegado para la categoría "${categoria.nombre}"`,
-          };
+          errors[`${categoria.id}_delegadoId`] = "Campo obligatorio";
         }
 
         for (let j = 0; j < categoria.subtareas.length; j++) {
           const sub = categoria.subtareas[j];
           const n = j + 1;
+          const subKey = `${categoria.id}_${sub.id}`;
 
           if (!sub.nombre?.trim()) {
-            return {
-              isValid: false,
-              errors,
-              modalMessage: `El requerimiento ${n} de "${categoria.nombre}" necesita un nombre`,
-            };
+            errors[`${subKey}_nombre`] = "Campo obligatorio";
           }
           if (!sub.prioridad) {
-            return {
-              isValid: false,
-              errors,
-              modalMessage: `El requerimiento "${sub.nombre}" necesita prioridad`,
-            };
+            errors[`${subKey}_prioridad`] = "Campo obligatorio";
           }
           if (!sub.fechaSolicitud) {
-            return {
-              isValid: false,
-              errors,
-              modalMessage: `El requerimiento "${sub.nombre}" necesita fecha de solicitud`,
-            };
+            errors[`${subKey}_fechaSolicitud`] = "Campo obligatorio";
           }
           if (!sub.tiempoEntrega?.trim()) {
-            return {
-              isValid: false,
-              errors,
-              modalMessage: `El requerimiento "${sub.nombre}" necesita fecha de entrega`,
-            };
+            errors[`${subKey}_tiempoEntrega`] = "Campo obligatorio";
           }
           if (!sub.formatoArchivo) {
-            return {
-              isValid: false,
-              errors,
-              modalMessage: `El requerimiento "${sub.nombre}" necesita formato de archivo`,
-            };
+            errors[`${subKey}_formatoArchivo`] = "Campo obligatorio";
           }
         }
       }
@@ -128,7 +103,7 @@ export const useAuditoriaValidation = () => {
       isValid: !hasFieldErrors,
       errors,
       modalMessage: hasFieldErrors
-        ? "Completa todos los campos obligatorios marcados en rojo"
+        ? "Hay campos incompletos. Por favor completa todos los campos marcados en rojo."
         : undefined,
     };
   };

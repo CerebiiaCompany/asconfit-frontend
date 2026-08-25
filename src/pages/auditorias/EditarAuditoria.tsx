@@ -18,6 +18,7 @@ export const EditarAuditoria: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [auditoria, setAuditoria] = useState<any>(null);
+  const [errors, setErrors] = useState<any>({});
 
   const [modal, setModal] = useState<{
     isOpen: boolean;
@@ -44,6 +45,41 @@ export const EditarAuditoria: React.FC = () => {
     handleLoadPlantilla,
     handleLoadExistingAuditoriaCategorias,
   } = useAuditoriaForm();
+
+  const handleSubtareaChangeWithValidation = (
+    categoriaId: string,
+    subtareaId: string,
+    field: string,
+    value: string,
+  ) => {
+    handleSubtareaChange(categoriaId, subtareaId, field as any, value);
+    // Limpiar error del campo específico cuando se modifica
+    const errorKey = `${categoriaId}_${subtareaId}_${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev: any) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleCategoriaChangeWithValidation = (
+    id: string,
+    field: string,
+    value: any,
+  ) => {
+    handleCategoriaChange(id, field as any, value);
+    // Limpiar error del campo específico cuando se modifica
+    const errorKey = `${id}_${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev: any) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
 
   // Cargar auditoría existente
   useEffect(() => {
@@ -123,6 +159,20 @@ export const EditarAuditoria: React.FC = () => {
   const handleSubmit = async () => {
     if (!id || !auditoria) return;
 
+    // Validar campos de categorías y subtareas
+    const validationResult = validateForm(formData, categorias, [auditoria?.delegado_1_id, auditoria?.delegado_2_id]);
+    
+    if (!validationResult.isValid) {
+      setErrors(validationResult.errors);
+      setModal({
+        isOpen: true,
+        type: "warning",
+        title: "Campos incompletos",
+        message: validationResult.modalMessage || "Completa todos los campos obligatorios marcados en rojo",
+      });
+      return;
+    }
+
     // Validar que al menos tenga una categoría para agregar
     if (categorias.length === 0) {
       setModal({
@@ -136,6 +186,7 @@ export const EditarAuditoria: React.FC = () => {
 
     try {
       setIsSubmitting(true);
+      setErrors({}); // Limpiar errores al enviar
       const updateData = {
         formData,
         categorias,
@@ -239,14 +290,15 @@ export const EditarAuditoria: React.FC = () => {
             categorias={categorias}
             onAddCategoria={handleAddCategoria}
             onRemoveCategoria={handleRemoveCategoria}
-            onCategoriaChange={handleCategoriaChange}
+            onCategoriaChange={handleCategoriaChangeWithValidation}
             onAddSubtarea={handleAddSubtarea}
             onRemoveSubtarea={handleRemoveSubtarea}
-            onSubtareaChange={handleSubtareaChange}
+            onSubtareaChange={handleSubtareaChangeWithValidation}
             onLoadPlantilla={handleLoadPlantilla}
             fechaAuditoriaInicio={formData.fechaInicial}
             fechaAuditoriaCorte={formData.fechaCorte}
             auditoriaDelegados={[auditoria?.delegado_1_id, auditoria?.delegado_2_id].filter((id): id is number => id !== null && id !== undefined)}
+            errors={errors}
           />
 
           <FormActions

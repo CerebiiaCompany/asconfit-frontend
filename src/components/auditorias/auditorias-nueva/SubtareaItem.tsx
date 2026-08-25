@@ -8,6 +8,8 @@ interface SubtareaItemProps {
   onChange: (field: keyof Subtarea, value: string) => void;
   fechaAuditoriaInicio: string;
   fechaAuditoriaCorte: string;
+  errors?: any;
+  categoriaId: string;
 }
 
 export const SubtareaItem: React.FC<SubtareaItemProps> = ({
@@ -16,6 +18,8 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
   onChange,
   fechaAuditoriaInicio,
   fechaAuditoriaCorte,
+  errors = {},
+  categoriaId,
 }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
@@ -28,7 +32,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           value={subtarea.nombre}
           onChange={(e) => onChange("nombre", e.target.value)}
           rows={2}
-          className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+          className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base ${errors[`${categoriaId}_${subtarea.id}_nombre`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
           placeholder="Descripción del requerimiento..."
         />
       </div>
@@ -40,7 +44,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           <select
             value={subtarea.prioridad}
             onChange={(e) => onChange("prioridad", e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base ${errors[`${categoriaId}_${subtarea.id}_prioridad`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
           >
             <option value="">Seleccionar</option>
             <option value="alta">Alta</option>
@@ -64,6 +68,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             min={fechaAuditoriaInicio}
             max={subtarea.tiempoEntrega || fechaAuditoriaCorte}
             placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+            hasError={!!errors[`${categoriaId}_${subtarea.id}_fechaSolicitud`]}
           />
         </div>
         <div>
@@ -77,6 +82,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
             min={subtarea.fechaSolicitud || fechaAuditoriaInicio}
             max={fechaAuditoriaCorte}
             placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+            hasError={!!errors[`${categoriaId}_${subtarea.id}_tiempoEntrega`]}
           />
         </div>
       </div>
@@ -104,7 +110,7 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           <select
             value={subtarea.formatoArchivo}
             onChange={(e) => onChange("formatoArchivo", e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base"
+            className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base ${errors[`${categoriaId}_${subtarea.id}_formatoArchivo`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
           >
             <option value="">Seleccionar formato</option>
             <option value="pdf">PDF</option>
