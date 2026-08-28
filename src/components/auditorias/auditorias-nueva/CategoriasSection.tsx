@@ -476,20 +476,18 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
           )}
         </div>
 
-        {/* Botón agregar categoría al final — evita scrollear hacia arriba */}
-        {categorias.length > 0 && (
-          <div className="mt-4 flex justify-center">
-            <button
-              onClick={onAddCategoria}
-              className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Agregar categoría
-            </button>
-          </div>
-        )}
+        {/* Botón agregar categoría al final — siempre visible */}
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={onAddCategoria}
+            className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Agregar categoría
+          </button>
+        </div>
       </div>
     </>
   );
