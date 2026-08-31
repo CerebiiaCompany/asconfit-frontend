@@ -42,6 +42,7 @@ export const useAuditoriaForm = () => {
         id: Date.now().toString(),
         nombre: "",
         delegadoId: null,
+        tipoEstado: 'estandar' as const,
         subtareas: [],
       },
     ]);
@@ -172,6 +173,7 @@ export const useAuditoriaForm = () => {
       id: cat.id ? cat.id : Date.now().toString() + '-' + catIndex,
       nombre: cat.nombre,
       delegadoId: cat.delegado_id,
+      tipoEstado: (cat.tipo_estado === 'si_no' ? 'si_no' : 'estandar') as 'estandar' | 'si_no',
       subtareas: cat.subtareas ? cat.subtareas.map((st: any, stIndex: number) => ({
         id: st.id ? st.id : Date.now().toString() + '-' + stIndex,
         nombre: st.nombre,

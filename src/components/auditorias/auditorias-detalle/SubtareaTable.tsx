@@ -4,6 +4,7 @@ import { SubtareaRow } from './SubtareaRow';
 interface SubtareaTableProps {
     subtareas: any[];
     auditoria: any;
+    categoriaTipoEstado: 'estandar' | 'si_no';
     uploadingSubtareaId: number | null;
     fileInputRefs: React.MutableRefObject<{ [key: number]: HTMLInputElement | null }>;
     onFileSelect: (subtareaId: number) => void;
@@ -20,6 +21,7 @@ interface SubtareaTableProps {
 export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     subtareas,
     auditoria,
+    categoriaTipoEstado,
     uploadingSubtareaId,
     fileInputRefs,
     onFileSelect,
@@ -69,6 +71,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             key={subtarea.id}
                             subtarea={subtarea}
                             auditoria={auditoria}
+                            categoriaTipoEstado={categoriaTipoEstado}
                             isUploading={uploadingSubtareaId === subtarea.id}
                             fileInputRef={(el) => { fileInputRefs.current[subtarea.id] = el; }}
                             onFileSelect={onFileSelect}

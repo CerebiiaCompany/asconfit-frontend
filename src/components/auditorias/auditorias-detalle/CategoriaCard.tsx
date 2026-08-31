@@ -41,7 +41,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                 <h4 className="text-xl font-bold text-white">{categoria.nombre}</h4>
                 {categoria.delegado && (
                     <div className="flex items-center text-white bg-white/20 px-3 py-1 rounded-full text-sm">
-                        Delegado: <span 
+                        Delegado: <span
                             className="font-semibold ml-1.5 cursor-pointer hover:underline"
                             onClick={() => setShowProfileModal(true)}
                         >{categoria.delegado.name}</span>
@@ -54,6 +54,7 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                     <SubtareaTable
                         subtareas={categoria.subtareas}
                         auditoria={auditoria}
+                        categoriaTipoEstado={categoria.tipo_estado === 'si_no' ? 'si_no' : 'estandar'}
                         uploadingSubtareaId={uploadingSubtareaId}
                         fileInputRefs={fileInputRefs}
                         onFileSelect={onFileSelect}

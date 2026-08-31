@@ -7,6 +7,8 @@ export interface TareaFlat {
   auditoriaNit: string;
   categoriaId: number;
   categoriaNombre: string;
+  /** 'estandar' = Pendiente/Aprobado/Rechazado | 'si_no' = Sí/No */
+  categoriaTipoEstado: 'estandar' | 'si_no';
   subtareaId: number;
   subtareaNombre: string;
   formatoArchivo: string | null;
@@ -56,6 +58,7 @@ export const useTareas = () => {
               auditoriaNit: auditoria.empresa?.nit || "Sin NIT",
               categoriaId: categoria.id,
               categoriaNombre: categoria.nombre,
+              categoriaTipoEstado: (categoria.tipo_estado === 'si_no' ? 'si_no' : 'estandar') as 'estandar' | 'si_no',
               subtareaId: subtarea.id,
               subtareaNombre: subtarea.nombre,
               formatoArchivo: subtarea.formato_archivo,

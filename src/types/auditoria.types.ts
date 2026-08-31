@@ -14,6 +14,8 @@ export interface Categoria {
   id: string;
   nombre: string;
   delegadoId: number | null;
+  /** 'estandar' = Pendiente/Aprobado/Rechazado con notificaciones | 'si_no' = Sí/No simple */
+  tipoEstado: 'estandar' | 'si_no';
   subtareas: Subtarea[];
 }
 

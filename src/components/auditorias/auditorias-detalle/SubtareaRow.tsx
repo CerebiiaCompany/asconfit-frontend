@@ -10,6 +10,7 @@ import { notaService } from "../../../services/notaService";
 interface SubtareaRowProps {
   subtarea: any;
   auditoria: any;
+  categoriaTipoEstado: 'estandar' | 'si_no';
   isUploading: boolean;
   fileInputRef: (el: HTMLInputElement | null) => void;
   onFileSelect: (subtareaId: number) => void;
@@ -29,6 +30,7 @@ interface SubtareaRowProps {
 export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   subtarea,
   auditoria,
+  categoriaTipoEstado,
   isUploading,
   fileInputRef,
   onFileSelect,
@@ -47,6 +49,12 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const [loadingNote, setLoadingNote] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingEstado, setPendingEstado] = useState<string>("");
+
+  // Tipo de estado viene directamente de la categoría padre via prop
+  const tipoEstado: 'estandar' | 'si_no' = categoriaTipoEstado ?? 'estandar';
+
+  // Para si_no: el estado inicial es vacío (sin seleccionar), no "pendiente"
+  const estadoActual = subtarea.estado_informacion || (tipoEstado === 'si_no' ? '' : 'pendiente');
 
   // Determinar si es admin para modo de solo lectura
   const isAdmin = userRole === 'admin';
@@ -79,7 +87,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
 
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newEstado = e.target.value;
-    const currentEstado = subtarea.estado_informacion || "pendiente";
+    const currentEstado = estadoActual;
 
     // Si el estado no cambió, no hacer nada
     if (newEstado === currentEstado) return;
@@ -108,6 +116,8 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
       pendiente: "Pendiente",
       aprobado: "Aprobado",
       rechazado: "Rechazado",
+      si: "Sí",
+      no: "No",
     };
     return labels[estado] || estado;
   };
@@ -175,16 +185,31 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         </td>
         <td className="px-2 py-3 whitespace-nowrap">
           {userRole === "admin" ? (
-            <select
-              value={subtarea.estado_informacion || "pendiente"}
-              onChange={handleEstadoChange}
-              disabled={isUpdatingEstado}
-              className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="aprobado">Aprobado</option>
-              <option value="rechazado">Rechazado</option>
-            </select>
+            tipoEstado === 'si_no' ? (
+              /* Tipo Sí/No: cualquier admin puede cambiar, sin confirmación especial */
+              <select
+                value={estadoActual}
+                onChange={handleEstadoChange}
+                disabled={isUpdatingEstado}
+                className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Sin respuesta</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+            ) : (
+              /* Tipo estándar: Pendiente / Aprobado / Rechazado */
+              <select
+                value={estadoActual}
+                onChange={handleEstadoChange}
+                disabled={isUpdatingEstado}
+                className="text-xs px-2 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="pendiente">Pendiente</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+              </select>
+            )
           ) : (
             <EstadoInformacionBadge estado={subtarea.estado_informacion} />
           )}

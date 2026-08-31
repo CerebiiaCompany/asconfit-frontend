@@ -129,10 +129,15 @@ export const TareaCard: React.FC<TareaCardProps> = ({
 
     const urgencyBadge = getUrgencyBadge(tarea.fechaEntrega, tarea.estadoInformacion);
 
+    // Detectar el tipo de estado de la categoría
+    const tipoEstado = tarea.categoriaTipoEstado || 'estandar';
+    const esSiNo = tipoEstado === 'si_no';
+
     // Lógica para deshabilitar el botón
     // Se deshabilita si está en revisión o ya fue aprobado.
     // También se deshabilita si ya fue recibido para evitar múltiples envíos.
-    const isUploadDisabled = ['recibido', 'revision', 'aprobado'].includes(tarea.estadoInformacion || '');
+    // Para tipo si_no no hay subida de archivo — siempre deshabilitado.
+    const isUploadDisabled = esSiNo || ['recibido', 'revision', 'aprobado'].includes(tarea.estadoInformacion || '');
 
     // Mapeo de estilos para los estados
     const getStatusConfig = (status: string | null) => {
@@ -145,8 +150,12 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                 return { label: 'Recibido', color: 'text-blue-600', bg: 'bg-blue-50', borderColor: 'border-blue-200' };
             case 'revision':
                 return { label: 'En revisión', color: 'text-yellow-600', bg: 'bg-yellow-50', borderColor: 'border-yellow-200' };
+            case 'si':
+                return { label: 'Sí', color: 'text-green-600', bg: 'bg-green-50', borderColor: 'border-green-200' };
+            case 'no':
+                return { label: 'No', color: 'text-red-600', bg: 'bg-red-50', borderColor: 'border-red-200' };
             default:
-                return { label: 'Pendiente', color: 'text-orange-600', bg: 'bg-orange-50', borderColor: 'border-orange-200' };
+                return { label: esSiNo ? 'Sin respuesta' : 'Pendiente', color: 'text-orange-600', bg: 'bg-orange-50', borderColor: 'border-orange-200' };
         }
     };
 
@@ -217,14 +226,16 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                 {/* Botón de subir archivo con lógica de estado */}
                 <div className="flex flex-col items-end gap-2">
                     <div className="flex items-center gap-2">
-                        <FileUploadButton
-                            onFileSelect={handleFileSelect}
-                            acceptedFileTypes={acceptedFileTypes}
-                            hasFile={!!tarea.archivoNombre}
-                            uploading={uploading}
-                            disabled={isUploadDisabled}
-                            empresaId={empresaId}
-                        />
+                        {!esSiNo && (
+                            <FileUploadButton
+                                onFileSelect={handleFileSelect}
+                                acceptedFileTypes={acceptedFileTypes}
+                                hasFile={!!tarea.archivoNombre}
+                                uploading={uploading}
+                                disabled={isUploadDisabled}
+                                empresaId={empresaId}
+                            />
+                        )}
                         <button
                             onClick={() => setShowNoteModal(true)}
                             className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
@@ -236,14 +247,14 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         </button>
                     </div>
 
-                    {/* Mensaje de ayuda basado en el estado */}
-                    {isUploadDisabled && tarea.estadoInformacion === 'aprobado' && (
+                    {/* Mensajes de ayuda — solo para tipo estándar */}
+                    {!esSiNo && isUploadDisabled && tarea.estadoInformacion === 'aprobado' && (
                         <span className="text-[10px] text-green-600 font-medium">Información aprobada</span>
                     )}
-                    {isUploadDisabled && (tarea.estadoInformacion === 'recibido' || tarea.estadoInformacion === 'revision') && (
+                    {!esSiNo && isUploadDisabled && (tarea.estadoInformacion === 'recibido' || tarea.estadoInformacion === 'revision') && (
                         <span className="text-[10px] text-blue-600 font-medium">En espera de revisión</span>
                     )}
-                    {tarea.estadoInformacion === 'rechazado' && (
+                    {!esSiNo && tarea.estadoInformacion === 'rechazado' && (
                         <span className="text-[10px] text-red-600 font-medium italic">Por favor, sube el archivo corregido</span>
                     )}
                 </div>
