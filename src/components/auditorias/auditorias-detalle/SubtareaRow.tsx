@@ -47,8 +47,6 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [loadingNote, setLoadingNote] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingEstado, setPendingEstado] = useState<string>("");
 
   // Tipo de estado viene directamente de la categoría padre via prop
   const tipoEstado: 'estandar' | 'si_no' = categoriaTipoEstado ?? 'estandar';
@@ -87,39 +85,8 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
 
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newEstado = e.target.value;
-    const currentEstado = estadoActual;
-
-    // Si el estado no cambió, no hacer nada
-    if (newEstado === currentEstado) return;
-
-    // Guardar el nuevo estado y mostrar confirmación
-    setPendingEstado(newEstado);
-    setShowConfirmModal(true);
-
-    // Revertir el select al valor actual
-    e.target.value = currentEstado;
-  };
-
-  const confirmEstadoChange = () => {
-    onEstadoChange(subtarea.id, pendingEstado);
-    setShowConfirmModal(false);
-    setPendingEstado("");
-  };
-
-  const cancelEstadoChange = () => {
-    setShowConfirmModal(false);
-    setPendingEstado("");
-  };
-
-  const getEstadoLabel = (estado: string) => {
-    const labels: Record<string, string> = {
-      pendiente: "Pendiente",
-      aprobado: "Aprobado",
-      rechazado: "Rechazado",
-      si: "Sí",
-      no: "No",
-    };
-    return labels[estado] || estado;
+    if (newEstado === estadoActual) return;
+    onEstadoChange(subtarea.id, newEstado);
   };
 
   const formatDate = (dateString?: string): string => {
@@ -312,34 +279,6 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         document.body
       )}
 
-      {showConfirmModal && createPortal(
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Confirmar cambio de estado
-            </h3>
-            <p className="text-gray-600 mb-6">
-              ¿Está seguro de cambiar el estado de "{subtarea.nombre}" a{" "}
-              <span className="font-semibold">{getEstadoLabel(pendingEstado)}</span>?
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={cancelEstadoChange}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmEstadoChange}
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
     </>
   );
 };

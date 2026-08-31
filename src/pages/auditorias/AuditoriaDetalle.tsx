@@ -11,12 +11,14 @@ import { CategoriaCard } from "../../components/auditorias/auditorias-detalle/Ca
 import { EstadoBadge } from "../../components/auditorias/EstadoBadge";
 import { LoadingState } from "../../components/common/LoadingState";
 import { Calendar, CalendarEvent } from "../../components/common/Calendar";
+import { useToast } from "../../contexts/ToastContext";
 
 export const AuditoriaDetalle: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useUser(() => navigate("/login"));
   const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
+  const { addToast } = useToast();
   const [findingsCount, setFindingsCount] = useState<Record<number, number>>({});
   const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<
     number | null
@@ -94,20 +96,10 @@ export const AuditoriaDetalle: React.FC = () => {
       setUpdatingEstadoSubtareaId(subtareaId);
       await auditoriaService.updateEstadoSubtarea(subtareaId, estado);
       await refetch();
-      setModal({
-        isOpen: true,
-        type: "success",
-        title: "Éxito",
-        message: "Estado actualizado correctamente",
-      });
+      addToast("Estado actualizado correctamente", "success");
     } catch (error) {
       console.error("Error al actualizar estado:", error);
-      setModal({
-        isOpen: true,
-        type: "error",
-        title: "Error",
-        message: "No se pudo actualizar el estado",
-      });
+      addToast("No se pudo actualizar el estado", "error");
     } finally {
       setUpdatingEstadoSubtareaId(null);
     }
