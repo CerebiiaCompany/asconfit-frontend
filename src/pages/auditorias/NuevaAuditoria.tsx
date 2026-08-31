@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "../../components/Modal";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { AuditoriaHeader } from "../../components/auditorias/auditorias-nueva/AuditoriaHeader";
 import { EmpresaSection } from "../../components/auditorias/auditorias-nueva/EmpresaSection";
@@ -14,25 +13,16 @@ import { useUser } from "../../hooks/useUser";
 import { useAuditoriaForm } from "../../hooks/useAuditoriaForm";
 import { useAuditoriaValidation, AuditoriaErrors } from "../../hooks/useAuditoriaValidation";
 import { auditoriaService } from "../../services/auditoriaService";
+import { useToast } from "../../contexts/ToastContext";
 
 export const NuevaAuditoria: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
+  const { addToast } = useToast();
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const [searchConcepto, setSearchConcepto] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<AuditoriaErrors>({});
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: "success" | "error";
-    title: string;
-    message: string;
-  }>({
-    isOpen: false,
-    type: "success",
-    title: "",
-    message: "",
-  });
 
   const {
     formData,
@@ -99,34 +89,14 @@ export const NuevaAuditoria: React.FC = () => {
   const handleSubmit = async () => {
     const validation = validateForm(formData, categorias, delegados);
 
-    // Siempre actualizar errores de campo (incluso si hay error de categoría)
     setFieldErrors(validation.errors);
 
     if (!validation.isValid) {
-      // Si hay errores en campos básicos, hacer scroll al primero visible
       const hasFieldErrors = Object.keys(validation.errors).length > 0;
       if (hasFieldErrors) {
-        // Scroll suave hacia arriba para que el usuario vea los campos en rojo
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
-
-      // Si el error es de categoría/subtarea, mostrar modal
-      if (validation.modalMessage) {
-        setModal({
-          isOpen: true,
-          type: "error",
-          title: "Campos incompletos",
-          message: validation.modalMessage,
-        });
-      } else {
-        // Error sólo de campos, mostrar toast breve en modal
-        setModal({
-          isOpen: true,
-          type: "error",
-          title: "Campos incompletos",
-          message: "Completa todos los campos obligatorios marcados en rojo antes de continuar.",
-        });
-      }
+      addToast(validation.modalMessage || "Completa todos los campos obligatorios marcados en rojo antes de continuar.", "error");
       return;
     }
 
@@ -141,30 +111,13 @@ export const NuevaAuditoria: React.FC = () => {
 
       await auditoriaService.createAuditoria(auditoriaData);
       setFieldErrors({});
-      setModal({
-        isOpen: true,
-        type: "success",
-        title: "¡Éxito!",
-        message: "Auditoría guardada exitosamente",
-      });
+      addToast("Auditoría guardada exitosamente", "success");
+      navigate("/auditorias");
     } catch (error: any) {
       console.error("Error al guardar auditoría:", error);
-      setModal({
-        isOpen: true,
-        type: "error",
-        title: "Error",
-        message:
-          error.response?.data?.message || "Error al guardar la auditoría",
-      });
+      addToast(error.response?.data?.message || "Error al guardar la auditoría", "error");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setModal({ ...modal, isOpen: false });
-    if (modal.type === "success") {
-      navigate("/auditorias");
     }
   };
 
@@ -247,14 +200,6 @@ export const NuevaAuditoria: React.FC = () => {
           />
         </div>
       </div>
-
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={handleCloseModal}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-      />
     </div>
   );
 };
