@@ -42,7 +42,7 @@ export const MisTareas: React.FC = () => {
     }
   }, [searchParams]);
 
-  const { uploadFile, uploadingSubtareaId, getAcceptedFileTypes } =
+  const { uploadFile, uploadingSubtareaId, getAcceptedFileTypes, handleOpenFile } =
     useFileUpload({
       onSuccess: (fileName) => {
         setModal({
@@ -156,6 +156,7 @@ export const MisTareas: React.FC = () => {
                         carpetaId
                       )
                     }
+                    onOpenFile={(fileName) => handleOpenFile(tarea.subtareaId, fileName)}
                     acceptedFileTypes={getAcceptedFileTypes(
                       tarea.formatoArchivo
                     )}

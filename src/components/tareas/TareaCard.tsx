@@ -7,6 +7,7 @@ import { notaService } from '../../services/notaService';
 interface TareaCardProps {
     tarea: TareaFlat;
     onFileUpload: (file: File, carpetaId?: number | null) => void;
+    onOpenFile: (fileName: string) => void;
     acceptedFileTypes: string;
     uploading?: boolean;
     empresaId?: number;
@@ -15,6 +16,7 @@ interface TareaCardProps {
 export const TareaCard: React.FC<TareaCardProps> = ({
     tarea,
     onFileUpload,
+    onOpenFile,
     acceptedFileTypes,
     uploading = false,
     empresaId
@@ -225,6 +227,19 @@ export const TareaCard: React.FC<TareaCardProps> = ({
 
                 {/* Botón de subir archivo con lógica de estado */}
                 <div className="flex flex-col items-end gap-2">
+                    {/* Link al archivo subido — solo si existe */}
+                    {tarea.archivoNombre && (
+                        <button
+                            onClick={() => onOpenFile(tarea.archivoNombre!)}
+                            className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors max-w-[160px]"
+                            title={`Ver: ${tarea.archivoNombre}`}
+                        >
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            <span className="truncate">{tarea.archivoNombre}</span>
+                        </button>
+                    )}
                     <div className="flex items-center gap-2">
                         <FileUploadButton
                             onFileSelect={handleFileSelect}
