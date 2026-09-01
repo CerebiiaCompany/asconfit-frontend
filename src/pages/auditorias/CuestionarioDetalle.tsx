@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import ExcelJS from 'exceljs';
 import { cuestionarioService } from '../../services/cuestionarioService';
 import { Breadcrumb } from '../../components/common/Breadcrumb';
 import { LoadingState } from '../../components/common/LoadingState';
@@ -121,7 +122,7 @@ export const CuestionarioDetalle: React.FC = () => {
 
             // Obtener datos para exportar
             const data = await cuestionarioService.exportar(Number(cuestionarioId), auditoriaId!);
-            generarCSV(data);
+            await generarExcel(data);
             addToast('Cuestionario descargado correctamente', 'success');
         } catch {
             addToast('Error al descargar el cuestionario', 'error');
@@ -130,38 +131,201 @@ export const CuestionarioDetalle: React.FC = () => {
         }
     };
 
-    const generarCSV = (data: any) => {
-        const BOM = '\uFEFF';
-        const filas: string[][] = [];
+    const generarExcel = async (data: any) => {
+        const workbook = new ExcelJS.Workbook();
+        const ws = workbook.addWorksheet('Cuestionario');
 
-        // Encabezado
-        filas.push([data.cuestionario]);
-        filas.push(['Empresa:', data.empresa || '']);
-        filas.push(['NIT:', data.nit || '']);
-        filas.push(['Fecha:', data.fecha]);
-        filas.push(['Objetivo:', data.objetivo || '']);
-        filas.push([]);
-        filas.push(['Sección', 'Pregunta', 'Si', 'No', 'N/A', 'Observaciones', 'Recomendaciones']);
+        // ── Anchos de columnas (igual que el formato original) ──────────────
+        ws.columns = [
+            { width: 70 },  // A: Pregunta
+            { width: 14 },  // B: Respuesta (Si / No / N/A combinadas)
+            { width: 6 },  // C: Sí
+            { width: 6 },  // D: No
+            { width: 6 },  // E: N/A
+            { width: 35 },  // F: Observaciones
+            { width: 35 },  // G: Recomendaciones
+        ];
 
+        // ── Colores ─────────────────────────────────────────────────────────
+        const NARANJA = 'FFFF6600';
+        const GRIS_OSC = 'FF404040';
+        const VERDE = 'FF70AD47';
+        const ROJO = 'FFFF0000';
+        const GRIS_CLR = 'FFD9D9D9';
+        const BLANCO = 'FFFFFFFF';
+        const AZUL_HDR = 'FF1F3864';
+
+        const centrado: Partial<ExcelJS.Alignment> = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        const izquierda: Partial<ExcelJS.Alignment> = { horizontal: 'left', vertical: 'middle', wrapText: true };
+
+        const fill = (argb: string): ExcelJS.Fill => ({
+            type: 'pattern', pattern: 'solid', fgColor: { argb },
+        });
+        const borde = (): Partial<ExcelJS.Borders> => ({
+            top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            right: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+        });
+
+        // ── Fila 1: Título ───────────────────────────────────────────────────
+        ws.mergeCells('A1:G1');
+        const r1 = ws.getRow(1);
+        r1.height = 30;
+        r1.getCell(1).value = data.cuestionario;
+        r1.getCell(1).font = { bold: true, size: 14, color: { argb: BLANCO } };
+        r1.getCell(1).fill = fill(NARANJA);
+        r1.getCell(1).alignment = centrado;
+
+        // ── Fila 2: Opciones Si / No / NA ────────────────────────────────────
+        ws.mergeCells('A2:D2');
+        ws.getRow(2).height = 18;
+        ws.getCell('E2').value = 'Si';
+        ws.getCell('F2').value = 'No';
+        ws.getCell('G2').value = 'N/A';
+        ['E2', 'F2', 'G2'].forEach(addr => {
+            ws.getCell(addr).font = { bold: true, color: { argb: BLANCO } };
+            ws.getCell(addr).fill = fill(GRIS_OSC);
+            ws.getCell(addr).alignment = centrado;
+        });
+
+        // ── Fila 3: Nombre cuestionario ──────────────────────────────────────
+        ws.mergeCells('A3:G3');
+        ws.getRow(3).height = 18;
+        ws.getCell('A3').value = data.cuestionario;
+        ws.getCell('A3').font = { bold: true, size: 11 };
+        ws.getCell('A3').alignment = centrado;
+
+        // ── Fila 4: Fecha ────────────────────────────────────────────────────
+        ws.mergeCells('A4:B4');
+        ws.getCell('A4').value = `Fecha de Elaboración: ${data.fecha}`;
+        ws.getCell('A4').font = { bold: true };
+        ws.getRow(4).height = 16;
+
+        // ── Fila 5: Objetivo ─────────────────────────────────────────────────
+        ws.mergeCells('A5:G5');
+        ws.getRow(5).height = 32;
+        ws.getCell('A5').value = `Objetivo: ${data.objetivo}`;
+        ws.getCell('A5').alignment = { wrapText: true, vertical: 'middle' };
+        ws.getCell('A5').fill = fill('FFFFF2CC');
+
+        // ── Fila 6: Empresa ──────────────────────────────────────────────────
+        ws.mergeCells('A6:G6');
+        ws.getRow(6).height = 18;
+        ws.getCell('A6').value = `${data.empresa || ''} · NIT: ${data.nit || ''}`;
+        ws.getCell('A6').font = { bold: true };
+        ws.getCell('A6').fill = fill(GRIS_CLR);
+        ws.getCell('A6').alignment = centrado;
+
+        // ── Fila 7: Cuestionario de control interno / Entrevistado ───────────
+        ws.mergeCells('A7:G7');
+        ws.getRow(7).height = 16;
+        ws.getCell('A7').value = 'Cuestionario de control interno';
+        ws.getCell('A7').font = { bold: true };
+        ws.getCell('A7').alignment = centrado;
+
+        // ── Fila 8: vacía de separación ──────────────────────────────────────
+        ws.getRow(8).height = 10;
+
+        // ── Encabezados de tabla ─────────────────────────────────────────────
+        const hdrRow = ws.getRow(9);
+        hdrRow.height = 20;
+        const hdrs = ['Pregunta', '', 'Si', 'No', 'N/A', 'Observaciones', 'Recomendaciones'];
+        hdrs.forEach((h, i) => {
+            const cell = hdrRow.getCell(i + 1);
+            cell.value = h;
+            cell.font = { bold: true, color: { argb: BLANCO } };
+            cell.fill = fill(AZUL_HDR);
+            cell.alignment = centrado;
+            cell.border = borde();
+        });
+
+        // ── Filas de preguntas ───────────────────────────────────────────────
+        let rowNum = 10;
         let seccionActual = '';
+
         for (const fila of data.filas) {
-            const esSi = fila.respuesta === 'SI' ? '✓' : '';
-            const esNo = fila.respuesta === 'NO' ? '✓' : '';
-            const esNA = fila.respuesta === 'NA' ? '✓' : '';
-            const seccion = fila.seccion !== seccionActual ? fila.seccion : '';
-            seccionActual = fila.seccion;
-            filas.push([seccion, fila.pregunta, esSi, esNo, esNA, fila.observaciones, fila.recomendaciones]);
+            // Fila de sección
+            if (fila.seccion !== seccionActual) {
+                seccionActual = fila.seccion;
+                ws.mergeCells(`A${rowNum}:G${rowNum}`);
+                const secRow = ws.getRow(rowNum);
+                secRow.height = 18;
+                secRow.getCell(1).value = seccionActual;
+                secRow.getCell(1).font = { bold: true, color: { argb: BLANCO } };
+                secRow.getCell(1).fill = fill(NARANJA);
+                secRow.getCell(1).alignment = { horizontal: 'left', vertical: 'middle' };
+                secRow.getCell(1).border = borde();
+                rowNum++;
+            }
+
+            const esSi = fila.respuesta === 'SI';
+            const esNo = fila.respuesta === 'NO';
+            const esNA = fila.respuesta === 'NA';
+
+            const pRow = ws.getRow(rowNum);
+            pRow.height = 36;
+
+            // A: Pregunta
+            pRow.getCell(1).value = fila.pregunta;
+            pRow.getCell(1).alignment = { ...izquierda, wrapText: true };
+            pRow.getCell(1).border = borde();
+
+            // B: vacía
+            pRow.getCell(2).border = borde();
+
+            // C: Sí
+            pRow.getCell(3).value = esSi ? '✓' : '';
+            pRow.getCell(3).alignment = centrado;
+            pRow.getCell(3).font = { bold: true, color: { argb: esSi ? VERDE : 'FF000000' } };
+            pRow.getCell(3).border = borde();
+            if (esSi) pRow.getCell(3).fill = fill('FFE2EFDA');
+
+            // D: No
+            pRow.getCell(4).value = esNo ? '✓' : '';
+            pRow.getCell(4).alignment = centrado;
+            pRow.getCell(4).font = { bold: true, color: { argb: esNo ? ROJO : 'FF000000' } };
+            pRow.getCell(4).border = borde();
+            if (esNo) pRow.getCell(4).fill = fill('FFFFC7CE');
+
+            // E: N/A
+            pRow.getCell(5).value = esNA ? '✓' : '';
+            pRow.getCell(5).alignment = centrado;
+            pRow.getCell(5).font = { bold: true, color: { argb: esNA ? '666666' : 'FF000000' } };
+            pRow.getCell(5).border = borde();
+            if (esNA) pRow.getCell(5).fill = fill(GRIS_CLR);
+
+            // F: Observaciones
+            pRow.getCell(6).value = fila.observaciones || '';
+            pRow.getCell(6).alignment = { ...izquierda, wrapText: true };
+            pRow.getCell(6).border = borde();
+
+            // G: Recomendaciones
+            pRow.getCell(7).value = fila.recomendaciones || '';
+            pRow.getCell(7).alignment = { ...izquierda, wrapText: true };
+            pRow.getCell(7).border = borde();
+
+            // Alternar fondo de filas
+            if (rowNum % 2 === 0) {
+                [1, 2, 6, 7].forEach(col => {
+                    if (!pRow.getCell(col).fill || (pRow.getCell(col).fill as any).fgColor?.argb === BLANCO) {
+                        pRow.getCell(col).fill = fill('FFF5F5F5');
+                    }
+                });
+            }
+
+            rowNum++;
         }
 
-        const csv = BOM + filas.map(r =>
-            r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')
-        ).join('\r\n');
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        // ── Descargar ────────────────────────────────────────────────────────
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${data.cuestionario} - ${data.empresa || 'Empresa'}.csv`;
+        a.download = `${data.cuestionario} - ${data.empresa || 'Empresa'}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -231,7 +395,7 @@ export const CuestionarioDetalle: React.FC = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
                                 )}
-                                Descargar CSV
+                                Descargar Excel
                             </button>
                         </div>
                     </div>
@@ -275,15 +439,14 @@ export const CuestionarioDetalle: React.FC = () => {
                                                     <button
                                                         key={opcion}
                                                         onClick={() => handleRespuesta(si, pi, pregunta.respuesta === opcion ? '' : opcion)}
-                                                        className={`w-10 h-8 rounded-lg text-xs font-bold border-2 transition-all ${
-                                                            pregunta.respuesta === opcion
-                                                                ? opcion === 'si'
-                                                                    ? 'bg-green-500 border-green-500 text-white'
-                                                                    : opcion === 'no'
-                                                                        ? 'bg-red-500 border-red-500 text-white'
-                                                                        : 'bg-gray-400 border-gray-400 text-white'
-                                                                : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
-                                                        }`}
+                                                        className={`w-10 h-8 rounded-lg text-xs font-bold border-2 transition-all ${pregunta.respuesta === opcion
+                                                            ? opcion === 'si'
+                                                                ? 'bg-green-500 border-green-500 text-white'
+                                                                : opcion === 'no'
+                                                                    ? 'bg-red-500 border-red-500 text-white'
+                                                                    : 'bg-gray-400 border-gray-400 text-white'
+                                                            : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
+                                                            }`}
                                                     >
                                                         {opcion === 'na' ? 'N/A' : opcion.toUpperCase()}
                                                     </button>
