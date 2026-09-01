@@ -16,6 +16,8 @@ export interface Categoria {
   delegadoId: number | null;
   /** 'estandar' = Pendiente/Aprobado/Rechazado con notificaciones | 'si_no' = Sí/No simple */
   tipoEstado: 'estandar' | 'si_no';
+  fechaInicio: string;
+  fechaFin: string;
   subtareas: Subtarea[];
 }
 

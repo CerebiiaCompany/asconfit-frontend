@@ -4,6 +4,7 @@ import { SubtareaItem } from "./SubtareaItem";
 import { plantillaService } from "../../../services/plantillaService";
 import { userService, User } from "../../../services/userService";
 import { Modal } from "../../Modal";
+import { DatePicker } from "../../common/DatePicker";
 
 interface CategoriasSectionProps {
   categorias: Categoria[];
@@ -360,6 +361,43 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         </select>
                       </div>
 
+                      <div className="flex-1 sm:max-w-[140px]">
+                        <label className="block text-xs text-gray-500 mb-1">
+                          Fecha inicio
+                        </label>
+                        <DatePicker
+                          value={categoria.fechaInicio || ""}
+                          onChange={(val) => {
+                            onCategoriaChange(categoria.id, "fechaInicio", val);
+                            if (categoria.fechaFin && val && categoria.fechaFin < val) {
+                              onCategoriaChange(categoria.id, "fechaFin", "");
+                            }
+                          }}
+                          min={fechaAuditoriaInicio || ""}
+                          max={categoria.fechaFin || fechaAuditoriaCorte || ""}
+                          disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
+                          placeholder={!fechaAuditoriaInicio ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+                          hasError={!!errors[`${categoria.id}_fechaInicio`]}
+                        />
+                      </div>
+
+                      <div className="flex-1 sm:max-w-[140px]">
+                        <label className="block text-xs text-gray-500 mb-1">
+                          Fecha fin
+                        </label>
+                        <DatePicker
+                          value={categoria.fechaFin || ""}
+                          onChange={(val) =>
+                            onCategoriaChange(categoria.id, "fechaFin", val)
+                          }
+                          min={categoria.fechaInicio || fechaAuditoriaInicio || ""}
+                          max={fechaAuditoriaCorte || ""}
+                          disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
+                          placeholder={!fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+                          hasError={!!errors[`${categoria.id}_fechaFin`]}
+                        />
+                      </div>
+
                       <div className="flex-1 sm:max-w-xs">
                         <label className="block text-xs text-gray-500 mb-1">
                           Delegado Responsable
@@ -481,8 +519,8 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                                   value,
                                 )
                               }
-                              fechaAuditoriaInicio={fechaAuditoriaInicio}
-                              fechaAuditoriaCorte={fechaAuditoriaCorte}
+                              fechaCategoriaInicio={categoria.fechaInicio || ""}
+                              fechaCategoriaFin={categoria.fechaFin || ""}
                               errors={errors}
                               categoriaId={categoria.id}
                             />

@@ -43,6 +43,8 @@ export const useAuditoriaForm = () => {
         nombre: "",
         delegadoId: null,
         tipoEstado: 'estandar' as const,
+        fechaInicio: formData.fechaInicial || "",
+        fechaFin: formData.fechaCorte || "",
         subtareas: [],
       },
     ]);
@@ -64,7 +66,31 @@ export const useAuditoriaForm = () => {
     value: any,
   ) => {
     setCategorias((prev) =>
-      prev.map((cat) => (cat.id === id ? { ...cat, [field]: value } : cat)),
+      prev.map((cat) => {
+        if (cat.id !== id) return cat;
+
+        const updated = { ...cat, [field]: value };
+
+        // Si cambia fechaInicio, actualizar fechaSolicitud de subtareas que tenían
+        // la fecha anterior de la categoría (para mantener sincronía)
+        if (field === 'fechaInicio') {
+          updated.subtareas = cat.subtareas.map((st) => ({
+            ...st,
+            fechaSolicitud: value || st.fechaSolicitud,
+          }));
+        }
+
+        // Si cambia fechaFin, actualizar tiempoEntrega de subtareas que tenían
+        // la fecha anterior de la categoría
+        if (field === 'fechaFin') {
+          updated.subtareas = cat.subtareas.map((st) => ({
+            ...st,
+            tiempoEntrega: value || st.tiempoEntrega,
+          }));
+        }
+
+        return updated;
+      }),
     );
   };
 
@@ -76,8 +102,8 @@ export const useAuditoriaForm = () => {
             id: Date.now().toString(),
             nombre: "",
             prioridad: "media",
-            fechaSolicitud: formData.fechaInicial || "",
-            tiempoEntrega: formData.fechaCorte || "",
+            fechaSolicitud: cat.fechaInicio || formData.fechaInicial || "",
+            tiempoEntrega: cat.fechaFin || formData.fechaCorte || "",
             observaciones: "",
             estadoInformacion: "pendiente",
             archivoNombre: "",
@@ -141,8 +167,8 @@ export const useAuditoriaForm = () => {
                 id: `${Date.now()}-${index}`,
                 nombre: req.nombre,
                 prioridad: "media",
-                fechaSolicitud: formData.fechaInicial || "",
-                tiempoEntrega: formData.fechaCorte || "",
+                fechaSolicitud: cat.fechaInicio || formData.fechaInicial || "",
+                tiempoEntrega: cat.fechaFin || formData.fechaCorte || "",
                 observaciones: "",
                 estadoInformacion: "pendiente",
                 archivoNombre: "",
@@ -174,6 +200,8 @@ export const useAuditoriaForm = () => {
       nombre: cat.nombre,
       delegadoId: cat.delegado_id,
       tipoEstado: (cat.tipo_estado === 'si_no' ? 'si_no' : 'estandar') as 'estandar' | 'si_no',
+      fechaInicio: formatDateToYYYYMMDD(cat.fecha_inicio),
+      fechaFin: formatDateToYYYYMMDD(cat.fecha_fin),
       subtareas: cat.subtareas ? cat.subtareas.map((st: any, stIndex: number) => ({
         id: st.id ? st.id : Date.now().toString() + '-' + stIndex,
         nombre: st.nombre,

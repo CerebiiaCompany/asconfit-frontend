@@ -6,8 +6,8 @@ interface SubtareaItemProps {
   subtarea: Subtarea;
   onRemove: () => void;
   onChange: (field: keyof Subtarea, value: string) => void;
-  fechaAuditoriaInicio: string;
-  fechaAuditoriaCorte: string;
+  fechaCategoriaInicio: string;
+  fechaCategoriaFin: string;
   errors?: any;
   categoriaId: string;
 }
@@ -16,8 +16,8 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
   subtarea,
   onRemove,
   onChange,
-  fechaAuditoriaInicio,
-  fechaAuditoriaCorte,
+  fechaCategoriaInicio,
+  fechaCategoriaFin,
   errors = {},
   categoriaId,
 }) => {
@@ -58,16 +58,16 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           </label>
           <DatePicker
             value={subtarea.fechaSolicitud}
-            disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
+            disabled={!fechaCategoriaInicio || !fechaCategoriaFin}
             onChange={(val) => {
               onChange("fechaSolicitud", val);
               if (subtarea.tiempoEntrega && val && subtarea.tiempoEntrega < val) {
                 onChange("tiempoEntrega", "");
               }
             }}
-            min={fechaAuditoriaInicio}
-            max={subtarea.tiempoEntrega || fechaAuditoriaCorte}
-            placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+            min={fechaCategoriaInicio}
+            max={subtarea.tiempoEntrega || fechaCategoriaFin}
+            placeholder={!fechaCategoriaInicio || !fechaCategoriaFin ? "Define fechas de categoría" : "dd/mm/aaaa"}
             hasError={!!errors[`${categoriaId}_${subtarea.id}_fechaSolicitud`]}
           />
         </div>
@@ -77,11 +77,11 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
           </label>
           <DatePicker
             value={subtarea.tiempoEntrega}
-            disabled={!fechaAuditoriaInicio || !fechaAuditoriaCorte}
+            disabled={!fechaCategoriaInicio || !fechaCategoriaFin}
             onChange={(val) => onChange("tiempoEntrega", val)}
-            min={subtarea.fechaSolicitud || fechaAuditoriaInicio}
-            max={fechaAuditoriaCorte}
-            placeholder={!fechaAuditoriaInicio || !fechaAuditoriaCorte ? "Define fechas de auditoría" : "dd/mm/aaaa"}
+            min={subtarea.fechaSolicitud || fechaCategoriaInicio}
+            max={fechaCategoriaFin}
+            placeholder={!fechaCategoriaInicio || !fechaCategoriaFin ? "Define fechas de categoría" : "dd/mm/aaaa"}
             hasError={!!errors[`${categoriaId}_${subtarea.id}_tiempoEntrega`]}
           />
         </div>
