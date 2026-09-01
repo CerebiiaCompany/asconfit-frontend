@@ -133,11 +133,11 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     const tipoEstado = tarea.categoriaTipoEstado || 'estandar';
     const esSiNo = tipoEstado === 'si_no';
 
-    // Para tipo si_no: siempre se puede subir (sin restricción de estado).
-    // Para estándar: se bloquea cuando está recibido, en revisión o aprobado.
-    const isUploadDisabled = esSiNo
-        ? false
-        : ['recibido', 'revision', 'aprobado'].includes(tarea.estadoInformacion || '');
+    // Lógica para deshabilitar el botón
+    // Se deshabilita si está en revisión o ya fue aprobado.
+    // También se deshabilita si ya fue recibido para evitar múltiples envíos.
+    // Para tipo si_no no hay subida de archivo — siempre deshabilitado.
+    const isUploadDisabled = esSiNo || ['recibido', 'revision', 'aprobado'].includes(tarea.estadoInformacion || '');
 
     // Mapeo de estilos para los estados
     const getStatusConfig = (status: string | null) => {
@@ -226,14 +226,16 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                 {/* Botón de subir archivo con lógica de estado */}
                 <div className="flex flex-col items-end gap-2">
                     <div className="flex items-center gap-2">
-                        <FileUploadButton
-                            onFileSelect={handleFileSelect}
-                            acceptedFileTypes={acceptedFileTypes}
-                            hasFile={!!tarea.archivoNombre}
-                            uploading={uploading}
-                            disabled={isUploadDisabled}
-                            empresaId={empresaId}
-                        />
+                        {!esSiNo && (
+                            <FileUploadButton
+                                onFileSelect={handleFileSelect}
+                                acceptedFileTypes={acceptedFileTypes}
+                                hasFile={!!tarea.archivoNombre}
+                                uploading={uploading}
+                                disabled={isUploadDisabled}
+                                empresaId={empresaId}
+                            />
+                        )}
                         <button
                             onClick={() => setShowNoteModal(true)}
                             className={`p-1.5 rounded-lg border transition-colors ${noteText ? 'border-orange-400 text-orange-500 bg-orange-50' : 'border-gray-300 text-gray-400 hover:border-orange-300 hover:text-orange-400'}`}
