@@ -4,6 +4,8 @@ import { SubtareaItem } from "./SubtareaItem";
 import { plantillaService } from "../../../services/plantillaService";
 import { userService, User } from "../../../services/userService";
 import { Modal } from "../../Modal";
+import { useToast } from "../../../contexts/ToastContext";
+import { DatePicker } from "../../common/DatePicker";
 
 interface CategoriasSectionProps {
   categorias: Categoria[];
@@ -39,21 +41,11 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   auditoriaDelegados,
   errors = {},
 }) => {
+  const { addToast } = useToast();
   const [plantillasDisponibles, setPlantillasDisponibles] = useState<any[]>([]);
   const [plantillasModificadas, setPlantillasModificadas] = useState<
     Set<string>
   >(new Set());
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    type: "success" | "error" | "warning" | "info";
-  }>({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "info",
-  });
   const [nuevaCategoriaModal, setNuevaCategoriaModal] = useState<{
     isOpen: boolean;
     categoriaId: string;
@@ -98,12 +90,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
       );
 
       if (!plantilla) {
-        setModal({
-          isOpen: true,
-          title: "Error",
-          message: "No se encontró la plantilla",
-          type: "error",
-        });
+        addToast("No se encontró la plantilla", "error");
         return;
       }
 
@@ -117,30 +104,18 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
 
       await plantillaService.updatePlantilla(plantilla.codigo, data);
 
-      // Remover de la lista de modificadas
       setPlantillasModificadas((prev) => {
         const newSet = new Set(prev);
         newSet.delete(categoria.nombre);
         return newSet;
       });
 
-      setModal({
-        isOpen: true,
-        title: "¡Éxito!",
-        message: "La plantilla ha sido actualizada correctamente",
-        type: "success",
-      });
+      addToast("La plantilla ha sido actualizada correctamente", "success");
     } catch (error) {
       console.error("Error al actualizar plantilla:", error);
-      setModal({
-        isOpen: true,
-        title: "Error",
-        message:
-          "Ocurrió un error al actualizar la plantilla. Por favor intenta de nuevo.",
-        type: "error",
-      });
+      addToast("Ocurrió un error al actualizar la plantilla. Por favor intenta de nuevo.", "error");
     }
-  };
+  }
 
   const handleAddSubtarea = (categoriaId: string) => {
     const categoria = categorias.find((c) => c.id === categoriaId);
@@ -170,14 +145,6 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
 
   return (
     <>
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={() => setModal({ ...modal, isOpen: false })}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-      />
-
       <Modal
         isOpen={nuevaCategoriaModal.isOpen}
         onClose={() =>
