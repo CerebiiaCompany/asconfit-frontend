@@ -339,26 +339,6 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
                         })()}
                       </div>
 
-                      <div className="flex-1 sm:max-w-[160px]">
-                        <label className="block text-xs text-gray-500 mb-1">
-                          Tipo de estado
-                        </label>
-                        <select
-                          value={categoria.tipoEstado || 'estandar'}
-                          onChange={(e) =>
-                            onCategoriaChange(
-                              categoria.id,
-                              "tipoEstado",
-                              e.target.value as 'estandar' | 'si_no',
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
-                          title="Tipo 1: Pendiente / Aprobado / Rechazado con notificaciones. Tipo 2: Sí / No simple."
-                        >
-                          <option value="estandar">Estándar (Pendiente / Aprobado / Rechazado)</option>
-                          <option value="si_no">Sí / No</option>
-                        </select>
-                      </div>
 
                       <div className="flex-1 sm:max-w-xs">
                         <label className="block text-xs text-gray-500 mb-1">
