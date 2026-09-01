@@ -34,10 +34,8 @@ export const useAuditoriaValidation = () => {
     formData: any,
     categorias: Categoria[],
     delegados: Array<number | null>,
-    options?: { validarSubtareas?: boolean }
   ): ValidationResult => {
     const errors: AuditoriaErrors = {};
-    const validarSubtareas = options?.validarSubtareas ?? true;
 
     // ── Campos de empresa (se llenan seleccionando empresa) ───────────────────
     if (!formData.empresa?.trim()) errors.empresa = "Campo obligatorio";
@@ -78,29 +76,23 @@ export const useAuditoriaValidation = () => {
 
         for (let j = 0; j < categoria.subtareas.length; j++) {
           const sub = categoria.subtareas[j];
+          const n = j + 1;
           const subKey = `${categoria.id}_${sub.id}`;
 
-          if (validarSubtareas) {
-            if (!sub.nombre?.trim()) {
-              errors[`${subKey}_nombre`] = "Campo obligatorio";
-            }
-            if (!sub.prioridad) {
-              errors[`${subKey}_prioridad`] = "Campo obligatorio";
-            }
-            if (!sub.fechaSolicitud) {
-              errors[`${subKey}_fechaSolicitud`] = "Campo obligatorio";
-            }
-            if (!sub.tiempoEntrega?.trim()) {
-              errors[`${subKey}_tiempoEntrega`] = "Campo obligatorio";
-            }
-            if (!sub.formatoArchivo) {
-              errors[`${subKey}_formatoArchivo`] = "Campo obligatorio";
-            }
-          } else {
-            // En modo edición solo validar que el nombre no esté vacío
-            if (!sub.nombre?.trim()) {
-              errors[`${subKey}_nombre`] = "Campo obligatorio";
-            }
+          if (!sub.nombre?.trim()) {
+            errors[`${subKey}_nombre`] = "Campo obligatorio";
+          }
+          if (!sub.prioridad) {
+            errors[`${subKey}_prioridad`] = "Campo obligatorio";
+          }
+          if (!sub.fechaSolicitud) {
+            errors[`${subKey}_fechaSolicitud`] = "Campo obligatorio";
+          }
+          if (!sub.tiempoEntrega?.trim()) {
+            errors[`${subKey}_tiempoEntrega`] = "Campo obligatorio";
+          }
+          if (!sub.formatoArchivo) {
+            errors[`${subKey}_formatoArchivo`] = "Campo obligatorio";
           }
         }
       }
