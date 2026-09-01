@@ -138,9 +138,9 @@ export const EditarAuditoria: React.FC = () => {
   const handleSubmit = async () => {
     if (!id || !auditoria) return;
 
-    // Validar campos de categorías y subtareas
-    const validationResult = validateForm(formData, categorias, [auditoria?.delegado_1_id, auditoria?.delegado_2_id]);
-    
+    // Validar campos — en edición no se exigen todos los campos de subtareas
+    const validationResult = validateForm(formData, categorias, [auditoria?.delegado_1_id, auditoria?.delegado_2_id], { validarSubtareas: false });
+
     if (!validationResult.isValid) {
       setErrors(validationResult.errors);
       addToast(validationResult.modalMessage || "Completa todos los campos obligatorios marcados en rojo", "warning");
