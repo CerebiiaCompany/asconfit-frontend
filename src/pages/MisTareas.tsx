@@ -7,17 +7,27 @@ import { AuditoriaCard } from "../components/tareas/AuditoriaCard";
 import { TareaCard } from "../components/tareas/TareaCard";
 import { EmptyState } from "../components/tareas/EmptyState";
 import { LoadingSpinner } from "../components/tareas/LoadingSpinner";
-import { useToast } from "../contexts/ToastContext";
+import { Modal } from "../components/Modal";
 import { authService } from "../services/authService";
 
 export const MisTareas: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useUser(() => navigate("/login"));
-  const { addToast } = useToast();
   const [auditoriaSeleccionada, setAuditoriaSeleccionada] = useState<
     number | null
   >(null);
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    type: "success" | "error";
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
 
   const { auditorias, loading, recargar } = useTareas();
 
@@ -35,11 +45,21 @@ export const MisTareas: React.FC = () => {
   const { uploadFile, uploadingSubtareaId, getAcceptedFileTypes, handleOpenFile } =
     useFileUpload({
       onSuccess: (fileName) => {
-        addToast(`Archivo "${fileName}" subido correctamente`, "success");
+        setModal({
+          isOpen: true,
+          type: "success",
+          title: "¡Éxito!",
+          message: `Archivo "${fileName}" subido correctamente`,
+        });
         recargar();
       },
       onError: (message) => {
-        addToast(message, "error");
+        setModal({
+          isOpen: true,
+          type: "error",
+          title: "Error",
+          message,
+        });
       },
     });
 
@@ -50,6 +70,10 @@ export const MisTareas: React.FC = () => {
     carpetaId?: number | null
   ) => {
     await uploadFile(subtareaId, file, formatoArchivo, carpetaId);
+  };
+
+  const handleCloseModal = () => {
+    setModal({ ...modal, isOpen: false });
   };
 
   return (
@@ -150,6 +174,14 @@ export const MisTareas: React.FC = () => {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={handleCloseModal}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
     </div>
   );
 };
