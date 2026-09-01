@@ -5,6 +5,7 @@ import { CategoriasSection } from "../../components/auditorias/auditorias-nueva/
 import { FormActions } from "../../components/auditorias/auditorias-nueva/FormActions";
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaForm } from "../../hooks/useAuditoriaForm";
+import { useAuditoriaValidation } from "../../hooks/useAuditoriaValidation";
 import { auditoriaService } from "../../services/auditoriaService";
 import { useToast } from "../../contexts/ToastContext";
 
@@ -132,34 +133,21 @@ export const EditarAuditoria: React.FC = () => {
     cargarAuditoria();
   }, [id, user]);
 
+  const { validateForm } = useAuditoriaValidation();
+
   const handleSubmit = async () => {
     if (!id || !auditoria) return;
 
-    // En edición solo validamos categorías y subtareas, no los campos del formulario
-    // (empresa, fechas, delegados ya existen y no se editan en esta pantalla)
-    const newErrors: any = {};
+    // Validar campos — en edición no se exigen todos los campos de subtareas
+    const validationResult = validateForm(formData, categorias, [auditoria?.delegado_1_id, auditoria?.delegado_2_id], { validarSubtareas: false });
 
-    for (const categoria of categorias) {
-      if (!categoria.nombre?.trim()) {
-        newErrors[`${categoria.id}_nombre`] = "Campo obligatorio";
-      }
-      if (!categoria.delegadoId) {
-        newErrors[`${categoria.id}_delegadoId`] = "Campo obligatorio";
-      }
-      for (const sub of categoria.subtareas) {
-        if (!sub.nombre?.trim()) {
-          newErrors[`${categoria.id}_${sub.id}_nombre`] = "Campo obligatorio";
-        }
-      }
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      addToast("Hay categorías o requerimientos con campos incompletos", "warning");
+    if (!validationResult.isValid) {
+      setErrors(validationResult.errors);
+      addToast(validationResult.modalMessage || "Completa todos los campos obligatorios marcados en rojo", "warning");
       return;
     }
 
-    // Validar que al menos tenga una categoría
+    // Validar que al menos tenga una categoría para agregar
     if (categorias.length === 0) {
       addToast("Debes agregar al menos una categoría para actualizar", "warning");
       return;
