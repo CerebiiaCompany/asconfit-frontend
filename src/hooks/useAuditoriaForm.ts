@@ -188,6 +188,9 @@ export const useAuditoriaForm = () => {
   const handleLoadExistingAuditoriaCategorias = (auditoriaCategorias: any[]) => {
     const formatDateToYYYYMMDD = (dateStr: string | null | undefined) => {
       if (!dateStr) return "";
+      // Si ya viene en formato YYYY-MM-DD simple (sin hora), usarlo directo
+      // para evitar el problema de zona horaria (UTC vs local)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return "";
       const y = d.getFullYear();
