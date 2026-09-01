@@ -17,6 +17,8 @@ import { EditarAuditoria } from "./pages/auditorias/EditarAuditoria";
 import { AuditoriaDetalle } from "./pages/auditorias/AuditoriaDetalle";
 import { PreliminaryReport } from "./pages/auditorias/PreliminaryReport";
 import { MatrizRiesgo } from "./pages/auditorias/MatrizRiesgo";
+import { CuestionariosPage } from "./pages/auditorias/CuestionariosPage";
+import { CuestionarioDetalle } from "./pages/auditorias/CuestionarioDetalle";
 import { MisTareas } from "./pages/MisTareas";
 import { TareaDetalle } from "./pages/TareaDetalle";
 import { Perfil } from "./pages/Perfil";
@@ -171,6 +173,22 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <PreliminaryReport />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/auditorias/:id/cuestionarios"
+                    element={
+                      <RoleBasedRoute>
+                        <CuestionariosPage />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/auditorias/:id/cuestionarios/:cuestionarioId"
+                    element={
+                      <RoleBasedRoute>
+                        <CuestionarioDetalle />
                       </RoleBasedRoute>
                     }
                   />
