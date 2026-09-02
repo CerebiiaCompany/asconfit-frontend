@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auditoriaService } from "../../services/auditoriaService";
 import { findingService } from "../../services/findingService";
-import { Modal } from "../../components/Modal";
 import { useUser } from "../../hooks/useUser";
 import { useAuditoriaDetalle } from "../../hooks/useAuditoriaDetalle";
 import { useFileUpload } from "../../hooks/useFileUpload";
@@ -20,11 +19,8 @@ export const AuditoriaDetalle: React.FC = () => {
   const { auditoria, loading, refetch } = useAuditoriaDetalle(id);
   const { addToast } = useToast();
   const [findingsCount, setFindingsCount] = useState<Record<number, number>>({});
-  const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<
-    number | null
-  >(null);
+  const [updatingEstadoSubtareaId, setUpdatingEstadoSubtareaId] = useState<number | null>(null);
 
-  // Cargar conteo de findings por subtarea
   useEffect(() => {
     if (!id) return;
     findingService.getByAuditoria(Number(id)).then((findings) => {
@@ -39,18 +35,6 @@ export const AuditoriaDetalle: React.FC = () => {
     }).catch(() => { });
   }, [id]);
 
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: "success" | "error";
-    title: string;
-    message: string;
-  }>({
-    isOpen: false,
-    type: "success",
-    title: "",
-    message: "",
-  });
-
   const {
     uploadingSubtareaId,
     fileInputRefs,
@@ -60,21 +44,11 @@ export const AuditoriaDetalle: React.FC = () => {
     handleOpenFile,
   } = useFileUpload({
     onSuccess: async () => {
-      setModal({
-        isOpen: true,
-        type: "success",
-        title: "Éxito",
-        message: "Archivo subido exitosamente",
-      });
+      addToast("Archivo subido exitosamente", "success");
       await refetch();
     },
     onError: (message) => {
-      setModal({
-        isOpen: true,
-        type: "error",
-        title: "Error",
-        message,
-      });
+      addToast(message, "error");
     },
   });
 
@@ -82,7 +56,6 @@ export const AuditoriaDetalle: React.FC = () => {
     setFindingsCount(prev => ({ ...prev, [actividadId]: newCount }));
   };
 
-  // Verificar si el usuario actual puede editar la auditoría
   const isAdmin = user?.role?.nombre?.toLowerCase() === 'admin';
   const canEdit = user && auditoria && (
     isAdmin ||
@@ -125,9 +98,7 @@ export const AuditoriaDetalle: React.FC = () => {
     );
   }
 
-  // Generar eventos del calendario — solo fechas de subtareas
   const calendarEvents: CalendarEvent[] = [];
-
   auditoria.categorias?.forEach((categoria: any) => {
     categoria.subtareas?.forEach((subtarea: any) => {
       if (subtarea.fecha_solicitud) {
@@ -156,18 +127,8 @@ export const AuditoriaDetalle: React.FC = () => {
             onClick={() => navigate("/auditorias")}
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
-            <svg
-              className="h-5 w-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Volver a auditorías
           </button>
@@ -177,38 +138,18 @@ export const AuditoriaDetalle: React.FC = () => {
                 onClick={() => navigate(`/auditorias/${id}/editar`)}
                 className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-sm"
               >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Agregar categorías
               </button>
             )}
             <button
               onClick={() => navigate(`/auditorias/${id}/cuestionarios`)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-sm"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                />
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
               Cuestionarios
             </button>
@@ -216,14 +157,11 @@ export const AuditoriaDetalle: React.FC = () => {
           </div>
         </div>
 
-        {/* Layout superior: Información de la Auditoría y Calendario */}
+        {/* Layout superior */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Columna izquierda: Información de la Auditoría */}
           <div className="flex-1">
             <AuditoriaInfoCard auditoria={auditoria} />
           </div>
-
-          {/* Columna derecha: Calendario */}
           <div className="lg:w-[280px] flex-shrink-0">
             <div className="sticky top-4">
               <Calendar events={calendarEvents} />
@@ -231,13 +169,12 @@ export const AuditoriaDetalle: React.FC = () => {
           </div>
         </div>
 
-        {/* Categorías y Subtareas - Ancho completo */}
+        {/* Categorías y Subtareas */}
         {auditoria.categorias && auditoria.categorias.length > 0 && (
           <div className="space-y-6">
             <h3 className="text-2xl font-bold text-gray-800">
               Categorías y Requerimientos
             </h3>
-
             {auditoria.categorias.map((categoria: any) => (
               <CategoriaCard
                 key={categoria.id}
@@ -259,15 +196,6 @@ export const AuditoriaDetalle: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Modal */}
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={() => setModal({ ...modal, isOpen: false })}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-      />
     </div>
   );
 };
