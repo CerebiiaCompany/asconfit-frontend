@@ -15,6 +15,7 @@ interface Pregunta {
     respuesta: Respuesta;
     observaciones: string;
     recomendaciones: string;
+    criticidad: 'alto' | 'medio' | 'bajo' | '';
 }
 
 interface Seccion {
