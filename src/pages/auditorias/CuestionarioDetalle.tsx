@@ -153,7 +153,7 @@ export const CuestionarioDetalle: React.FC = () => {
         const ROJO = 'FFFF0000';
         const GRIS_CLR = 'FFD9D9D9';
         const BLANCO = 'FFFFFFFF';
-        const AZUL_HDR = 'FF1F3864';
+        const AZUL_HDR = 'FFFF6600'; // naranja
 
         const centrado: Partial<ExcelJS.Alignment> = { horizontal: 'center', vertical: 'middle', wrapText: true };
         const izquierda: Partial<ExcelJS.Alignment> = { horizontal: 'left', vertical: 'middle', wrapText: true };
@@ -419,7 +419,7 @@ export const CuestionarioDetalle: React.FC = () => {
                 <div className="space-y-6">
                     {secciones.map((seccion, si) => (
                         <div key={seccion.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3">
+                            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3">
                                 <h2 className="text-white font-semibold text-sm">{seccion.titulo}</h2>
                             </div>
 
