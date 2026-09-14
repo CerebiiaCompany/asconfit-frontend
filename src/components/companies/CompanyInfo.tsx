@@ -5,9 +5,10 @@ import { Calendar, CalendarEvent } from "../common/Calendar";
 
 interface CompanyInfoProps {
   initialData?: EmpresaModel | null;
+  isAdmin?: boolean;
 }
 
-export const CompanyInfo: React.FC<CompanyInfoProps> = ({ initialData }) => {
+export const CompanyInfo: React.FC<CompanyInfoProps> = ({ initialData, isAdmin }) => {
   const navigate = useNavigate();
 
   // Form State
@@ -98,16 +99,18 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({ initialData }) => {
             className="bg-gray-100 border border-gray-200 text-gray-800 font-medium rounded px-3 py-1.5 text-sm w-full outline-none"
           />
         </div>
-        <div className="flex justify-end pt-2">
-          <button 
-            type="button"
-            onClick={handleUpdate}
-            disabled={!initialData}
-            className={`px-6 py-2 border border-orange-400 rounded text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-orange-50`}
-          >
-            Actualizar Datos
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              onClick={handleUpdate}
+              disabled={!initialData}
+              className={`px-6 py-2 border border-orange-400 rounded text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-orange-50`}
+            >
+              Actualizar Datos
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Reusable Calendar Component */}

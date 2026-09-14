@@ -60,7 +60,7 @@ export const Companies: React.FC = () => {
         </div>
       ) : empresaState ? (
         <>
-          <CompanyInfo initialData={empresaState} />
+          <CompanyInfo initialData={empresaState} isAdmin={isAdmin} />
           <CompanyTabs
             empresaId={empresaState.id!}
             activeCarpetaId={activeCarpeta?.id ?? null}
