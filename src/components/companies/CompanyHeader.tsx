@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, PlusCircle, FileText, Building2 } from "lucide-react";
 import { empresaService, Empresa as EmpresaModel } from "../../services/empresaService";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const CompanyHeader: React.FC = () => {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
+  const isAdmin = userRole === "admin";
   const [searchTerm, setSearchTerm] = useState("");
   const [empresas, setEmpresas] = useState<EmpresaModel[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -103,13 +106,15 @@ export const CompanyHeader: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <button
-            onClick={handleNewEmpresa}
-            className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded hover:bg-orange-50 transition-colors w-full md:w-auto justify-center text-sm font-medium"
-          >
-            <PlusCircle className="w-4 h-4 text-orange-400" />
-            Crear empresa
-          </button>
+          {isAdmin && (
+            <button
+              onClick={handleNewEmpresa}
+              className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded hover:bg-orange-50 transition-colors w-full md:w-auto justify-center text-sm font-medium"
+            >
+              <PlusCircle className="w-4 h-4 text-orange-400" />
+              Crear empresa
+            </button>
+          )}
           <button
             onClick={handleVerEmpresas}
             className="flex items-center gap-2 px-6 py-2 border border-orange-400 text-gray-700 rounded hover:bg-orange-50 transition-colors w-full md:w-auto justify-center text-sm font-medium"

@@ -10,10 +10,13 @@ import {
 } from "lucide-react";
 import { empresaService, Empresa } from "../../services/empresaService";
 import { useToast } from "../../contexts/ToastContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const ViewCompanies: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { userRole } = useAuth();
+  const isAdmin = userRole === "admin";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
@@ -85,13 +88,15 @@ export const ViewCompanies: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 flex-shrink-0">
-          <button
-            onClick={handleNewEmpresa}
-            className="flex items-center gap-2 px-4 py-2 border border-orange-400 text-gray-700 rounded-md hover:bg-orange-50 transition-colors font-medium text-sm"
-          >
-            <PlusCircle className="w-4 h-4 text-orange-400" />
-            Crear empresa
-          </button>
+          {isAdmin && (
+            <button
+              onClick={handleNewEmpresa}
+              className="flex items-center gap-2 px-4 py-2 border border-orange-400 text-gray-700 rounded-md hover:bg-orange-50 transition-colors font-medium text-sm"
+            >
+              <PlusCircle className="w-4 h-4 text-orange-400" />
+              Crear empresa
+            </button>
+          )}
           <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-bold text-sm shadow-sm">
             <FileText className="w-4 h-4" />
             Ver empresas
@@ -174,17 +179,20 @@ export const ViewCompanies: React.FC = () => {
             <div className="flex gap-2 mt-auto">
               <button
                 onClick={() => navigate(`/empresas?id=${empresa.id}`)}
-                className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-orange-400 rounded-md text-orange-500 hover:bg-orange-50 transition-colors"
+                className={`flex items-center justify-center border border-orange-400 rounded-md text-orange-500 hover:bg-orange-50 transition-colors ${isAdmin ? "flex-shrink-0 w-8 h-8" : "flex-grow h-8 gap-2 text-[13px] font-bold"}`}
                 title="Ver detalles"
               >
                 <Eye className="w-4 h-4" />
+                {!isAdmin && "Ver detalles"}
               </button>
-              <button
-                onClick={() => navigate(`/empresas/crear?id=${empresa.id}`)}
-                className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm"
-              >
-                Actualizar datos
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => navigate(`/empresas/crear?id=${empresa.id}`)}
+                  className="flex-grow h-8 bg-orange-500 text-white rounded-md text-[13px] font-bold hover:bg-orange-600 transition-colors shadow-sm"
+                >
+                  Actualizar datos
+                </button>
+              )}
             </div>
           </div>
         ))}
