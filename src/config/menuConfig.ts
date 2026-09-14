@@ -89,6 +89,7 @@ export const MENU_BY_ROLE: Record<UserRole, string[]> = {
     "ai-analysis",
     "mis-tareas",
     "empresas",
+    "papelera",
     "perfil",
   ],
   delegado: ["dashboard", "auditorias", "mis-tareas", "perfil"],
