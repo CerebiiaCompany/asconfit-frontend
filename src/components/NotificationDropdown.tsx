@@ -36,10 +36,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     }
 
     // Navegar según el tipo de notificación
-    // archivo_subido es para admin (cuando alguien sube archivo, admin recibe notificación)
-    // Los demás son para usuarios delegados
+    // archivo_subido y auditoria_creada son para admin (van al detalle de la auditoría)
+    // Los demás son para usuarios delegados (van a sus tareas)
     if (notification.auditoria_id) {
-      if (notification.tipo === 'archivo_subido') {
+      if (notification.tipo === 'archivo_subido' || notification.tipo === 'auditoria_creada') {
         navigate(`/auditorias/${notification.auditoria_id}`);
       } else {
         navigate(`/mis-tareas?auditoria_id=${notification.auditoria_id}`);
