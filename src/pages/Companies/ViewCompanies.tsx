@@ -130,7 +130,11 @@ export const ViewCompanies: React.FC = () => {
         {loading ? (
           <div className="col-span-full text-center py-10 text-gray-500 font-bold">Cargando empresas...</div>
         ) : filteredEmpresas.length === 0 ? (
-          <div className="col-span-full text-center py-10 text-gray-500 font-bold">No hay empresas registradas.</div>
+          <div className="col-span-full text-center py-10 text-gray-500 font-bold">
+            {isAdmin
+              ? "No hay empresas registradas."
+              : "No tienes empresas o encargos asignados. Solicita acceso a un administrador."}
+          </div>
         ) : filteredEmpresas.map((empresa) => (
           <div key={empresa.id} className="bg-white rounded-lg border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex flex-col h-full hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow relative overflow-hidden">
             {/* Badge decorativo ribbon */}

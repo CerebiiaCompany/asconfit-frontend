@@ -81,6 +81,9 @@ export const NuevaAuditoria: React.FC = () => {
       contacto: empresa.telefono_empresarial || empresa.telefono_personal || "",
       empresaId: empresa.id || null,
     }));
+    // Los delegados disponibles dependen de la empresa seleccionada: se limpian al cambiarla.
+    handleDelegateChange(0, null);
+    handleDelegateChange(1, null);
   };
 
   const handleSubmit = async () => {
@@ -173,6 +176,7 @@ export const NuevaAuditoria: React.FC = () => {
           <DelegadosSection
             selectedDelegados={delegados}
             onDelegateChange={handleDelegateChangeWithClear}
+            empresaId={formData.empresaId}
             errors={fieldErrors}
           />
 
@@ -188,6 +192,7 @@ export const NuevaAuditoria: React.FC = () => {
             fechaAuditoriaInicio={formData.fechaInicial}
             fechaAuditoriaCorte={formData.fechaCorte}
             auditoriaDelegados={delegados.filter((item): item is number => item !== null)}
+            empresaId={formData.empresaId}
           />
 
           <FormActions

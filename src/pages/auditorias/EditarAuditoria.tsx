@@ -250,6 +250,7 @@ export const EditarAuditoria: React.FC = () => {
             fechaAuditoriaInicio={formData.fechaInicial}
             fechaAuditoriaCorte={formData.fechaCorte}
             auditoriaDelegados={[auditoria?.delegado_1_id, auditoria?.delegado_2_id].filter((id): id is number => id !== null && id !== undefined)}
+            empresaId={formData.empresaId}
             errors={errors}
           />
 

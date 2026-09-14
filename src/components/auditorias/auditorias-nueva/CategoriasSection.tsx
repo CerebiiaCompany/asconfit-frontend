@@ -24,6 +24,7 @@ interface CategoriasSectionProps {
   fechaAuditoriaInicio: string;
   fechaAuditoriaCorte: string;
   auditoriaDelegados?: number[];
+  empresaId?: number | null;
   errors?: any;
 }
 
@@ -39,6 +40,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   fechaAuditoriaInicio,
   fechaAuditoriaCorte,
   auditoriaDelegados,
+  empresaId,
   errors = {},
 }) => {
   const { addToast } = useToast();
@@ -68,7 +70,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
       try {
         const [plantillas, listaDelegados] = await Promise.all([
           plantillaService.getPlantillas(),
-          userService.getDelegados(),
+          empresaId ? userService.getDelegados(empresaId) : Promise.resolve([]),
         ]);
         setPlantillasDisponibles(plantillas);
         setAllDelegados(listaDelegados);
@@ -77,7 +79,7 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
       }
     };
     cargarDatos();
-  }, []);
+  }, [empresaId]);
 
   const marcarPlantillaModificada = (codigoPlantilla: string) => {
     setPlantillasModificadas((prev) => new Set(prev).add(codigoPlantilla));

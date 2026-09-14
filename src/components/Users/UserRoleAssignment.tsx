@@ -4,6 +4,7 @@ import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
 import { CustomSelect } from "../common/CustomSelect";
 import { UserProfileModal } from "./UserProfileModal";
+import { EmpresaAssignmentModal } from "./EmpresaAssignmentModal";
 
 interface UserRoleAssignmentProps {
   users: User[];
@@ -21,6 +22,7 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
+  const [empresaAssignmentUser, setEmpresaAssignmentUser] = useState<User | null>(null);
 
   const handleRoleChange = async (userId: number, roleId: string) => {
     setUpdatingId(userId);
@@ -103,6 +105,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   Asignar Rol
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Empresas y Encargos
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   PERFIL
                 </th>
               </tr>
@@ -163,6 +168,20 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    {user.role?.nombre === "admin" ? (
+                      <span className="text-xs text-gray-400 italic">
+                        Acceso total (admin)
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setEmpresaAssignmentUser(user)}
+                        className="inline-flex items-center gap-2 px-4 py-2 border border-orange-400 text-gray-700 rounded-lg hover:bg-orange-50 transition-colors text-sm font-medium"
+                      >
+                        Asignar empresas
+                      </button>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleViewProfile(user.id)}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
@@ -196,6 +215,16 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
           isOpen={true}
           onClose={() => setSelectedProfileUserId(null)}
           userId={selectedProfileUserId}
+        />
+      )}
+
+      {/* Empresa Assignment Modal */}
+      {empresaAssignmentUser && (
+        <EmpresaAssignmentModal
+          isOpen={true}
+          onClose={() => setEmpresaAssignmentUser(null)}
+          userId={empresaAssignmentUser.id}
+          userName={empresaAssignmentUser.name}
         />
       )}
     </div>

@@ -5,22 +5,28 @@ import { AuditoriaErrors } from "../../../hooks/useAuditoriaValidation";
 interface DelegadosSectionProps {
   selectedDelegados: Array<number | null>;
   onDelegateChange: (index: number, value: number | null) => void;
+  empresaId?: number | null;
   errors?: AuditoriaErrors;
 }
 
 export const DelegadosSection: React.FC<DelegadosSectionProps> = ({
   selectedDelegados,
   onDelegateChange,
+  empresaId,
   errors = {},
 }) => {
   const [delegados, setDelegados] = useState<User[]>([]);
 
   useEffect(() => {
+    if (!empresaId) {
+      setDelegados([]);
+      return;
+    }
     userService
-      .getDelegados()
+      .getDelegados(empresaId)
       .then(setDelegados)
       .catch((err) => console.error("Error al cargar delegados:", err));
-  }, []);
+  }, [empresaId]);
 
   const renderSelect = (index: number) => {
     // Solo delegado 0 puede mostrar error (el requerido)
@@ -84,10 +90,16 @@ export const DelegadosSection: React.FC<DelegadosSectionProps> = ({
           Asigna hasta dos delegados responsables de esta auditoría.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {renderSelect(0)}
-        {renderSelect(1)}
-      </div>
+      {!empresaId ? (
+        <p className="text-sm text-gray-500 italic">
+          Selecciona primero una empresa para ver los auditores con acceso a ella.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {renderSelect(0)}
+          {renderSelect(1)}
+        </div>
+      )}
     </div>
   );
 };

@@ -98,11 +98,27 @@ export const userService = {
     return response.data;
   },
 
-  async getDelegados(): Promise<User[]> {
+  async getDelegados(empresaId?: number | null): Promise<User[]> {
     const response = await axios.get(`${API_URL}/users/delegados`, {
       headers: getAuthHeader(),
+      params: empresaId ? { empresa_id: empresaId } : {},
     });
     return response.data;
+  },
+
+  async getUserEmpresas(userId: number): Promise<number[]> {
+    const response = await axios.get(`${API_URL}/users/${userId}/empresas`, {
+      headers: getAuthHeader(),
+    });
+    return response.data.map((empresa: { id: number }) => empresa.id);
+  },
+
+  async syncUserEmpresas(userId: number, empresaIds: number[]): Promise<void> {
+    await axios.put(
+      `${API_URL}/users/${userId}/empresas`,
+      { empresa_ids: empresaIds },
+      { headers: getAuthHeader() }
+    );
   },
 
   async getUserProfile(userId: number): Promise<UserProfile> {
