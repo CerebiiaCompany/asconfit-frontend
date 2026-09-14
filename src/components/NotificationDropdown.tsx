@@ -11,6 +11,7 @@ interface Notification {
   tipo?: string;
   auditoria_id?: number | null;
   subtarea_id?: number | null;
+  empresa_id?: number | null;
 }
 
 interface NotificationDropdownProps {
@@ -37,8 +38,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
     // Navegar según el tipo de notificación
     // archivo_subido y auditoria_creada son para admin (van al detalle de la auditoría)
+    // empresa_asignada lleva a la ficha de la empresa recién asignada
     // Los demás son para usuarios delegados (van a sus tareas)
-    if (notification.auditoria_id) {
+    if (notification.tipo === 'empresa_asignada' && notification.empresa_id) {
+      navigate(`/empresas?id=${notification.empresa_id}`);
+    } else if (notification.auditoria_id) {
       if (notification.tipo === 'archivo_subido' || notification.tipo === 'auditoria_creada') {
         navigate(`/auditorias/${notification.auditoria_id}`);
       } else {

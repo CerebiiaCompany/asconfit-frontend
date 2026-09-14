@@ -12,6 +12,7 @@ export interface Notificacion {
   user_id: number;
   auditoria_id: number | null;
   subtarea_id: number | null;
+  empresa_id: number | null;
   tipo: string;
   titulo: string;
   mensaje: string;
@@ -20,6 +21,7 @@ export interface Notificacion {
   updated_at: string;
   auditoria?: any;
   subtarea?: any;
+  empresa?: any;
 }
 
 export const notificacionService = {

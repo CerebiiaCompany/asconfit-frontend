@@ -12,6 +12,7 @@ export interface Notification {
     tipo?: string;
     auditoria_id?: number | null;
     subtarea_id?: number | null;
+    empresa_id?: number | null;
 }
 
 interface NotificationContextType {
@@ -33,6 +34,7 @@ const getNotificationType = (tipo: string): 'info' | 'warning' | 'success' | 'er
         case 'archivo_subido':
         case 'documento_aprobado':
         case 'auditoria_completada':
+        case 'empresa_asignada':
             return 'success';
         case 'documento_pendiente':
             return 'warning';
@@ -69,7 +71,8 @@ const convertToNotification = (notif: Notificacion): Notification => ({
     type: getNotificationType(notif.tipo),
     tipo: notif.tipo,
     auditoria_id: notif.auditoria_id,
-    subtarea_id: notif.subtarea_id
+    subtarea_id: notif.subtarea_id,
+    empresa_id: notif.empresa_id
 });
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
