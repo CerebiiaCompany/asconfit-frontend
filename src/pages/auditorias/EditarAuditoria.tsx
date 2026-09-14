@@ -110,7 +110,6 @@ export const EditarAuditoria: React.FC = () => {
             responsable: data.empresa?.representante_legal || "",
             actividadEconomica: data.empresa?.actividad_economica || "",
             contacto: data.empresa?.telefono_empresarial || "",
-            pt: data.pt || "",
             tipoAuditoria: data.tipo_auditoria || "",
             fechaInicial: formatDateToYYYYMMDD(data.fecha_inicial),
             fechaCorte: formatDateToYYYYMMDD(data.fecha_corte),

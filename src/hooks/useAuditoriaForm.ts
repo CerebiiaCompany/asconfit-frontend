@@ -13,7 +13,6 @@ const initialFormData: AuditoriaFormData = {
   direccion: "",
   responsable: "",
   contacto: "",
-  pt: "",
   tipoAuditoria: "",
   fechaInicial: "",
   fechaCorte: "",

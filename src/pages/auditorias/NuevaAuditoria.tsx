@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { AuditoriaHeader } from "../../components/auditorias/auditorias-nueva/AuditoriaHeader";
 import { EmpresaSection } from "../../components/auditorias/auditorias-nueva/EmpresaSection";
-import { PTSection } from "../../components/auditorias/auditorias-nueva/PTSection";
 import { TipoAuditoriaSection } from "../../components/auditorias/auditorias-nueva/TipoAuditoriaSection";
 import { FechasSection } from "../../components/auditorias/auditorias-nueva/FechasSection";
 import { DelegadosSection } from "../../components/auditorias/auditorias-nueva/DelegadosSection";
@@ -148,11 +147,6 @@ export const NuevaAuditoria: React.FC = () => {
             formData={formData}
             onInputChange={handleInputChangeWithClear}
             errors={fieldErrors}
-          />
-
-          <PTSection
-            value={formData.pt}
-            onChange={handleInputChangeWithClear}
           />
 
           <TipoAuditoriaSection

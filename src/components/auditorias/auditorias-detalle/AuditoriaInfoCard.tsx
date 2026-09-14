@@ -45,7 +45,6 @@ export const AuditoriaInfoCard: React.FC<AuditoriaInfoCardProps> = ({ auditoria 
           <InfoField label="Dirección" value={auditoria.empresa?.direccion || auditoria.direccion} />
           <InfoField label="Responsable" value={auditoria.empresa?.representante_legal || auditoria.responsable} />
           <InfoField label="Contacto" value={auditoria.empresa?.telefono_empresarial || auditoria.contacto} />
-          <InfoField label="PT" value={auditoria.pt} />
           <InfoField label="Fecha Inicial" value={formatDate(auditoria.fecha_inicial)} />
           <InfoField label="Fecha Corte" value={formatDate(auditoria.fecha_corte)} />
           {auditoria.delegado1 && (
