@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 
 interface Option {
     value: string | number | "";
@@ -21,7 +21,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     placeholder = 'Seleccionar...',
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [openUpward, setOpenUpward] = useState(false);
+    const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
     const selectRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,20 +38,42 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        if (isOpen && selectRef.current && dropdownRef.current) {
+    // El dropdown se posiciona con position:fixed (calculado en JS) en lugar de
+    // absolute dentro del contenedor con scroll horizontal de la tabla, para que
+    // no amplíe el scrollWidth de ese contenedor y genere un scroll horizontal falso.
+    // Usamos useLayoutEffect (no useEffect) para que la posición se calcule ANTES
+    // del pintado del navegador: con useEffect, el primer render de cada select se
+    // pintaba sin position:fixed (dropdownStyle todavía era {}), mostrando el
+    // dropdown "suelto" en el flujo normal por una fracción de segundo la primera
+    // vez que se abría cada select.
+    useLayoutEffect(() => {
+        if (!isOpen || !selectRef.current) return;
+
+        const updatePosition = () => {
+            if (!selectRef.current) return;
             const selectRect = selectRef.current.getBoundingClientRect();
-            const dropdownHeight = dropdownRef.current.offsetHeight;
+            const dropdownHeight = dropdownRef.current?.offsetHeight ?? 240;
             const spaceBelow = window.innerHeight - selectRect.bottom;
             const spaceAbove = selectRect.top;
+            const shouldOpenUpward = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
 
-            // Si no hay suficiente espacio abajo pero sí arriba, abrir hacia arriba
-            if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
-                setOpenUpward(true);
-            } else {
-                setOpenUpward(false);
-            }
-        }
+            setDropdownStyle({
+                position: 'fixed',
+                left: selectRect.left,
+                width: selectRect.width,
+                ...(shouldOpenUpward
+                    ? { bottom: window.innerHeight - selectRect.top + 8 }
+                    : { top: selectRect.bottom + 8 }),
+            });
+        };
+
+        updatePosition();
+        window.addEventListener('scroll', updatePosition, true);
+        window.addEventListener('resize', updatePosition);
+        return () => {
+            window.removeEventListener('scroll', updatePosition, true);
+            window.removeEventListener('resize', updatePosition);
+        };
     }, [isOpen]);
 
     const handleSelect = (optionValue: string | number | "") => {
@@ -85,8 +107,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             {isOpen && (
                 <div
                     ref={dropdownRef}
-                    className={`absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-60 overflow-auto left-0 ${openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
-                        }`}
+                    style={dropdownStyle}
+                    className="z-50 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-60 overflow-auto"
                 >
                     {options.map((option, index) => (
                         <button
