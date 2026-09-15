@@ -3,8 +3,10 @@ import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
 import { CustomSelect } from "../common/CustomSelect";
+import { UserAvatar } from "../common/UserAvatar";
 import { UserProfileModal } from "./UserProfileModal";
 import { EmpresaAssignmentModal } from "./EmpresaAssignmentModal";
+import { storageUrl } from "../../utils/storageUrl";
 
 interface UserRoleAssignmentProps {
   users: User[];
@@ -119,8 +121,17 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {user.name}
+                    <div className="flex items-center gap-3">
+                      <UserAvatar
+                        name={user.name}
+                        photoUrl={storageUrl(
+                          user.profile_photo_url ?? user.profile_photo_path,
+                        )}
+                        size="sm"
+                      />
+                      <div className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

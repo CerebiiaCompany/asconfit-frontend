@@ -21,6 +21,8 @@ export interface User {
   };
   cv_path?: string;
   cv_url?: string;
+  profile_photo_path?: string;
+  profile_photo_url?: string;
 }
 
 export interface UserProfile {
