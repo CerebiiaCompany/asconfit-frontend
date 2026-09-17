@@ -258,9 +258,9 @@ const exportToExcel = async (auditoria: Auditoria, tasks: TaskRow[]) => {
                 const lB = w === 1 ? medB(DARK) : thnB(MID);
                 const rB = w === 4 ? medB(DARK) : thnB(MID);
 
-                /* Fila P */
+                /* Fila P — celda verde marca la fecha de ENTREGA (no la de inicio) */
                 const cpCell = ws.getCell(rP, col);
-                const pHit = inSlot(t.desde, m.year, m.month, w);
+                const pHit = inSlot(t.hasta, m.year, m.month, w);
                 cpCell.fill = fill(pHit ? GREEN : (i % 2 === 0 ? EVEN_BG : ODD_BG));
                 cpCell.border = { top: thnB(MID), bottom: thnB(MID), left: lB, right: rB };
 
