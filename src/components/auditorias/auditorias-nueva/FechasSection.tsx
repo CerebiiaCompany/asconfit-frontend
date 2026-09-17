@@ -19,8 +19,6 @@ export const FechasSection: React.FC<FechasSectionProps> = ({
   onFechaCorteChange,
   errors = {},
 }) => {
-  const today = new Date().toISOString().split("T")[0];
-
   const getMinFechaCorte = () => {
     if (!fechaInicial) {
       const tomorrow = new Date();
@@ -76,7 +74,6 @@ export const FechasSection: React.FC<FechasSectionProps> = ({
             <DatePicker
               value={fechaInicial}
               onChange={handleFechaInicial}
-              min={today}
               className={errors.fechaInicial ? "border-red-500 bg-red-50" : ""}
             />
           </div>
