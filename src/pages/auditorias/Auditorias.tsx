@@ -13,6 +13,7 @@ import { Modal } from "../../components/Modal";
 export const Auditorias: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser(() => navigate("/login"));
+  const isAdmin = user?.role?.nombre?.toLowerCase() === "admin";
   const [searchTerm, setSearchTerm] = useState("");
   const { auditorias, loading, refetch } = useAuditorias();
   const [currentPage, setCurrentPage] = useState(1);
@@ -164,6 +165,7 @@ export const Auditorias: React.FC = () => {
               onDeleteAuditoria={handleDeleteAuditoria}
               onRiskMatrixAuditoria={handleRiskMatrix}
               currentUserId={user?.id}
+              isAdmin={isAdmin}
             />
             <Pagination
               totalItems={totalItems}
