@@ -7,6 +7,7 @@ interface AuditoriaCardListProps {
   onViewAuditoria: (id: number) => void;
   onDeleteAuditoria?: (id: number) => void;
   onRiskMatrixAuditoria?: (id: number) => void;
+  currentUserId?: number;
 }
 
 export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
@@ -14,6 +15,7 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
   onViewAuditoria,
   onDeleteAuditoria,
   onRiskMatrixAuditoria,
+  currentUserId,
 }) => {
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -38,15 +40,21 @@ export const AuditoriaCardList: React.FC<AuditoriaCardListProps> = ({
       </div>
 
       {/* Cards */}
-      {auditorias.map((auditoria) => (
-        <AuditoriaCard
-          key={auditoria.id}
-          auditoria={auditoria}
-          onViewComplete={onViewAuditoria}
-          onDelete={onDeleteAuditoria}
-          onRiskMatrix={onRiskMatrixAuditoria}
-        />
-      ))}
+      {auditorias.map((auditoria) => {
+        // Solo el creador puede mover la auditoría a papelera (regla del backend:
+        // AuditoriaController::destroy solo busca por user_id). Mostrar el ícono
+        // a delegados/otros usuarios producía un DELETE que el backend responde 404.
+        const isOwner = currentUserId != null && auditoria.user_id === currentUserId;
+        return (
+          <AuditoriaCard
+            key={auditoria.id}
+            auditoria={auditoria}
+            onViewComplete={onViewAuditoria}
+            onDelete={isOwner ? onDeleteAuditoria : undefined}
+            onRiskMatrix={onRiskMatrixAuditoria}
+          />
+        );
+      })}
     </div>
   );
 };

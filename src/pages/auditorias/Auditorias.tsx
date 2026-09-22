@@ -163,6 +163,7 @@ export const Auditorias: React.FC = () => {
               onViewAuditoria={handleViewAuditoria}
               onDeleteAuditoria={handleDeleteAuditoria}
               onRiskMatrixAuditoria={handleRiskMatrix}
+              currentUserId={user?.id}
             />
             <Pagination
               totalItems={totalItems}
