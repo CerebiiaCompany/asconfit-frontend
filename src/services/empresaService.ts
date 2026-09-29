@@ -13,6 +13,7 @@ export interface Empresa {
   razon_social: string;
   nit: string;
   tipo_sociedad: string;
+  tipo_servicio: string;
   actividad_economica: string;
   estado: string;
   representante_legal: string;

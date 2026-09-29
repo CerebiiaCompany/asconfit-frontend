@@ -28,6 +28,8 @@ function validate(formData: Empresa): FormErrors {
 
   if (!formData.tipo_sociedad) e.tipo_sociedad = 'Requerido';
 
+  if (!formData.tipo_servicio) e.tipo_servicio = 'Requerido';
+
   if (!formData.actividad_economica.trim()) e.actividad_economica = 'Requerido';
   else if (!onlyLetters.test(formData.actividad_economica)) e.actividad_economica = 'Solo letras';
 
@@ -81,7 +83,7 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
   const { addToast } = useToast();
 
   const empty: Empresa = {
-    razon_social: '', nit: '', tipo_sociedad: '', actividad_economica: '',
+    razon_social: '', nit: '', tipo_sociedad: '', tipo_servicio: '', actividad_economica: '',
     estado: '', representante_legal: '', tipo_documento: '', numero_documento: '',
     correo_personal: '', telefono_personal: '', pais: '', departamento: '',
     ciudad: '', direccion: '', telefono_empresarial: '', correo_empresarial: '',
@@ -208,6 +210,20 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
             <ChevronDown className="absolute right-3 top-[34px] w-4 h-4 text-orange-400 pointer-events-none" />
             <ErrMsg msg={er.tipo_sociedad} />
           </div>
+        </div>
+
+        {/* Tipo de servicio */}
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-600 mb-1.5">Tipo de servicio</label>
+          <select name="tipo_servicio" value={f.tipo_servicio} onChange={handleChange} onBlur={handleBlur}
+            className={selectClass(er.tipo_servicio, !!f.tipo_servicio)}>
+            <option value="">Selecciona el tipo</option>
+            <option value="auditoria" className="text-gray-800">Auditoría</option>
+            <option value="revisoria_fiscal" className="text-gray-800">Revisoría Fiscal</option>
+            <option value="control_interno" className="text-gray-800">Control Interno</option>
+          </select>
+          <ChevronDown className="absolute right-3 top-[34px] w-4 h-4 text-orange-400 pointer-events-none" />
+          <ErrMsg msg={er.tipo_servicio} />
         </div>
 
         {/* Actividad economica & Estado */}
