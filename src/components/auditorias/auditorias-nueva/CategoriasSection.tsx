@@ -133,8 +133,17 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
   };
 
   const hasDelegados = !!auditoriaDelegados && auditoriaDelegados.length > 0;
+  const hasFechas = !!fechaAuditoriaInicio && !!fechaAuditoriaCorte;
+  const canAddCategoria = hasDelegados && hasFechas;
 
   const handleAddCategoriaClick = () => {
+    if (!hasFechas) {
+      addToast(
+        "Selecciona las fechas de la auditoría antes de agregar categorías",
+        "error",
+      );
+      return;
+    }
     if (!hasDelegados) {
       addToast(
         "Selecciona al menos un delegado en la auditoría antes de agregar categorías",
@@ -463,14 +472,16 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
         <div className="mt-4 flex flex-col items-center gap-2">
           <button
             onClick={handleAddCategoriaClick}
-            disabled={!hasDelegados}
+            disabled={!canAddCategoria}
             title={
-              hasDelegados
+              canAddCategoria
                 ? undefined
+                : !hasFechas
+                ? "Selecciona las fechas de la auditoría para poder agregar categorías"
                 : "Selecciona al menos un delegado en la auditoría para poder agregar categorías"
             }
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium shadow-sm ${
-              hasDelegados
+              canAddCategoria
                 ? "bg-orange-500 text-white hover:bg-orange-600"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
@@ -480,9 +491,11 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
             </svg>
             Agregar categoría
           </button>
-          {!hasDelegados && (
+          {!canAddCategoria && (
             <p className="text-xs text-red-500">
-              Selecciona al menos un delegado en la auditoría para poder agregar categorías.
+              {!hasFechas
+                ? "Selecciona las fechas de la auditoría para poder agregar categorías."
+                : "Selecciona al menos un delegado en la auditoría para poder agregar categorías."}
             </p>
           )}
         </div>
