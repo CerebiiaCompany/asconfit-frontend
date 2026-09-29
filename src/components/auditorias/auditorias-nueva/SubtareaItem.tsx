@@ -101,23 +101,8 @@ export const SubtareaItem: React.FC<SubtareaItemProps> = ({
         />
       </div>
 
-      {/* Formato de archivo + botón eliminar */}
-      <div className="mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-end">
-        <div className="flex-1">
-          <label className="block text-sm text-gray-600 mb-2">
-            Formato de archivo
-          </label>
-          <select
-            value={subtarea.formatoArchivo}
-            onChange={(e) => onChange("formatoArchivo", e.target.value)}
-            className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent bg-[#F3F3F3] text-sm sm:text-base ${errors[`${categoriaId}_${subtarea.id}_formatoArchivo`] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-          >
-            <option value="">Seleccionar formato</option>
-            <option value="pdf">PDF</option>
-            <option value="excel">Excel</option>
-            <option value="word">Word</option>
-          </select>
-        </div>
+      {/* Botón eliminar */}
+      <div className="mt-4 flex justify-end">
         <button
           type="button"
           onClick={onRemove}

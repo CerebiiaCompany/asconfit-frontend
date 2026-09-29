@@ -13,66 +13,17 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
   );
   const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
-  const getAcceptedFileTypes = (formatoArchivo: string | null): string => {
-    if (!formatoArchivo) return "*";
-
-    const formatos: Record<string, string> = {
-      pdf: ".pdf",
-      excel: ".xlsx,.xls,.csv,.xlsm,.xlsb,.xltx,.xltm",
-      word: ".doc,.docx,.docm,.dotx,.dotm,.odt",
-    };
-    return formatos[formatoArchivo.toLowerCase()] || "*";
-  };
-
-  const getExtensionesPermitidas = (
-    formatoArchivo: string | null
-  ): string[] => {
-    if (!formatoArchivo) return [];
-
-    const extensiones: Record<string, string[]> = {
-      pdf: ["pdf"],
-      excel: ["xlsx", "xls", "csv", "xlsm", "xlsb", "xltx", "xltm"],
-      word: ["doc", "docx", "docm", "dotx", "dotm", "odt"],
-    };
-    return extensiones[formatoArchivo.toLowerCase()] || [];
-  };
-
-  const validateFile = (
-    file: File,
-    formatoArchivo: string | null
-  ): { valid: boolean; error?: string } => {
-    if (!formatoArchivo) return { valid: true };
-
-    const extension = file.name.split(".").pop()?.toLowerCase();
-    const formatosPermitidos = getExtensionesPermitidas(formatoArchivo);
-
-    if (
-      extension &&
-      formatosPermitidos.length > 0 &&
-      !formatosPermitidos.includes(extension)
-    ) {
-      return {
-        valid: false,
-        error: `El archivo debe ser de tipo: ${formatosPermitidos.join(", ")}`,
-      };
-    }
-
-    return { valid: true };
+  // Se permite subir archivos de cualquier formato, sin restricción por tipo.
+  const getAcceptedFileTypes = (_formatoArchivo?: string | null): string => {
+    return "*";
   };
 
   const uploadFile = async (
     subtareaId: number,
     file: File,
-    formatoArchivo: string | null,
+    _formatoArchivo?: string | null,
     carpetaId?: number | null
   ) => {
-    const validation = validateFile(file, formatoArchivo);
-
-    if (!validation.valid) {
-      options?.onError?.(validation.error!);
-      return { success: false, error: validation.error };
-    }
-
     try {
       setUploading(true);
       setUploadingSubtareaId(subtareaId);
@@ -101,9 +52,7 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Obtener el formato desde el input accept attribute o desde el data attribute
-    const formatoArchivo = event.target.getAttribute("data-formato") || null;
-    await uploadFile(subtareaId, file, formatoArchivo);
+    await uploadFile(subtareaId, file);
   };
 
   const handleOpenFile = async (subtareaId: number, fileName: string) => {
@@ -145,7 +94,6 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
     uploadingSubtareaId,
     fileInputRefs,
     getAcceptedFileTypes,
-    getExtensionesPermitidas,
     handleFileSelect,
     handleFileChange,
     handleOpenFile,

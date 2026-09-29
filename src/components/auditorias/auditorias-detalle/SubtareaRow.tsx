@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { PriorityBadge } from "../PriorityBadge";
 import { EstadoInformacionBadge } from "../EstadoInformacionBadge";
 import { FileUploadCell } from "./FileUploadCell";
-import { FormatoBadge } from "../FormatoBadge";
 import { CrearFindingModal } from "../Findings/CrearFindingModal";
 import { notaService } from "../../../services/notaService";
 
@@ -193,9 +192,6 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
             onOpenFile={onOpenFile}
             getAcceptedFileTypes={getAcceptedFileTypes}
           />
-        </td>
-        <td className="px-2 py-3 whitespace-nowrap">
-          <FormatoBadge formato={subtarea.formato_archivo} />
         </td>
         <td className="px-2 py-3 whitespace-nowrap">
           <div className="flex items-center gap-2">

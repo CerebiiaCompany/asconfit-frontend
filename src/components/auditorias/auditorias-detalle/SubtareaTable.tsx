@@ -57,9 +57,6 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                         <th className="px-3 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
                             Archivo
                         </th>
-                        <th className="px-2 py-3 text-left text-xs font-medium text-gray-500  tracking-wider w-20">
-                            Formato
-                        </th>
                         <th className="px-2 py-3 text-left text-xs font-medium text-gray-500  tracking-wider w-24">
                             Hallazgo
                         </th>

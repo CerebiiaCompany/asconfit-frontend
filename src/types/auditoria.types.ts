@@ -7,7 +7,6 @@ export interface Subtarea {
   observaciones: string;
   estadoInformacion: string;
   archivoNombre: string;
-  formatoArchivo: "pdf" | "excel" | "word" | "";
 }
 
 export interface Categoria {

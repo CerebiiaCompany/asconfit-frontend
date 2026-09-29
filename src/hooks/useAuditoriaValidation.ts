@@ -91,9 +91,6 @@ export const useAuditoriaValidation = () => {
           if (!sub.tiempoEntrega?.trim()) {
             errors[`${subKey}_tiempoEntrega`] = "Campo obligatorio";
           }
-          if (!sub.formatoArchivo) {
-            errors[`${subKey}_formatoArchivo`] = "Campo obligatorio";
-          }
         }
       }
     }

@@ -16,13 +16,6 @@ export const SubtareaCard: React.FC<SubtareaCardProps> = ({
         <div className="flex-1">
           <h4 className="font-medium text-gray-800 mb-2">{subtarea.nombre}</h4>
 
-          {subtarea.formato_archivo && (
-            <p className="text-sm text-gray-600">
-              Formato:{" "}
-              <span className="font-medium">{subtarea.formato_archivo}</span>
-            </p>
-          )}
-
           {subtarea.observaciones && (
             <p className="text-sm text-gray-600 mt-1">
               Observaciones: {subtarea.observaciones}

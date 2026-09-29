@@ -185,12 +185,6 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         {tarea.subtareaNombre}
                     </h4>
                     <div className="space-y-1">
-                        {tarea.formatoArchivo && (
-                            <p className="text-sm text-gray-600">
-                                <span className="font-medium text-gray-700">Formato requerido:</span>{' '}
-                                <span className="text-orange-600 font-semibold">{tarea.formatoArchivo}</span>
-                            </p>
-                        )}
                         <div className="flex flex-wrap gap-x-6 gap-y-1">
                             {tarea.fechaSolicitud && (
                                 <p className="text-sm text-gray-600">

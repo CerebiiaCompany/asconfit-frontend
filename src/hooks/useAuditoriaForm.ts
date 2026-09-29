@@ -80,7 +80,6 @@ export const useAuditoriaForm = () => {
             observaciones: "",
             estadoInformacion: "pendiente",
             archivoNombre: "",
-            formatoArchivo: "",
           };
           return { ...cat, subtareas: [...cat.subtareas, newSubtarea] };
         }
@@ -145,7 +144,6 @@ export const useAuditoriaForm = () => {
                 observaciones: "",
                 estadoInformacion: "pendiente",
                 archivoNombre: "",
-                formatoArchivo: req.formato_archivo || "",
               }),
             );
             return { ...cat, subtareas, delegadoId: cat.delegadoId };
@@ -182,7 +180,6 @@ export const useAuditoriaForm = () => {
         observaciones: st.observaciones || "",
         estadoInformacion: st.estado_informacion || "pendiente",
         archivoNombre: st.archivo_nombre || "",
-        formatoArchivo: st.formato_archivo || "",
       })) : []
     }));
     setCategorias(mappedCategorias);
