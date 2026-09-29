@@ -34,13 +34,13 @@ export const useAuditoriaForm = () => {
     }));
   };
 
-  const handleAddCategoria = () => {
+  const handleAddCategoria = (defaultDelegadoId: number | null = null) => {
     setCategorias((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
         nombre: "",
-        delegadoId: null,
+        delegadoId: defaultDelegadoId,
         tipoEstado: 'estandar' as const,
         subtareas: [],
       },

@@ -9,7 +9,7 @@ import { DatePicker } from "../../common/DatePicker";
 
 interface CategoriasSectionProps {
   categorias: Categoria[];
-  onAddCategoria: () => void;
+  onAddCategoria: (defaultDelegadoId?: number | null) => void;
   onRemoveCategoria: (id: string) => void;
   onCategoriaChange: (id: string, field: keyof Categoria, value: any) => void;
   onAddSubtarea: (categoriaId: string) => void;
@@ -130,6 +130,19 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
       }
     }
     onAddSubtarea(categoriaId);
+  };
+
+  const hasDelegados = !!auditoriaDelegados && auditoriaDelegados.length > 0;
+
+  const handleAddCategoriaClick = () => {
+    if (!hasDelegados) {
+      addToast(
+        "Selecciona al menos un delegado en la auditoría antes de agregar categorías",
+        "error",
+      );
+      return;
+    }
+    onAddCategoria(auditoriaDelegados![0]);
   };
 
   const handleRemoveSubtarea = (categoriaId: string, subtareaId: string) => {
@@ -447,16 +460,31 @@ export const CategoriasSection: React.FC<CategoriasSectionProps> = ({
         </div>
 
         {/* Botón agregar categoría al final — siempre visible */}
-        <div className="mt-4 flex justify-center">
+        <div className="mt-4 flex flex-col items-center gap-2">
           <button
-            onClick={onAddCategoria}
-            className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+            onClick={handleAddCategoriaClick}
+            disabled={!hasDelegados}
+            title={
+              hasDelegados
+                ? undefined
+                : "Selecciona al menos un delegado en la auditoría para poder agregar categorías"
+            }
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium shadow-sm ${
+              hasDelegados
+                ? "bg-orange-500 text-white hover:bg-orange-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Agregar categoría
           </button>
+          {!hasDelegados && (
+            <p className="text-xs text-red-500">
+              Selecciona al menos un delegado en la auditoría para poder agregar categorías.
+            </p>
+          )}
         </div>
       </div>
     </>
