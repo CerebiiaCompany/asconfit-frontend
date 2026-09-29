@@ -393,11 +393,8 @@ export const CronogramaAuditoria: React.FC<Props> = ({ auditoria }) => {
                     {tasks.map((task, idx) => {
                         const colors = ESTADO_COLORS[task.estado] ?? ESTADO_COLORS.pendiente;
                         const dotColor = PRIORIDAD_DOT[task.prioridad] ?? "bg-gray-300";
-                        const barFrom = task.desde ?? task.hasta!;
-                        const barTo = task.hasta ?? task.desde!;
-                        const x1 = xOf(barFrom);
-                        const x2 = xOf(addDays(barTo, 1));
-                        const barW = Math.max(x2 - x1, colWidth * 0.25);
+                        const fechaFinal = task.hasta ?? task.desde!;
+                        const xFinal = xOf(fechaFinal);
                         const todayX = xOf(today);
 
                         return (
@@ -423,14 +420,13 @@ export const CronogramaAuditoria: React.FC<Props> = ({ auditoria }) => {
                                             style={{ left: todayX }} />
                                     )}
                                     <div
-                                        className={`absolute top-1/2 -translate-y-1/2 rounded-full ${colors.bar} opacity-90 flex items-center px-1.5`}
-                                        style={{ left: x1, width: barW, height: 16 }}
-                                        title={`${task.nombre}\n${task.desde ? fmtShort(task.desde) : "?"} → ${task.hasta ? fmtShort(task.hasta) : "?"}`}>
-                                        {barW > 50 && (
-                                            <span className="text-white text-[9px] truncate leading-none font-medium">
-                                                {task.hasta ? fmtShort(task.hasta) : ""}
-                                            </span>
-                                        )}
+                                        className="absolute top-1/2 -translate-y-1/2 flex items-center gap-1.5"
+                                        style={{ left: xFinal }}
+                                        title={`${task.nombre}\nEntrega: ${fmtShort(fechaFinal)}`}>
+                                        <span className={`w-3.5 h-3.5 rounded-full ${colors.bar} opacity-90 shrink-0 border-2 border-white shadow-sm`} />
+                                        <span className="text-[9px] text-gray-600 font-semibold whitespace-nowrap">
+                                            {fmtShort(fechaFinal)}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
