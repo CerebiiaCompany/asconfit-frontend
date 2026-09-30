@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { KeyRound } from "lucide-react";
 import { User } from "../../services/userService";
 import { Role, getRoleName } from "../../types/role";
 import { SearchInput } from "../SearchInput";
@@ -6,6 +7,7 @@ import { CustomSelect } from "../common/CustomSelect";
 import { UserAvatar } from "../common/UserAvatar";
 import { UserProfileModal } from "./UserProfileModal";
 import { EmpresaAssignmentModal } from "./EmpresaAssignmentModal";
+import { ChangePasswordModal } from "./ChangePasswordModal";
 import { storageUrl } from "../../utils/storageUrl";
 
 interface UserRoleAssignmentProps {
@@ -25,6 +27,7 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
   const [empresaAssignmentUser, setEmpresaAssignmentUser] = useState<User | null>(null);
+  const [passwordChangeUser, setPasswordChangeUser] = useState<User | null>(null);
 
   const handleRoleChange = async (userId: number, roleId: string) => {
     setUpdatingId(userId);
@@ -110,7 +113,10 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   Empresas y Encargos
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  PERFIL
+                  Contraseña
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Perfil
                 </th>
               </tr>
             </thead>
@@ -194,6 +200,16 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
+                      onClick={() => setPasswordChangeUser(user)}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 border border-amber-300 bg-amber-50 text-amber-800 rounded-lg hover:bg-amber-100 transition-colors text-sm font-medium shadow-sm"
+                      title="Cambiar contraseña de usuario"
+                    >
+                      <KeyRound className="w-4 h-4 text-amber-600" />
+                      <span>Cambiar</span>
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
                       onClick={() => handleViewProfile(user.id)}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#F97316] text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
                     >
@@ -236,6 +252,17 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
           onClose={() => setEmpresaAssignmentUser(null)}
           userId={empresaAssignmentUser.id}
           userName={empresaAssignmentUser.name}
+        />
+      )}
+
+      {/* Change Password Modal */}
+      {passwordChangeUser && (
+        <ChangePasswordModal
+          isOpen={true}
+          onClose={() => setPasswordChangeUser(null)}
+          userId={passwordChangeUser.id}
+          userName={passwordChangeUser.name}
+          userEmail={passwordChangeUser.email}
         />
       )}
     </div>

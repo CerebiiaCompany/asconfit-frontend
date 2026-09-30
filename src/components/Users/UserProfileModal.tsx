@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, User, Mail, Phone, MapPin, Building, Calendar, FileText, Eye, BarChart3 } from 'lucide-react';
+import { X, User, Mail, Phone, MapPin, Building, Calendar, FileText, Eye, BarChart3, KeyRound } from 'lucide-react';
 import { userService, UserProfile } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { ChangePasswordModal } from './ChangePasswordModal';
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -16,8 +18,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     userId
 }) => {
     const navigate = useNavigate();
+    const { userRole } = useAuth();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
     const { addToast } = useToast();
 
     useEffect(() => {
@@ -280,7 +284,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 rounded-b-2xl">
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap sm:flex-nowrap gap-3">
+                        {userRole === 'admin' && profile && (
+                            <button
+                                onClick={() => setShowPasswordModal(true)}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg font-semibold transition-colors"
+                            >
+                                <KeyRound className="w-4 h-4 text-amber-600" />
+                                Cambiar Contraseña
+                            </button>
+                        )}
                         <button
                             onClick={() => navigate(`/user-stats/${userId}`)}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
@@ -297,6 +310,17 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     </div>
                 </div>
             </div>
+
+            {/* Change Password Modal */}
+            {showPasswordModal && profile && (
+                <ChangePasswordModal
+                    isOpen={true}
+                    onClose={() => setShowPasswordModal(false)}
+                    userId={profile.id}
+                    userName={profile.name}
+                    userEmail={profile.email}
+                />
+            )}
         </div>
     );
 };

@@ -145,4 +145,17 @@ export const userService = {
     });
     return URL.createObjectURL(response.data);
   },
+
+  async resetUserPassword(
+    userId: number,
+    password: string,
+    password_confirmation: string
+  ): Promise<{ message: string }> {
+    const response = await axios.put(
+      `${API_URL}/users/${userId}/password`,
+      { password, password_confirmation },
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
 };
