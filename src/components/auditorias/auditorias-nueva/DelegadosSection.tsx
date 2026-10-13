@@ -40,10 +40,10 @@ export const DelegadosSection: React.FC<DelegadosSectionProps> = ({
         <label className="text-sm text-gray-600 sm:w-44 flex-shrink-0 sm:pt-2">
           {index === 0 ? (
             <>
-              Delegado 1: <span className="text-red-500">*</span>
+              Auditor Principal: <span className="text-red-500">*</span>
             </>
           ) : (
-            "Delegado 2:"
+            "Auditor Suplente:"
           )}
         </label>
         <div className="flex-1">
