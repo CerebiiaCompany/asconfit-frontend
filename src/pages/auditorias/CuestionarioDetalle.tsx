@@ -169,14 +169,31 @@ export const CuestionarioDetalle: React.FC = () => {
             right: { style: 'thin', color: { argb: 'FFB0B0B0' } },
         });
 
-        // ── Fila 1: Título ───────────────────────────────────────────────────
+        // ── Fila 1: Título (con el logo de Asconfit pegado a la izquierda) ───
         ws.mergeCells('A1:G1');
         const r1 = ws.getRow(1);
-        r1.height = 30;
+        r1.height = 36;
         r1.getCell(1).value = data.cuestionario;
         r1.getCell(1).font = { bold: true, size: 14, color: { argb: BLANCO } };
         r1.getCell(1).fill = fill(NARANJA);
         r1.getCell(1).alignment = centrado;
+
+        try {
+            const logoBase64 = await fetch('/Asconfit.png')
+                .then(res => res.blob())
+                .then(blob => new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                }));
+            const logoId = workbook.addImage({ base64: logoBase64, extension: 'png' });
+            // Logo pegado a la izquierda, dentro de la misma fila del título (fondo naranja = contraste con el logo blanco)
+            // Proporción real del archivo (924x168) para que no se vea estirado
+            ws.addImage(logoId, { tl: { col: 0.05, row: 0.2 }, ext: { width: 154, height: 28 } });
+        } catch (e) {
+            console.error('No se pudo cargar el logo para el Excel', e);
+        }
 
         // ── Fila 2: Opciones Si / No / NA ────────────────────────────────────
         ws.mergeCells('A2:D2');
