@@ -33,6 +33,17 @@ export interface User {
   especialidad_otros?: boolean;
 }
 
+export interface UserAdjunto {
+  id: number;
+  user_id: number;
+  nombre: string;
+  original_name: string;
+  mime_type?: string;
+  size?: number;
+  url: string | null;
+  created_at: string;
+}
+
 export interface AuthResponse {
   access_token: string;
   token_type: string;
@@ -144,6 +155,27 @@ class AuthService {
       "/profile/tarjeta-profesional",
       formData,
     );
+  }
+
+  async getAdjuntos(): Promise<UserAdjunto[]> {
+    return api.get<UserAdjunto[]>("/profile/adjuntos");
+  }
+
+  async uploadAdjunto(
+    nombre: string,
+    file: File,
+  ): Promise<{ message: string; adjunto: UserAdjunto }> {
+    const formData = new FormData();
+    formData.append("nombre", nombre);
+    formData.append("archivo", file);
+    return api.post<{ message: string; adjunto: UserAdjunto }>(
+      "/profile/adjuntos",
+      formData,
+    );
+  }
+
+  async deleteAdjunto(id: number): Promise<{ message: string }> {
+    return api.delete<{ message: string }>(`/profile/adjuntos/${id}`);
   }
 
   setToken(token: string): void {

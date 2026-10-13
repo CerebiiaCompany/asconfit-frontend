@@ -244,6 +244,41 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                                 </div>
                             </div>
 
+                            {/* Otros Documentos Section */}
+                            <div className="bg-gray-50 rounded-xl p-6">
+                                <h4 className="text-lg font-semibold text-gray-800 mb-4">Otros Documentos</h4>
+                                {profile.adjuntos && profile.adjuntos.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {profile.adjuntos.map(adjunto => (
+                                            <div key={adjunto.id} className="flex items-center justify-between gap-3">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-8 h-8 shrink-0 bg-orange-100 rounded-lg flex items-center justify-center">
+                                                        <FileText className="w-4 h-4 text-orange-500" />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="font-semibold text-gray-800 truncate">{adjunto.nombre}</p>
+                                                        <p className="text-xs text-gray-500 truncate">{adjunto.original_name}</p>
+                                                    </div>
+                                                </div>
+                                                {adjunto.url && (
+                                                    <a
+                                                        href={adjunto.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-2 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg font-semibold transition-colors shrink-0"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                        Ver
+                                                    </a>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-400">No hay documentos adicionales</p>
+                                )}
+                            </div>
+
                             {/* Especialidades Section */}
                             <div className="bg-gray-50 rounded-xl p-6">
                                 <h4 className="text-lg font-semibold text-gray-800 mb-4">Especialidades</h4>

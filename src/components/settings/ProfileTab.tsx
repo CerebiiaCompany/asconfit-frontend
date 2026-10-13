@@ -1,6 +1,7 @@
 import React from "react";
 import { Alert } from "../common/Alert";
 import { storageUrl } from "../../utils/storageUrl";
+import { AdjuntosSection } from "./AdjuntosSection";
 
 interface ProfileTabProps {
   user: any;
@@ -327,6 +328,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Otros documentos adjuntos */}
+      <AdjuntosSection />
     </div>
   );
 };

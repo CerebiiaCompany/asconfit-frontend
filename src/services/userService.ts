@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { UserAdjunto } from "./authService";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -40,6 +41,7 @@ export interface UserProfile {
   has_cv: boolean;
   tarjeta_profesional_url?: string;
   has_tarjeta_profesional: boolean;
+  adjuntos?: UserAdjunto[];
   created_at: string;
   especialidad_revisoria_fiscal?: boolean;
   especialidad_auditoria_externa?: boolean;
