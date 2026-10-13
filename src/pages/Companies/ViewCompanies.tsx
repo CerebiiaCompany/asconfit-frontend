@@ -50,9 +50,15 @@ export const ViewCompanies: React.FC = () => {
   );
 
   const tipoServicioLabels: Record<string, string> = {
-    auditoria: "Auditoría",
-    revisoria_fiscal: "Revisoría Fiscal",
+    tributaria: "Tributaria",
+    financiera: "Financiera",
+    operativa: "Operativa",
+    cumplimiento: "Cumplimiento",
+    sistemas: "Sistemas",
     control_interno: "Control Interno",
+    inventarios: "Inventarios",
+    calidad: "Calidad",
+    gestion: "Gestión",
   };
 
   // Formatear fecha en formato legible
