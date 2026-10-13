@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { FolderNavigator } from '../../common/FolderNavigator';
 
 interface FileUploadCellProps {
     subtareaId: number;
     archivoNombre?: string;
     formatoArchivo: string;
+    empresaId?: number;
     isUploading: boolean;
     fileInputRef: (el: HTMLInputElement | null) => void;
     onFileSelect: (subtareaId: number) => void;
-    onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
+    onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
 }
@@ -16,13 +19,50 @@ export const FileUploadCell: React.FC<FileUploadCellProps> = ({
     subtareaId,
     archivoNombre,
     formatoArchivo,
+    empresaId,
     isUploading,
     fileInputRef,
     onFileSelect,
-    onFileChange,
+    onUploadConfirm,
     onOpenFile,
     getAcceptedFileTypes
 }) => {
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [customFileName, setCustomFileName] = useState('');
+    const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+    const [selectedFolderName, setSelectedFolderName] = useState<string>('');
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            setSelectedFile(file);
+            setCustomFileName(nameWithoutExt);
+            setShowUploadModal(true);
+        }
+        e.target.value = '';
+    };
+
+    const resetModalState = () => {
+        setShowUploadModal(false);
+        setSelectedFile(null);
+        setCustomFileName('');
+        setSelectedFolderId(null);
+        setSelectedFolderName('');
+    };
+
+    const handleConfirmUpload = () => {
+        if (!selectedFile) return;
+
+        const extension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.'));
+        const finalName = customFileName.trim() ? `${customFileName.trim()}${extension}` : selectedFile.name;
+        const renamedFile = new File([selectedFile], finalName, { type: selectedFile.type });
+
+        onUploadConfirm(subtareaId, renamedFile, selectedFolderId || undefined);
+        resetModalState();
+    };
+
     return (
         <div className="flex items-center gap-2">
             {archivoNombre ? (
@@ -50,7 +90,7 @@ export const FileUploadCell: React.FC<FileUploadCellProps> = ({
             <input
                 type="file"
                 ref={fileInputRef}
-                onChange={(e) => onFileChange(e, subtareaId)}
+                onChange={handleFileChange}
                 accept={getAcceptedFileTypes(formatoArchivo)}
                 data-formato={formatoArchivo}
                 className="hidden"
@@ -72,6 +112,87 @@ export const FileUploadCell: React.FC<FileUploadCellProps> = ({
                     </svg>
                 )}
             </button>
+
+            {showUploadModal && createPortal(
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Subir archivo
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-6">
+                            Nombra el archivo y selecciona una carpeta de destino (opcional).
+                        </p>
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre del archivo
+                            </label>
+                            <input
+                                type="text"
+                                value={customFileName}
+                                onChange={(e) => setCustomFileName(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                placeholder="Ej: Certificado de Retención - Abril 2026"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleConfirmUpload();
+                                    if (e.key === 'Escape') resetModalState();
+                                }}
+                            />
+                            {selectedFile && (
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Extensión: {selectedFile.name.substring(selectedFile.name.lastIndexOf('.'))}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Selector de carpetas */}
+                        <div className="mb-6">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                Carpeta de destino (opcional)
+                            </h4>
+                            <p className="text-xs text-gray-500 mb-3">
+                                Si no seleccionas una carpeta, el archivo se guardará en la auditoría.
+                            </p>
+                            {empresaId ? (
+                                <FolderNavigator
+                                    empresaId={empresaId}
+                                    onFolderSelect={(carpetaId, carpetaNombre) => {
+                                        setSelectedFolderId(carpetaId);
+                                        setSelectedFolderName(carpetaNombre);
+                                    }}
+                                    selectedFolderId={selectedFolderId}
+                                />
+                            ) : (
+                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p className="text-sm text-yellow-700">
+                                        No se pudo cargar el selector de carpetas.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={resetModalState}
+                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleConfirmUpload}
+                                disabled={!customFileName.trim()}
+                                className={`px-4 py-2 rounded-lg transition-colors ${customFileName.trim()
+                                    ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Subir archivo
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 };

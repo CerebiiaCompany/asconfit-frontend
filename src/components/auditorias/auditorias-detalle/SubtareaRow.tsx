@@ -10,13 +10,11 @@ interface SubtareaRowProps {
   subtarea: any;
   auditoria: any;
   categoriaTipoEstado: 'estandar' | 'si_no';
+  empresaId?: number;
   isUploading: boolean;
   fileInputRef: (el: HTMLInputElement | null) => void;
   onFileSelect: (subtareaId: number) => void;
-  onFileChange: (
-    event: React.ChangeEvent<HTMLInputElement>,
-    subtareaId: number
-  ) => void;
+  onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
   onOpenFile: (subtareaId: number, fileName: string) => void;
   getAcceptedFileTypes: (formatoArchivo: string) => string;
   onEstadoChange: (subtareaId: number, estado: string) => void;
@@ -30,10 +28,11 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   subtarea,
   auditoria,
   categoriaTipoEstado,
+  empresaId,
   isUploading,
   fileInputRef,
   onFileSelect,
-  onFileChange,
+  onUploadConfirm,
   onOpenFile,
   getAcceptedFileTypes,
   onEstadoChange,
@@ -185,10 +184,11 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
             subtareaId={subtarea.id}
             archivoNombre={subtarea.archivo_nombre}
             formatoArchivo={subtarea.formato_archivo}
+            empresaId={empresaId}
             isUploading={isUploading}
             fileInputRef={fileInputRef}
             onFileSelect={onFileSelect}
-            onFileChange={onFileChange}
+            onUploadConfirm={onUploadConfirm}
             onOpenFile={onOpenFile}
             getAcceptedFileTypes={getAcceptedFileTypes}
           />

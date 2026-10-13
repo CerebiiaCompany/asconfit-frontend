@@ -5,10 +5,11 @@ import { UserProfileModal } from '../../Users/UserProfileModal';
 interface CategoriaCardProps {
     categoria: any;
     auditoria: any;
+    empresaId?: number;
     uploadingSubtareaId: number | null;
     fileInputRefs: React.MutableRefObject<{ [key: number]: HTMLInputElement | null }>;
     onFileSelect: (subtareaId: number) => void;
-    onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
+    onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
     onEstadoChange: (subtareaId: number, estado: string) => void;
@@ -21,10 +22,11 @@ interface CategoriaCardProps {
 export const CategoriaCard: React.FC<CategoriaCardProps> = ({
     categoria,
     auditoria,
+    empresaId,
     uploadingSubtareaId,
     fileInputRefs,
     onFileSelect,
-    onFileChange,
+    onUploadConfirm,
     onOpenFile,
     getAcceptedFileTypes,
     onEstadoChange,
@@ -55,10 +57,11 @@ export const CategoriaCard: React.FC<CategoriaCardProps> = ({
                         subtareas={categoria.subtareas}
                         auditoria={auditoria}
                         categoriaTipoEstado={categoria.tipo_estado === 'si_no' ? 'si_no' : 'estandar'}
+                        empresaId={empresaId}
                         uploadingSubtareaId={uploadingSubtareaId}
                         fileInputRefs={fileInputRefs}
                         onFileSelect={onFileSelect}
-                        onFileChange={onFileChange}
+                        onUploadConfirm={onUploadConfirm}
                         onOpenFile={onOpenFile}
                         getAcceptedFileTypes={getAcceptedFileTypes}
                         onEstadoChange={onEstadoChange}

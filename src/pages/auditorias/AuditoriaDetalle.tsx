@@ -36,11 +36,11 @@ export const AuditoriaDetalle: React.FC = () => {
   }, [id]);
 
   const {
+    uploadFile,
     uploadingSubtareaId,
     fileInputRefs,
     getAcceptedFileTypes,
     handleFileSelect,
-    handleFileChange: uploadFile,
     handleOpenFile,
   } = useFileUpload({
     onSuccess: async () => {
@@ -55,6 +55,12 @@ export const AuditoriaDetalle: React.FC = () => {
   const handleFindingCreated = (actividadId: number, newCount: number) => {
     setFindingsCount(prev => ({ ...prev, [actividadId]: newCount }));
   };
+
+  const handleUploadConfirm = (subtareaId: number, file: File, carpetaId?: number | null) => {
+    uploadFile(subtareaId, file, undefined, carpetaId);
+  };
+
+  const empresaId = auditoria?.empresa_id || auditoria?.empresa?.id;
 
   const isAdmin = user?.role?.nombre?.toLowerCase() === 'admin';
   const canEdit = user && auditoria && (
@@ -180,10 +186,11 @@ export const AuditoriaDetalle: React.FC = () => {
                 key={categoria.id}
                 categoria={categoria}
                 auditoria={auditoria}
+                empresaId={empresaId}
                 uploadingSubtareaId={uploadingSubtareaId}
                 fileInputRefs={fileInputRefs}
                 onFileSelect={handleFileSelect}
-                onFileChange={uploadFile}
+                onUploadConfirm={handleUploadConfirm}
                 onOpenFile={handleOpenFile}
                 getAcceptedFileTypes={getAcceptedFileTypes}
                 onEstadoChange={handleEstadoChange}

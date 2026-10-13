@@ -5,10 +5,11 @@ interface SubtareaTableProps {
     subtareas: any[];
     auditoria: any;
     categoriaTipoEstado: 'estandar' | 'si_no';
+    empresaId?: number;
     uploadingSubtareaId: number | null;
     fileInputRefs: React.MutableRefObject<{ [key: number]: HTMLInputElement | null }>;
     onFileSelect: (subtareaId: number) => void;
-    onFileChange: (event: React.ChangeEvent<HTMLInputElement>, subtareaId: number) => void;
+    onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
     onEstadoChange: (subtareaId: number, estado: string) => void;
@@ -22,10 +23,11 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     subtareas,
     auditoria,
     categoriaTipoEstado,
+    empresaId,
     uploadingSubtareaId,
     fileInputRefs,
     onFileSelect,
-    onFileChange,
+    onUploadConfirm,
     onOpenFile,
     getAcceptedFileTypes,
     onEstadoChange,
@@ -71,8 +73,9 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             categoriaTipoEstado={categoriaTipoEstado}
                             isUploading={uploadingSubtareaId === subtarea.id}
                             fileInputRef={(el) => { fileInputRefs.current[subtarea.id] = el; }}
+                            empresaId={empresaId}
                             onFileSelect={onFileSelect}
-                            onFileChange={onFileChange}
+                            onUploadConfirm={onUploadConfirm}
                             onOpenFile={onOpenFile}
                             getAcceptedFileTypes={getAcceptedFileTypes}
                             onEstadoChange={onEstadoChange}
