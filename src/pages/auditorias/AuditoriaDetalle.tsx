@@ -56,9 +56,8 @@ export const AuditoriaDetalle: React.FC = () => {
     setFindingsCount(prev => ({ ...prev, [actividadId]: newCount }));
   };
 
-  const handleUploadConfirm = (subtareaId: number, file: File, carpetaId?: number | null) => {
+  const handleUploadConfirm = (subtareaId: number, file: File, carpetaId?: number | null) =>
     uploadFile(subtareaId, file, undefined, carpetaId);
-  };
 
   const empresaId = auditoria?.empresa_id || auditoria?.empresa?.id;
 
@@ -198,6 +197,7 @@ export const AuditoriaDetalle: React.FC = () => {
                 userRole={user?.role?.nombre || "delegado"}
                 findingsCount={findingsCount}
                 onFindingCreated={handleFindingCreated}
+                onArchivosChanged={refetch}
               />
             ))}
           </div>

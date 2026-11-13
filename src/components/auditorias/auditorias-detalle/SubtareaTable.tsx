@@ -9,7 +9,9 @@ interface SubtareaTableProps {
     uploadingSubtareaId: number | null;
     fileInputRefs: React.MutableRefObject<{ [key: number]: HTMLInputElement | null }>;
     onFileSelect: (subtareaId: number) => void;
-    onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
+    onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void | Promise<unknown>;
+  /** Se llama al eliminar un archivo de una tarea (para refrescar). */
+  onArchivosChanged?: () => void;
     onOpenFile: (subtareaId: number, fileName: string) => void;
     getAcceptedFileTypes: (formatoArchivo: string) => string;
     onEstadoChange: (subtareaId: number, estado: string) => void;
@@ -35,6 +37,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
     userRole,
     findingsCount = {},
     onFindingCreated,
+    onArchivosChanged,
 }) => {
     return (
         <div className="overflow-hidden">
@@ -83,6 +86,7 @@ export const SubtareaTable: React.FC<SubtareaTableProps> = ({
                             userRole={userRole}
                             findingsCount={findingsCount[subtarea.id] || 0}
                             onFindingCreated={onFindingCreated}
+                        onArchivosChanged={onArchivosChanged}
                         />
                     ))}
                 </tbody>

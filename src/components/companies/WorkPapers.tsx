@@ -3,6 +3,7 @@ import { Search, SlidersHorizontal, Lock, Users, Upload, FileText, Trash2, Eye, 
 import { documentoService, Documento, Carpeta } from "../../services/documentoService";
 import { useToast } from "../../contexts/ToastContext";
 import { DeleteConfirmModal } from "../common/DeleteConfirmModal";
+import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "../../utils/uploadLimits";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -233,8 +234,8 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
   const handleFileClick = () => fileInputRef.current?.click();
 
   const uploadFile = async (file: File) => {
-    if (file.size > 50 * 1024 * 1024) {
-      addToast("El archivo no puede exceder los 50 MB", "warning");
+    if (exceedsUploadLimit(file)) {
+      addToast(UPLOAD_TOO_LARGE_MESSAGE, "warning");
       return;
     }
     try {
@@ -243,7 +244,7 @@ export const WorkPapers: React.FC<WorkPapersProps> = ({ carpetaId, empresaId, is
       setDocumentos(prev => [...prev, newDoc]);
       addToast("Documento subido correctamente", "success");
     } catch (error: any) {
-      addToast(error.response?.data?.message || "Error al subir el archivo", "error");
+      addToast(error.response?.data?.message || error.message || "Error al subir el archivo", "error");
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

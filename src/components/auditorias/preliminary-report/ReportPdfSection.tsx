@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { auditoriaService } from "../../../services/auditoriaService";
 import { storageUrl } from "../../../utils/storageUrl";
+import { exceedsUploadLimit, UPLOAD_TOO_LARGE_MESSAGE } from "../../../utils/uploadLimits";
 import { ReportPdfUpload } from "./ReportPdfUpload";
 
 interface ReportPdfSectionProps {
@@ -24,6 +25,7 @@ export const ReportPdfSection: React.FC<ReportPdfSectionProps> = ({ auditoriaId 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || file.type !== "application/pdf") return;
+        if (exceedsUploadLimit(file)) { setUploadError(UPLOAD_TOO_LARGE_MESSAGE); return; }
         setPdfFile(file);
         setPdfUrl(URL.createObjectURL(file));
         setUploadSuccess(false);
@@ -34,6 +36,7 @@ export const ReportPdfSection: React.FC<ReportPdfSectionProps> = ({ auditoriaId 
         e.preventDefault();
         const file = e.dataTransfer.files?.[0];
         if (!file || file.type !== "application/pdf") return;
+        if (exceedsUploadLimit(file)) { setUploadError(UPLOAD_TOO_LARGE_MESSAGE); return; }
         setPdfFile(file);
         setPdfUrl(URL.createObjectURL(file));
         setUploadSuccess(false);
@@ -49,8 +52,8 @@ export const ReportPdfSection: React.FC<ReportPdfSectionProps> = ({ auditoriaId 
             setPdfUrl(storageUrl(path));
             setPdfFile(null);
             setUploadSuccess(true);
-        } catch {
-            setUploadError("Error al subir el informe. Intenta de nuevo.");
+        } catch (err: any) {
+            setUploadError(err?.response?.data?.message || err?.message || "Error al subir el informe. Intenta de nuevo.");
         } finally {
             setUploading(false);
         }

@@ -57,13 +57,13 @@ export const useAuditoria = (
 
       // Recargar la auditoría para mostrar el archivo actualizado
       await cargarAuditoria();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al subir archivo:", error);
       setModal({
         isOpen: true,
         type: "error",
         title: "Error",
-        message: "No se pudo subir el archivo",
+        message: error?.response?.data?.message || error?.message || "No se pudo subir el archivo",
       });
     }
   };

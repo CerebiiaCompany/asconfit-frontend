@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronDown } from 'lucide-react';
 import { empresaService, Empresa } from '../../services/empresaService';
 import { useToast } from "../../contexts/ToastContext";
+import { TIPOS_SERVICIO } from "../../constants/tipos";
 
 interface FormProps {
   isEdit?: boolean;
@@ -218,15 +219,9 @@ export const CreateCompanyForm: React.FC<FormProps> = ({ isEdit, initialData }) 
           <select name="tipo_servicio" value={f.tipo_servicio} onChange={handleChange} onBlur={handleBlur}
             className={selectClass(er.tipo_servicio, !!f.tipo_servicio)}>
             <option value="">Selecciona el tipo</option>
-            <option value="tributaria" className="text-gray-800">Tributaria</option>
-            <option value="financiera" className="text-gray-800">Financiera</option>
-            <option value="operativa" className="text-gray-800">Operativa</option>
-            <option value="cumplimiento" className="text-gray-800">Cumplimiento</option>
-            <option value="sistemas" className="text-gray-800">Sistemas</option>
-            <option value="control_interno" className="text-gray-800">Control Interno</option>
-            <option value="inventarios" className="text-gray-800">Inventarios</option>
-            <option value="calidad" className="text-gray-800">Calidad</option>
-            <option value="gestion" className="text-gray-800">Gestión</option>
+            {TIPOS_SERVICIO.map((t) => (
+              <option key={t.value} value={t.value} className="text-gray-800">{t.label}</option>
+            ))}
           </select>
           <ChevronDown className="absolute right-3 top-[34px] w-4 h-4 text-orange-400 pointer-events-none" />
           <ErrMsg msg={er.tipo_servicio} />

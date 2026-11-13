@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Auditoria, Subtarea, Categoria } from "../../../types/auditoria";
+import { fetchImageBase64, LOGO_OSCURO_PATH } from "../../../utils/excelLogo";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-commonjs
 const ExcelJS = require("exceljs") as any;
@@ -114,13 +115,23 @@ const exportToExcel = async (auditoria: Auditoria, tasks: TaskRow[]) => {
 
     let R = 1;
 
-    /* Fila 1 — Formato */
+    /* Fila 1 — Logo de ASCONFIT (izquierda) + Formato (derecha) */
     ws.mergeCells(R, 1, R, totalCols);
     const fc = ws.getCell(R, 1);
     fc.value = "Anexo No.1 / Formato CC - 01";
     fc.font = { bold: true, size: 10, name: "Calibri" };
+    fc.alignment = { horizontal: "right", vertical: "bottom" };
     fc.border = { bottom: medB(DARK) };
-    ws.getRow(R).height = 13; R++;
+    ws.getRow(R).height = 34;
+    try {
+        const logoId = wb.addImage({ base64: await fetchImageBase64(LOGO_OSCURO_PATH), extension: "png" });
+        // Proporción real del logo (924x168) para que no se deforme
+        ws.addImage(logoId, { tl: { col: 0.1, row: 0.15 }, ext: { width: 154, height: 28 } });
+    } catch (e) {
+        // Si el logo no carga, el Excel se genera igual (sin logo)
+        console.error("No se pudo cargar el logo para el cronograma", e);
+    }
+    R++;
 
     /* Fila 2 — vacía */
     ws.getRow(R).height = 6; R++;

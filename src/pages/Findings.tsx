@@ -1,4 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "../contexts/ToastContext";
+import { Finding } from "../services/findingService";
+import { EditarFindingModal } from "../components/Findings/EditarFindingModal";
 import { useFindingsPage } from "../hooks/useFindingsPage";
 import { FindingsFilters } from "../components/Findings/FindingsFilters";
 import { FindingsStats } from "../components/Findings/FindingsStats";
@@ -6,8 +10,13 @@ import { FindingsCharts } from "../components/Findings/FindingsCharts";
 import { FindingsTable } from "../components/Findings/FindingsTable";
 
 export const Findings: React.FC = () => {
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [editing, setEditing] = useState<Finding | null>(null);
+
     const {
         loading,
+        updateFinding,
         empresas,
         tiposAuditoria,
         filtered,
@@ -17,6 +26,10 @@ export const Findings: React.FC = () => {
         sevFilter, setSevFilter,
         tipoAuditoriaFilter, setTipoAuditoriaFilter,
     } = useFindingsPage();
+
+    // Misma regla que el backend: puede editar el autor del hallazgo o un admin
+    const isAdmin = user?.role?.nombre?.toLowerCase() === "admin";
+    const canEdit = (f: Finding) => isAdmin || (!!user && Number(f.user_id) === Number(user.id));
 
     return (
         <div className="py-4 px-3 sm:px-6 lg:px-8">
@@ -56,8 +69,20 @@ export const Findings: React.FC = () => {
                         leves={stats.leves}
                         barData={barData}
                     />
-                    <FindingsTable findings={filtered} />
+                    <FindingsTable findings={filtered} canEdit={canEdit} onEdit={setEditing} />
                 </>
+            )}
+
+            {editing && (
+                <EditarFindingModal
+                    finding={editing}
+                    onClose={() => setEditing(null)}
+                    onSaved={(updated) => {
+                        updateFinding(updated);
+                        setEditing(null);
+                        addToast("Hallazgo actualizado correctamente", "success");
+                    }}
+                />
             )}
         </div>
     );

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { FolderNavigator } from '../common/FolderNavigator';
 
 interface FileUploadButtonProps {
-    onFileSelect: (file: File, customName?: string, carpetaId?: number | null) => void;
+    onFileSelect: (file: File, customName?: string, carpetaId?: number | null) => void | Promise<unknown>;
     acceptedFileTypes: string;
     hasFile: boolean;
     uploading?: boolean;
@@ -20,17 +20,20 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [showRenameModal, setShowRenameModal] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // Se pueden elegir varios archivos a la vez; con uno solo se permite renombrarlo
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const selectedFile = selectedFiles.length === 1 ? selectedFiles[0] : null;
     const [customFileName, setCustomFileName] = useState('');
     const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
     const [selectedFolderName, setSelectedFolderName] = useState<string>('');
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Extraer nombre sin extensión
+        const files = Array.from(e.target.files ?? []);
+        if (files.length) {
+            // Extraer nombre sin extensión (solo se usa si es un único archivo)
+            const file = files[0];
             const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-            setSelectedFile(file);
+            setSelectedFiles(files);
             setCustomFileName(nameWithoutExt);
             setShowRenameModal(true);
         }
@@ -40,27 +43,32 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
         }
     };
 
-    const handleConfirmUpload = () => {
+    const handleConfirmUpload = async () => {
+        if (!selectedFiles.length) return;
+        const carpetaId = selectedFolderId || undefined;
+
+        let files = selectedFiles;
+        let customName: string | undefined;
         if (selectedFile) {
-            // Obtener extensión original
+            // Obtener extensión original y crear archivo con nombre personalizado
             const extension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.'));
             const finalName = customFileName.trim() ? `${customFileName.trim()}${extension}` : selectedFile.name;
+            files = [new File([selectedFile], finalName, { type: selectedFile.type })];
+            customName = customFileName.trim();
+        }
 
-            // Crear nuevo archivo con nombre personalizado
-            const renamedFile = new File([selectedFile], finalName, { type: selectedFile.type });
-
-            onFileSelect(renamedFile, customFileName.trim(), selectedFolderId || undefined);
-            setShowRenameModal(false);
-            setSelectedFile(null);
-            setCustomFileName('');
-            setSelectedFolderId(null);
-            setSelectedFolderName('');
+        handleCancelUpload();
+        // Uno tras otro, para que el último elegido quede como el más reciente
+        for (const f of files) {
+            await onFileSelect(f, customName, carpetaId);
         }
     };
 
+    const canConfirm = selectedFile ? !!customFileName.trim() : selectedFiles.length > 0;
+
     const handleCancelUpload = () => {
         setShowRenameModal(false);
-        setSelectedFile(null);
+        setSelectedFiles([]);
         setCustomFileName('');
         setSelectedFolderId(null);
         setSelectedFolderName('');
@@ -73,6 +81,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                     <input
                         ref={inputRef}
                         type="file"
+                        multiple
                         className="hidden"
                         accept={acceptedFileTypes}
                         onChange={handleFileChange}
@@ -107,11 +116,21 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            Subir archivo
+                            {selectedFile ? 'Subir archivo' : `Subir ${selectedFiles.length} archivos`}
                         </h3>
                         <p className="text-sm text-gray-600 mb-6">
-                            Nombra el archivo y selecciona una carpeta de destino (opcional).
+                            {selectedFile
+                                ? 'Nombra el archivo y selecciona una carpeta de destino (opcional).'
+                                : 'Se subirán con su nombre original. Selecciona una carpeta de destino (opcional).'}
                         </p>
+                        {!selectedFile && (
+                            <ul className="mb-6 max-h-40 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+                                {selectedFiles.map((f, i) => (
+                                    <li key={i} className="px-3 py-1.5 text-sm text-gray-700 truncate" title={f.name}>{f.name}</li>
+                                ))}
+                            </ul>
+                        )}
+                        {selectedFile && (
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Nombre del archivo
@@ -134,6 +153,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                                 </p>
                             )}
                         </div>
+                        )}
 
                         {/* Selector de carpetas */}
                         <div className="mb-6">
@@ -173,13 +193,13 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                             </button>
                             <button
                                 onClick={handleConfirmUpload}
-                                disabled={!customFileName.trim()}
-                                className={`px-4 py-2 rounded-lg transition-colors ${customFileName.trim()
+                                disabled={!canConfirm}
+                                className={`px-4 py-2 rounded-lg transition-colors ${canConfirm
                                     ? 'bg-orange-500 text-white hover:bg-orange-600'
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
-                                Subir archivo
+                                {selectedFile ? 'Subir archivo' : `Subir ${selectedFiles.length} archivos`}
                             </button>
                         </div>
                     </div>

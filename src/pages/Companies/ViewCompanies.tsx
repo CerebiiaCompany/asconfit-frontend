@@ -11,6 +11,7 @@ import {
 import { empresaService, Empresa } from "../../services/empresaService";
 import { useToast } from "../../contexts/ToastContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { TIPO_SERVICIO_LABELS } from "../../constants/tipos";
 
 export const ViewCompanies: React.FC = () => {
   const navigate = useNavigate();
@@ -49,17 +50,7 @@ export const ViewCompanies: React.FC = () => {
     emp.nit.includes(searchTerm)
   );
 
-  const tipoServicioLabels: Record<string, string> = {
-    tributaria: "Tributaria",
-    financiera: "Financiera",
-    operativa: "Operativa",
-    cumplimiento: "Cumplimiento",
-    sistemas: "Sistemas",
-    control_interno: "Control Interno",
-    inventarios: "Inventarios",
-    calidad: "Calidad",
-    gestion: "Gestión",
-  };
+  const tipoServicioLabels = TIPO_SERVICIO_LABELS;
 
   // Formatear fecha en formato legible
   const formatDate = (dateStr: string | null | undefined) => {
