@@ -5,6 +5,7 @@ import { userService, UserProfile } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ChangePasswordModal } from './ChangePasswordModal';
+import { EncargosList } from './EncargosList';
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -242,6 +243,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                                         </button>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* Encargos Section: empresas y papel en cada auditoría */}
+                            <div className="bg-gray-50 rounded-xl p-6">
+                                <h4 className="text-lg font-semibold text-gray-800 mb-1">Encargos</h4>
+                                <p className="text-xs text-gray-500 mb-4">
+                                    Empresas a cargo y papel en cada auditoría (auditor principal o suplente)
+                                </p>
+                                <EncargosList encargos={profile.encargos ?? []} />
                             </div>
 
                             {/* Otros Documentos Section */}

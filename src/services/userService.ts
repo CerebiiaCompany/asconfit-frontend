@@ -51,6 +51,26 @@ export interface UserProfile {
   especialidad_auditoria_financiera?: boolean;
   especialidad_analisis_riesgos?: boolean;
   especialidad_otros?: boolean;
+  encargos?: Encargo[];
+}
+
+/** Auditoría de un encargo y papel del usuario: auditor 1 = principal, auditor 2 = suplente. */
+export interface EncargoAuditoria {
+  id: number;
+  tipo_auditoria: string | null;
+  estado: string;
+  fecha_inicial: string | null;
+  papel: "principal" | "suplente";
+}
+
+/** Empresa (encargo) a la que está vinculado un usuario. */
+export interface Encargo {
+  empresa_id: number;
+  razon_social: string;
+  nit: string;
+  tipo_servicio: string | null;
+  tipo_servicio_label: string | null;
+  auditorias: EncargoAuditoria[];
 }
 
 export interface CreateDelegadoData {

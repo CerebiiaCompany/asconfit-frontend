@@ -3,7 +3,7 @@ import { Subtarea } from "../../types/tarea.types";
 
 interface SubtareaCardProps {
   subtarea: Subtarea;
-  onFileUpload: (file: File) => void;
+  onFileUpload: (file: File) => void | Promise<unknown>;
 }
 
 export const SubtareaCard: React.FC<SubtareaCardProps> = ({
@@ -27,11 +27,14 @@ export const SubtareaCard: React.FC<SubtareaCardProps> = ({
           <label className="cursor-pointer">
             <input
               type="file"
+              multiple
               className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  onFileUpload(file);
+              onChange={async (e) => {
+                const files = Array.from(e.target.files ?? []);
+                e.target.value = "";
+                // Uno tras otro, para que el último elegido quede como el más reciente
+                for (const file of files) {
+                  await onFileUpload(file);
                 }
               }}
             />
@@ -42,7 +45,7 @@ export const SubtareaCard: React.FC<SubtareaCardProps> = ({
 
           {subtarea.archivo_nombre && (
             <div className="text-xs text-green-600 text-center">
-              ✓ Archivo subido
+              ✓ {(subtarea.archivos_count ?? 1) > 1 ? `${subtarea.archivos_count} archivos subidos` : "Archivo subido"}
             </div>
           )}
         </div>

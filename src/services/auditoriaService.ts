@@ -1,4 +1,5 @@
 import axios from "axios";
+import { assertUploadSize } from "../utils/uploadLimits";
 import { NuevaAuditoriaData } from "../types/auditoria.types";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -8,7 +9,42 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+/** Un archivo de una tarea (una tarea puede tener varios). */
+export interface SubtareaArchivo {
+  id: number;
+  subtarea_id: number;
+  user_id: number | null;
+  carpeta_id: number | null;
+  nombre: string;
+  tamano: number | null;
+  created_at: string;
+  user?: { id: number; name: string } | null;
+}
+
 export const auditoriaService = {
+  async getArchivosSubtarea(subtareaId: number): Promise<SubtareaArchivo[]> {
+    const response = await axios.get(`${API_URL}/auditorias/subtareas/${subtareaId}/archivos`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
+  /** Descarga el archivo con autenticación y devuelve un blob URL para abrirlo. */
+  async getArchivoSubtareaBlobUrl(subtareaId: number, archivoId: number): Promise<string> {
+    const response = await axios.get(`${API_URL}/auditorias/subtareas/${subtareaId}/archivos/${archivoId}`, {
+      headers: getAuthHeader(),
+      responseType: "blob",
+    });
+    return URL.createObjectURL(response.data);
+  },
+
+  async deleteArchivoSubtarea(subtareaId: number, archivoId: number) {
+    const response = await axios.delete(`${API_URL}/auditorias/subtareas/${subtareaId}/archivos/${archivoId}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
   async createAuditoria(data: NuevaAuditoriaData) {
     const response = await axios.post(`${API_URL}/auditorias`, data, {
       headers: getAuthHeader(),
@@ -77,6 +113,7 @@ export const auditoriaService = {
   },
 
   async uploadFile(subtareaId: number, file: File, carpetaId?: number | null) {
+    assertUploadSize(file);
     const formData = new FormData();
     formData.append("file", file);
     if (carpetaId) {
@@ -135,6 +172,7 @@ export const auditoriaService = {
   },
 
   async uploadInformePreliminar(auditoriaId: string, file: File) {
+    assertUploadSize(file);
     const formData = new FormData();
     formData.append("informe", file);
     const response = await axios.post(

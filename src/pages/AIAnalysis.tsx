@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Brain, AlertTriangle, Rocket, LayoutGrid, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { Sparkles, Brain, AlertTriangle, Rocket, LayoutGrid, CheckCircle, Clock, TrendingUp, FileDown } from 'lucide-react';
+import { exportAIReportPdf } from '../utils/aiReportPdf';
 import { useEmpresas } from '../hooks/useEmpresas';
 import { useAIAnalysis } from '../hooks/useAIAnalysis';
 import { StyledDropdown } from '../components/AIAnalysis/StyledDropdown';
@@ -38,6 +39,8 @@ const AIAnalysis: React.FC = () => {
     const data = analysisData as AnalysisResult | null;
     const empresaOptions = (empresas ?? []).map((e: any) => ({ value: String(e.id), label: e.razon_social }));
     const typeOptions = availableTypes.map(t => ({ value: t, label: t }));
+    const empresaNombre = empresaOptions.find(e => e.value === selectedCompany)?.label ?? '';
+    const canExport = showResults && !isAnalyzing && !!data;
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto bg-[#F9FAFB] min-h-screen">
@@ -50,6 +53,16 @@ const AIAnalysis: React.FC = () => {
                     </h1>
                     <p className="text-gray-500 mt-1">IA especializada en normativa colombiana — auditorías, NIIF y Estatuto Tributario</p>
                 </div>
+                <div className="flex flex-wrap items-center gap-3">
+                {canExport && (
+                    <button
+                        onClick={() => exportAIReportPdf(data!, { empresa: empresaNombre, tipoAuditoria: selectedType })}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold border border-orange-500 text-orange-600 bg-white hover:bg-orange-50 transition-all shadow-sm"
+                    >
+                        <FileDown className="w-5 h-5" />
+                        Exportar PDF
+                    </button>
+                )}
                 <button
                     onClick={executeAnalysis}
                     disabled={isAnalyzing || !selectedCompany || !selectedType}
@@ -61,6 +74,7 @@ const AIAnalysis: React.FC = () => {
                     <Rocket className={`w-5 h-5 ${isAnalyzing ? 'animate-bounce' : ''}`} />
                     {isAnalyzing ? 'Analizando...' : 'Ejecutar Análisis IA'}
                 </button>
+                </div>
             </div>
 
             {/* Selección */}

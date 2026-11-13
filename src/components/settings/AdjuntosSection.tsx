@@ -1,6 +1,7 @@
 import React from "react";
 import { Alert } from "../common/Alert";
 import { storageUrl } from "../../utils/storageUrl";
+import { MAX_UPLOAD_MB } from "../../utils/uploadLimits";
 import { authService, UserAdjunto } from "../../services/authService";
 
 const ACCEPT = ".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx";
@@ -55,7 +56,7 @@ export const AdjuntosSection: React.FC = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-50">
         <p className="text-sm font-semibold text-gray-700">Otros Documentos</p>
-        <p className="text-xs text-gray-400">Cédula, temas disciplinarios, anexos, etc. · PDF, imagen, Word o Excel · máx. 20MB</p>
+        <p className="text-xs text-gray-400">Cédula, temas disciplinarios, anexos, etc. · PDF, imagen, Word o Excel · máx. {MAX_UPLOAD_MB}MB</p>
       </div>
 
       <form onSubmit={handleUpload} className="p-4 flex flex-col sm:flex-row gap-2 border-b border-gray-50">

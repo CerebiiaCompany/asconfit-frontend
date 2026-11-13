@@ -13,6 +13,9 @@ export interface TareaFlat {
   subtareaNombre: string;
   formatoArchivo: string | null;
   archivoNombre: string | null;
+  /** Cantidad de archivos de la tarea (puede tener varios). */
+  archivosCount: number;
+  auditoriaCreadorId: number | null;
   observaciones: string | null;
   fechaSolicitud: string | null;
   fechaEntrega: string | null;
@@ -63,6 +66,8 @@ export const useTareas = () => {
               subtareaNombre: subtarea.nombre,
               formatoArchivo: subtarea.formato_archivo,
               archivoNombre: subtarea.archivo_nombre,
+              archivosCount: subtarea.archivos_count ?? (subtarea.archivo_nombre ? 1 : 0),
+              auditoriaCreadorId: auditoria.user_id ?? null,
               observaciones: subtarea.observaciones,
               fechaSolicitud: subtarea.fecha_solicitud,
               fechaEntrega: subtarea.tiempo_entrega,

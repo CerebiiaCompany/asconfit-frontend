@@ -9,9 +9,20 @@ export interface FindingPayload {
     fecha_limite?: string;
 }
 
+/** En edición, los campos opcionales pueden enviarse en null para vaciarlos. */
+export interface FindingUpdatePayload {
+    titulo: string;
+    descripcion: string | null;
+    severidad: "critico" | "grave" | "leve";
+    responsable: string | null;
+    fecha_limite: string | null;
+}
+
 export interface FindingActividad {
     id: number;
     nombre: string;
+    fecha_solicitud?: string | null;
+    tiempo_entrega?: string | null;
 }
 
 export interface FindingAuditoria {
@@ -42,6 +53,12 @@ export const findingService = {
         api.post<{ message: string; findings: Finding[] }>(
             `/auditorias/${auditoriaId}/findings`,
             { findings }
+        ),
+
+    update: (auditoriaId: number, id: number, data: Partial<FindingUpdatePayload>) =>
+        api.put<{ message: string; finding: Finding }>(
+            `/auditorias/${auditoriaId}/findings/${id}`,
+            data
         ),
 
     delete: (auditoriaId: number, id: number) =>

@@ -25,7 +25,7 @@ export const useAuditoriaForm = () => {
   const [delegados, setDelegados] = useState<(number | null)[]>([null, null]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({

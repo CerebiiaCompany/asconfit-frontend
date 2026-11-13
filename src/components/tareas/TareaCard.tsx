@@ -3,10 +3,13 @@ import { TareaFlat } from '../../hooks/useTareas';
 import { FileUploadButton } from './FileUploadButton';
 import { useAuth } from '../../contexts/AuthContext';
 import { notaService } from '../../services/notaService';
+import { SubtareaArchivosModal } from '../auditorias/SubtareaArchivosModal';
 
 interface TareaCardProps {
     tarea: TareaFlat;
-    onFileUpload: (file: File, carpetaId?: number | null) => void;
+    onFileUpload: (file: File, carpetaId?: number | null) => void | Promise<unknown>;
+    /** Se llama al eliminar un archivo de la tarea (para refrescar). */
+    onArchivosChanged?: () => void;
     acceptedFileTypes: string;
     uploading?: boolean;
     empresaId?: number;
@@ -17,8 +20,10 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     onFileUpload,
     acceptedFileTypes,
     uploading = false,
-    empresaId
+    empresaId,
+    onArchivosChanged,
 }) => {
+    const [showArchivos, setShowArchivos] = useState(false);
     const { userRole } = useAuth();
     const [showNoteModal, setShowNoteModal] = useState(false);
     const [noteText, setNoteText] = useState("");
@@ -54,9 +59,8 @@ export const TareaCard: React.FC<TareaCardProps> = ({
     };
 
     // Wrapper para manejar el archivo con nombre personalizado
-    const handleFileSelect = (file: File, customName?: string, carpetaId?: number | null) => {
+    const handleFileSelect = (file: File, customName?: string, carpetaId?: number | null) =>
         onFileUpload(file, carpetaId);
-    };
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return null;
@@ -214,6 +218,14 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                                 <span className="font-medium text-gray-700">Archivo subido:</span> {formatDate(tarea.fechaSubida)}
                             </p>
                         )}
+                        {tarea.archivosCount > 0 && (
+                            <button
+                                onClick={() => setShowArchivos(true)}
+                                className="text-sm font-medium text-orange-600 hover:text-orange-700 hover:underline"
+                            >
+                                Ver archivos ({tarea.archivosCount})
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -292,6 +304,16 @@ export const TareaCard: React.FC<TareaCardProps> = ({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {showArchivos && (
+                <SubtareaArchivosModal
+                    subtareaId={tarea.subtareaId}
+                    subtareaNombre={tarea.subtareaNombre}
+                    auditoriaCreadorId={tarea.auditoriaCreadorId}
+                    onClose={() => setShowArchivos(false)}
+                    onChanged={onArchivosChanged}
+                />
             )}
         </div>
     );

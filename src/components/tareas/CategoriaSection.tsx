@@ -4,7 +4,7 @@ import { SubtareaCard } from "./SubtareaCard";
 
 interface CategoriaSectionProps {
   categoria: Categoria;
-  onFileUpload: (subtareaId: string, file: File) => void;
+  onFileUpload: (subtareaId: string, file: File) => void | Promise<unknown>;
 }
 
 export const CategoriaSection: React.FC<CategoriaSectionProps> = ({

@@ -1,4 +1,5 @@
 import React from "react";
+import { Pencil } from "lucide-react";
 import { Finding } from "../../services/findingService";
 
 const SEV_CONFIG = {
@@ -9,9 +10,12 @@ const SEV_CONFIG = {
 
 interface FindingsTableProps {
     findings: Finding[];
+    /** Indica si el usuario actual puede editar el hallazgo (autor o admin). */
+    canEdit?: (finding: Finding) => boolean;
+    onEdit?: (finding: Finding) => void;
 }
 
-export function FindingsTable({ findings }: FindingsTableProps) {
+export function FindingsTable({ findings, canEdit, onEdit }: FindingsTableProps) {
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
@@ -24,12 +28,13 @@ export function FindingsTable({ findings }: FindingsTableProps) {
                             <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Severidad</th>
                             <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Responsable</th>
                             <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">Fecha límite</th>
+                            <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {findings.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="text-center py-12 text-gray-400 text-sm">
+                                <td colSpan={7} className="text-center py-12 text-gray-400 text-sm">
                                     No hay hallazgos para mostrar
                                 </td>
                             </tr>
@@ -52,6 +57,19 @@ export function FindingsTable({ findings }: FindingsTableProps) {
                                         {f.fecha_limite
                                             ? new Date(f.fecha_limite).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
                                             : "—"}
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        {onEdit && canEdit?.(f) && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onEdit(f)}
+                                                title="Editar hallazgo"
+                                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
+                                            >
+                                                <Pencil className="w-3.5 h-3.5" />
+                                                Editar
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             );

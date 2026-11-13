@@ -1,7 +1,9 @@
 import React from "react";
 import { Alert } from "../common/Alert";
 import { storageUrl } from "../../utils/storageUrl";
+import { MAX_UPLOAD_MB } from "../../utils/uploadLimits";
 import { AdjuntosSection } from "./AdjuntosSection";
+import { MisEncargosSection } from "./MisEncargosSection";
 
 interface ProfileTabProps {
   user: any;
@@ -269,7 +271,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               <p className="text-sm font-semibold text-gray-700">
                 {user.cv_path || user.cv_url ? "CV cargado" : "Sin hoja de vida"}
               </p>
-              <p className="text-xs text-gray-400">Formato PDF · máx. 5MB</p>
+              <p className="text-xs text-gray-400">Formato PDF · máx. {MAX_UPLOAD_MB}MB</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -307,7 +309,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               <p className="text-sm font-semibold text-gray-700">
                 {user.tarjeta_profesional_path || user.tarjeta_profesional_url ? "Tarjeta profesional cargada" : "Sin tarjeta profesional"}
               </p>
-              <p className="text-xs text-gray-400">Formato PDF · máx. 5MB</p>
+              <p className="text-xs text-gray-400">Formato PDF · máx. {MAX_UPLOAD_MB}MB</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -328,6 +330,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Encargos: empresas y papel (principal / suplente) en cada auditoría */}
+      {user?.id && <MisEncargosSection userId={user.id} />}
 
       {/* Otros documentos adjuntos */}
       <AdjuntosSection />

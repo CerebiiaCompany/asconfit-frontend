@@ -14,7 +14,9 @@ interface SubtareaRowProps {
   isUploading: boolean;
   fileInputRef: (el: HTMLInputElement | null) => void;
   onFileSelect: (subtareaId: number) => void;
-  onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void;
+  onUploadConfirm: (subtareaId: number, file: File, carpetaId?: number | null) => void | Promise<unknown>;
+  /** Se llama al eliminar un archivo de una tarea (para refrescar). */
+  onArchivosChanged?: () => void;
   onOpenFile: (subtareaId: number, fileName: string) => void;
   getAcceptedFileTypes: (formatoArchivo: string) => string;
   onEstadoChange: (subtareaId: number, estado: string) => void;
@@ -40,6 +42,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   userRole,
   findingsCount = 0,
   onFindingCreated,
+  onArchivosChanged,
 }) => {
   const [showFindingModal, setShowFindingModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
@@ -191,6 +194,10 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
             onUploadConfirm={onUploadConfirm}
             onOpenFile={onOpenFile}
             getAcceptedFileTypes={getAcceptedFileTypes}
+            archivosCount={subtarea.archivos_count ?? (subtarea.archivo_nombre ? 1 : 0)}
+            subtareaNombre={subtarea.nombre}
+            onArchivosChanged={onArchivosChanged}
+            auditoriaCreadorId={auditoria?.user_id}
           />
         </td>
         <td className="px-2 py-3 whitespace-nowrap">

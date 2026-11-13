@@ -42,7 +42,7 @@ export const NuevaAuditoria: React.FC = () => {
   const { validateForm } = useAuditoriaValidation();
 
   const handleInputChangeWithClear = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name } = e.target;
     if (fieldErrors[name as keyof AuditoriaErrors]) {

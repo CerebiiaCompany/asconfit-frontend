@@ -9,6 +9,8 @@ export interface Subtarea {
   estado_informacion?: "pendiente" | "recibido" | "revision" | "aprobado";
   archivo_nombre?: string;
   archivo_path?: string;
+  /** Cantidad de archivos subidos a la tarea (puede tener varios). */
+  archivos_count?: number;
   formato_archivo?: string;
   gravedad_riesgo?: number;
   probabilidad_riesgo?: number;

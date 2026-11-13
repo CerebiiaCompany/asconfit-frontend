@@ -160,6 +160,7 @@ export const MisTareas: React.FC = () => {
                       tarea.formatoArchivo
                     )}
                     uploading={uploadingSubtareaId === tarea.subtareaId}
+                    onArchivosChanged={recargar}
                     empresaId={(() => {
                       const auditoria = auditorias.find((a) => a.auditoriaId === auditoriaSeleccionada);
                       console.log('Debug MisTareas - auditoriaSeleccionada:', auditoriaSeleccionada);

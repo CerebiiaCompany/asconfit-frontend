@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { MapaCalorRiesgo, HeatMapTask, getGridLevel } from "./MapaCalorRiesgo";
 import { Auditoria } from "../../../types/auditoria";
+import { printHtmlWithWatermark, WATERMARK_IMAGE_PATH } from "../../../utils/pdfWatermark";
 
 interface PdfMatrizRiesgoModalProps {
   isOpen: boolean;
@@ -148,17 +149,8 @@ export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
   };
 
   const handlePrint = () => {
-    const win = window.open("", "_blank", "width=900,height=700");
-    if (!win) return;
-    win.document.write(buildPrintHtml());
-    win.document.close();
-    // Esperar a que cargue y luego imprimir
-    win.onload = () => {
-      win.focus();
-      win.print();
-      // Cerrar la ventana después de imprimir
-      win.onafterprint = () => win.close();
-    };
+    // Todos los PDF exportados llevan la marca de agua de ASCONFIT
+    printHtmlWithWatermark(buildPrintHtml());
   };
 
   return (
@@ -203,8 +195,12 @@ export const PdfMatrizRiesgoModal: React.FC<PdfMatrizRiesgoModalProps> = ({
 
         {/* Vista previa del mapa */}
         <div className="bg-slate-100/60 p-4 sm:p-6 overflow-y-auto flex-1">
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full">
+          <div className="relative bg-white rounded-2xl border border-gray-200 p-6 w-full overflow-hidden">
             <MapaCalorRiesgo tasks={subtareas} />
+            {/* Marca de agua: igual a la del PDF exportado */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+              <img src={WATERMARK_IMAGE_PATH} alt="" className="w-[70%] max-w-[720px] opacity-[0.08] -rotate-[30deg]" />
+            </div>
           </div>
         </div>
 

@@ -4,6 +4,8 @@ export interface Subtarea {
   formato_archivo?: string;
   observaciones?: string;
   archivo_nombre?: string;
+  /** Cantidad de archivos de la tarea (puede tener varios). */
+  archivos_count?: number;
   prioridad?: string;
   fecha_solicitud?: string;
   tiempo_entrega?: string;

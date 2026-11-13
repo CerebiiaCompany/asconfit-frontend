@@ -32,7 +32,7 @@ export const useFileUpload = (options?: UseFileUploadOptions) => {
       return { success: true };
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || "No se pudo subir el archivo";
+        error.response?.data?.message || error.message || "No se pudo subir el archivo";
       options?.onError?.(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

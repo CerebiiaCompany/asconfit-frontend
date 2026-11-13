@@ -77,8 +77,14 @@ export function useFindingsPage() {
             .slice(0, 6);
     }, [filtered]);
 
+    // Reemplaza en memoria un hallazgo tras editarlo, sin recargar la página
+    const updateFinding = (updated: Finding) => {
+        setFindings(prev => prev.map(f => (f.id === updated.id ? updated : f)));
+    };
+
     return {
         loading,
+        updateFinding,
         empresas,
         tiposAuditoria,
         filtered,

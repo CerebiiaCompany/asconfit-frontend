@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { assertUploadSize } from "../utils/uploadLimits";
 
 export interface Role {
   id: number;
@@ -138,6 +139,7 @@ class AuthService {
   async uploadCV(
     file: File,
   ): Promise<{ message: string; user: User; cv_url: string }> {
+    assertUploadSize(file);
     const formData = new FormData();
     formData.append("cv", file);
     return api.post<{ message: string; user: User; cv_url: string }>(
@@ -149,6 +151,7 @@ class AuthService {
   async uploadTarjetaProfesional(
     file: File,
   ): Promise<{ message: string; user: User; tarjeta_profesional_url: string }> {
+    assertUploadSize(file);
     const formData = new FormData();
     formData.append("tarjeta_profesional", file);
     return api.post<{ message: string; user: User; tarjeta_profesional_url: string }>(
@@ -165,6 +168,7 @@ class AuthService {
     nombre: string,
     file: File,
   ): Promise<{ message: string; adjunto: UserAdjunto }> {
+    assertUploadSize(file);
     const formData = new FormData();
     formData.append("nombre", nombre);
     formData.append("archivo", file);

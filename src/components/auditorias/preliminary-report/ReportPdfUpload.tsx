@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MAX_UPLOAD_MB } from "../../../utils/uploadLimits";
 
 interface ReportPdfUploadProps {
     pdfFile: File | null;
@@ -64,7 +65,7 @@ export const ReportPdfUpload: React.FC<ReportPdfUploadProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <p className="text-sm font-medium text-gray-600">Arrastra el PDF aquí</p>
-                        <p className="text-xs text-gray-400 mt-1">o haz click para seleccionar</p>
+                        <p className="text-xs text-gray-400 mt-1">o haz click para seleccionar · máx. {MAX_UPLOAD_MB} MB</p>
                         <button type="button" className="mt-4 px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors">
                             Seleccionar PDF
                         </button>
@@ -102,6 +103,11 @@ export const ReportPdfUpload: React.FC<ReportPdfUploadProps> = ({
                             style={{ minHeight: "460px" }}
                         />
                     </div>
+                )}
+
+                {/* Error al elegir archivo (p. ej. supera el tamaño máximo) */}
+                {!pdfFile && uploadError && (
+                    <p className="text-xs text-red-500 text-center">{uploadError}</p>
                 )}
 
                 {/* Actions */}

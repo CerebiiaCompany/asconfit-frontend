@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { assertUploadSize } from '../utils/uploadLimits';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
@@ -88,6 +89,7 @@ export const documentoService = {
     },
 
     uploadDocumento: async (carpetaId: number, file: File): Promise<Documento> => {
+        assertUploadSize(file);
         const formData = new FormData();
         formData.append('carpeta_id', carpetaId.toString());
         formData.append('archivo', file);
