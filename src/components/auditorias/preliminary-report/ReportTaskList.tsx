@@ -4,6 +4,7 @@ import { Finding } from "../../../services/findingService";
 import { SEVERIDAD_CONFIG } from "../../../types/finding.types";
 import { auditoriaService } from "../../../services/auditoriaService";
 import { InformePreliminarIA } from "../../../types/informePreliminar";
+import { exportPreliminaryReportPdf } from "../../../utils/preliminaryReportPdf";
 
 const formatDate = (d?: string) => {
     if (!d) return null;
@@ -16,6 +17,7 @@ const formatDate = (d?: string) => {
 interface ReportTaskListProps {
     auditoria: Auditoria;
     findings: Finding[];
+    empresaNombre: string;
 }
 
 const TextoIA: React.FC<{ loading: boolean; texto?: string; placeholder: string }> = ({
@@ -32,7 +34,7 @@ const TextoIA: React.FC<{ loading: boolean; texto?: string; placeholder: string 
     return <p className="text-gray-400 italic">No disponible.</p>;
 };
 
-export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findings }) => {
+export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findings, empresaNombre }) => {
     const [iaInforme, setIaInforme] = useState<InformePreliminarIA | null>(null);
     const [loadingIA, setLoadingIA] = useState(true);
     const [errorIA, setErrorIA] = useState<string | null>(null);
@@ -118,12 +120,26 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4">
-                <h2 className="text-white font-semibold text-base">Informe Preliminar</h2>
-                <p className="text-orange-100 text-xs mt-0.5">
-                    {aprobadas} de {totalSubtareas} aprobados · {pendientes} pendientes
-                    {loadingIA ? " · Generando con IA..." : " · Generado con IA"}
-                </p>
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-4 flex items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-white font-semibold text-base">Informe Preliminar</h2>
+                    <p className="text-orange-100 text-xs mt-0.5">
+                        {aprobadas} de {totalSubtareas} aprobados · {pendientes} pendientes
+                        {loadingIA ? " · Generando con IA..." : " · Generado con IA"}
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => exportPreliminaryReportPdf({ auditoria, findings, informe: iaInforme, empresa: empresaNombre })}
+                    disabled={loadingIA || !iaInforme}
+                    title={loadingIA ? "Espera a que termine de generarse el informe" : "Exportar a PDF con marca de agua"}
+                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-orange-600 text-xs font-semibold hover:bg-orange-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M6 20h12a2 2 0 002-2V8l-6-6H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Exportar PDF
+                </button>
             </div>
 
             {errorIA && (

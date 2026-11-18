@@ -47,7 +47,7 @@ export const PreliminaryReport: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ReportTaskList auditoria={auditoria} findings={findings} />
+                <ReportTaskList auditoria={auditoria} findings={findings} empresaNombre={empresaNombre} />
                 <ReportPdfSection auditoriaId={id!} />
             </div>
 
