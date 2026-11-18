@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { UserRole, getMenuItemsByRole, getMenuItemsByPermissions } from "../config/menuConfig";
+import { UserRole, getMenuItemsByRole, getMenuItemsByPermissions, withRoleLabels } from "../config/menuConfig";
 import { SidebarHeader } from "./Sidebar/SidebarHeader";
 import { SidebarNav } from "./Sidebar/SidebarNav";
 import { SidebarFooter } from "./Sidebar/SidebarFooter";
@@ -21,10 +21,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // Obtener items del menú según los permisos granulares (o por rol si no hay permisos)
   const menuItems = useMemo(() => {
-    if (permissions.length > 0) {
-      return getMenuItemsByPermissions(permissions);
-    }
-    return getMenuItemsByRole(userRole);
+    const items = permissions.length > 0
+      ? getMenuItemsByPermissions(permissions)
+      : getMenuItemsByRole(userRole);
+    return withRoleLabels(items, userRole);
   }, [userRole, permissions]);
 
   return (

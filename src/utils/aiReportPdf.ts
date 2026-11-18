@@ -1,6 +1,7 @@
 import { AnalysisResult } from "../types/aiAnalysis";
 import { printHtmlWithWatermark } from "./pdfWatermark";
 import { LOGO_OSCURO_PATH } from "./excelLogo";
+import { CHART_STYLE, ChartDatum, barList, donutChart, riskGauge } from "./pdfCharts";
 
 /** Escapa el texto (lo genera la IA) antes de insertarlo en el HTML del PDF. */
 const esc = (v: unknown): string =>
@@ -11,12 +12,13 @@ const esc = (v: unknown): string =>
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
 
-const SEVERIDAD_COLOR: Record<string, string> = {
-    "CRÍTICA": "#dc2626", "ALTA": "#d97706", "MEDIA": "#ea580c", "BAJA": "#64748b",
-};
-const GLOBAL_COLOR: Record<string, string> = {
-    "CRÍTICO": "#dc2626", "ALTO": "#d97706", "MEDIO": "#ea580c", "BAJO": "#16a34a",
-};
+/** La IA a veces responde con o sin tilde ("CRITICA" / "CRÍTICA"). */
+const sinTilde = (v: string) => v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+const colorSeveridad = (v: string) =>
+    ({ CRITICA: "#dc2626", ALTA: "#d97706", MEDIA: "#ea580c", BAJA: "#64748b" } as Record<string, string>)[sinTilde(v)] ?? "#64748b";
+const colorGlobal = (v: string) =>
+    ({ CRITICO: "#dc2626", ALTO: "#d97706", MEDIO: "#ea580c", BAJO: "#16a34a" } as Record<string, string>)[sinTilde(v)] ?? "#64748b";
+
 
 interface AIReportMeta {
     empresa: string;
@@ -30,10 +32,39 @@ function buildHtml(data: AnalysisResult, meta: AIReportMeta): string {
     const areas = (data.resumen?.areas_exposicion ?? [])
         .map((a) => `<span class="chip">${esc(a)}</span>`).join("");
 
-    const alertas = (data.alertas ?? []).map((a) => `
-      <div class="alerta" style="border-left-color:${SEVERIDAD_COLOR[a.severidad] ?? "#64748b"}">
+    // Gráficas a partir de la respuesta que ya llegó (no se vuelve a llamar a la IA)
+    const lista = data.alertas ?? [];
+    const porSeveridad: ChartDatum[] = [
+        { label: "Crítica", color: "#dc2626", key: "CRITICA" },
+        { label: "Alta", color: "#d97706", key: "ALTA" },
+        { label: "Media", color: "#ea580c", key: "MEDIA" },
+        { label: "Baja", color: "#64748b", key: "BAJA" },
+    ].map((d) => ({ label: d.label, color: d.color, value: lista.filter((a) => sinTilde(a.severidad) === d.key).length }))
+        .filter((d) => d.value > 0);
+    const areasCount = new Map<string, number>();
+    lista.forEach((a) => areasCount.set(a.area || "Otro", (areasCount.get(a.area || "Otro") ?? 0) + 1));
+    const porArea: ChartDatum[] = Array.from(areasCount, ([label, value]) => ({ label, value, color: "#f97316" }))
+        .sort((a, b) => b.value - a.value);
+    const plan = data.recomendaciones;
+    const porPlazo: ChartDatum[] = plan ? [
+        { label: "Inmediato (0–30 días)", value: plan.inmediato?.length ?? 0, color: "#dc2626" },
+        { label: "Corto plazo (1–3 meses)", value: plan.corto_plazo?.length ?? 0, color: "#f59e0b" },
+        { label: "Mediano plazo (3–12 meses)", value: plan.mediano_plazo?.length ?? 0, color: "#16a34a" },
+    ] : [];
+
+    const graficas = lista.length ? `
+  <div class="grid3">
+    <div class="panel center"><h5>Nivel de riesgo global</h5>${riskGauge(global)}
+      <div class="nivel" style="color:${colorGlobal(global)}">${esc(global || "Sin calificar")}</div></div>
+    <div class="panel"><h5>Alertas por severidad</h5>${donutChart(porSeveridad, "alertas")}</div>
+    <div class="panel"><h5>Alertas por área</h5>${barList(porArea)}</div>
+  </div>
+  ${porPlazo.some((d) => d.value > 0) ? `<div class="panel" style="margin-top:10px"><h5>Acciones recomendadas por plazo</h5>${barList(porPlazo)}</div>` : ""}` : "";
+
+    const alertas = lista.map((a) => `
+      <div class="alerta" style="border-left-color:${colorSeveridad(a.severidad)}">
         <div class="alerta-top">
-          <span class="badge" style="background:${SEVERIDAD_COLOR[a.severidad] ?? "#64748b"}">${esc(a.severidad)}</span>
+          <span class="badge" style="background:${colorSeveridad(a.severidad)}">${esc(a.severidad)}</span>
           <span class="muted">Probabilidad: ${esc(a.probabilidad)} · Área: ${esc(a.area)}</span>
         </div>
         <h3>${esc(a.titulo)}</h3>
@@ -61,7 +92,7 @@ function buildHtml(data: AnalysisResult, meta: AIReportMeta): string {
     header img{height:30px;}
     header .meta{text-align:right;font-size:11px;color:#475569;}
     h1{font-size:18px;margin:0 0 4px;}
-    h2{font-size:14px;margin:20px 0 8px;color:#0f172a;border-bottom:1px solid #e2e8f0;padding-bottom:4px;}
+    h2{font-size:14px;margin:20px 0 8px;color:#0f172a;border-bottom:1px solid #e2e8f0;padding-bottom:4px;page-break-after:avoid;break-after:avoid;}
     h3{font-size:13px;margin:6px 0 4px;}
     h4{font-size:12px;margin:0 0 6px;}
     p{margin:0 0 6px;}
@@ -77,6 +108,12 @@ function buildHtml(data: AnalysisResult, meta: AIReportMeta): string {
     .grupo ul{margin:0;padding-left:18px;}
     .grupo li{margin-bottom:3px;}
     footer{margin-top:20px;font-size:10px;color:#94a3b8;text-align:center;}
+    .grid3{display:grid;grid-template-columns:0.8fr 1.1fr 1.1fr;gap:10px;margin:12px 0 4px;}
+    .panel{border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;page-break-inside:avoid;}
+    .panel h5{font-size:12px;margin:0 0 8px;}
+    .panel.center{text-align:center;}
+    .nivel{font-weight:700;font-size:13px;margin-top:2px;}
+    ${CHART_STYLE}
   </style>
 </head>
 <body>
@@ -88,7 +125,9 @@ function buildHtml(data: AnalysisResult, meta: AIReportMeta): string {
   <h1>Análisis de Riesgo Predictivo</h1>
   <p class="muted">${esc(meta.empresa)}${meta.tipoAuditoria ? ` — Auditoría ${esc(meta.tipoAuditoria)}` : ""}</p>
 
-  <h2>Dictamen ejecutivo ${global ? `<span class="global" style="background:${GLOBAL_COLOR[global] ?? "#64748b"}">Riesgo ${esc(global)}</span>` : ""}</h2>
+  ${graficas}
+
+  <h2>Dictamen ejecutivo ${global ? `<span class="global" style="background:${colorGlobal(global)}">Riesgo ${esc(global)}</span>` : ""}</h2>
   <div class="sintesis">${esc(data.resumen?.sintesis)}</div>
   ${areas ? `<p class="small"><b>Áreas de exposición:</b></p><div>${areas}</div>` : ""}
 

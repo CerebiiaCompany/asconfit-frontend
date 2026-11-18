@@ -20,7 +20,7 @@ export const RoleBasedRoute: React.FC<RoleBasedRouteProps> = ({ children }) => {
 
   // Si no hay rol, redirigir al login (el usuario no está autenticado)
   if (!userRole) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
   // Verificar si el usuario puede acceder a esta ruta

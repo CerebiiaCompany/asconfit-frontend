@@ -4,6 +4,7 @@ import { PriorityBadge } from "../PriorityBadge";
 import { EstadoInformacionBadge } from "../EstadoInformacionBadge";
 import { FileUploadCell } from "./FileUploadCell";
 import { CrearFindingModal } from "../Findings/CrearFindingModal";
+import { HallazgosActividadModal } from "../Findings/HallazgosActividadModal";
 import { notaService } from "../../../services/notaService";
 
 interface SubtareaRowProps {
@@ -45,6 +46,7 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
   onArchivosChanged,
 }) => {
   const [showFindingModal, setShowFindingModal] = useState(false);
+  const [showFindingsList, setShowFindingsList] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [loadingNote, setLoadingNote] = useState(false);
@@ -203,9 +205,9 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
         <td className="px-2 py-3 whitespace-nowrap">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowFindingModal(true)}
+              onClick={() => (findingsCount > 0 ? setShowFindingsList(true) : setShowFindingModal(true))}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 text-xs font-medium transition-colors whitespace-nowrap"
-              title="Crear hallazgo para esta actividad"
+              title={findingsCount > 0 ? "Ver y editar los hallazgos de esta actividad" : "Crear hallazgo para esta actividad"}
             >
               {findingsCount > 0 && (
                 <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
@@ -237,6 +239,19 @@ export const SubtareaRow: React.FC<SubtareaRowProps> = ({
             if (onFindingCreated) {
               onFindingCreated(subtarea.id, findingsCount + savedFindings.length);
             }
+          }}
+        />,
+        document.body
+      )}
+
+      {showFindingsList && createPortal(
+        <HallazgosActividadModal
+          auditoria={auditoria}
+          subtarea={subtarea}
+          onClose={() => setShowFindingsList(false)}
+          onNuevo={() => {
+            setShowFindingsList(false);
+            setShowFindingModal(true);
           }}
         />,
         document.body

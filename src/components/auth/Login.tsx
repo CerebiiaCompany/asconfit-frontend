@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { rutaTrasLogin } from '../../utils/loginRedirect';
 import { useLoginForm } from '../../hooks';
 import { LoginHeader } from './LoginHeader';
 import { LoginForm } from './LoginForm';
@@ -11,6 +12,7 @@ import { LoginFooter } from './LoginFooter';
  */
 export const Login: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const {
         email,
@@ -20,7 +22,7 @@ export const Login: React.FC = () => {
         setEmail,
         setPassword,
         handleSubmit,
-    } = useLoginForm({ onSuccess: () => navigate('/dashboard') });
+    } = useLoginForm({ onSuccess: () => navigate(rutaTrasLogin(location.state), { replace: true }) });
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

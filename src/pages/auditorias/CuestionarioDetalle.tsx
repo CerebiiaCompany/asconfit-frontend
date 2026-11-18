@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ExcelJS from 'exceljs';
-import { cuestionarioService } from '../../services/cuestionarioService';
+import { cuestionarioService, EvidenciaPregunta, evidenciaAppUrl } from '../../services/cuestionarioService';
+import { EvidenciasPregunta } from '../../components/auditorias/cuestionarios/EvidenciasPregunta';
 import { Breadcrumb } from '../../components/common/Breadcrumb';
 import { LoadingState } from '../../components/common/LoadingState';
 import { useToast } from '../../contexts/ToastContext';
@@ -16,6 +17,7 @@ interface Pregunta {
     observaciones: string;
     recomendaciones: string;
     criticidad: 'alto' | 'medio' | 'bajo' | '';
+    archivos: EvidenciaPregunta[];
 }
 
 interface Seccion {
@@ -53,6 +55,7 @@ export const CuestionarioDetalle: React.FC = () => {
                     respuesta: p.respuesta || '',
                     observaciones: p.observaciones || '',
                     recomendaciones: p.recomendaciones || '',
+                    archivos: p.archivos || [],
                 })),
             }));
             setSecciones(secsNormalizadas);
@@ -82,6 +85,17 @@ export const CuestionarioDetalle: React.FC = () => {
                 ...s,
                 preguntas: s.preguntas.map((p, pi) =>
                     pi !== preguntaIdx ? p : { ...p, [campo]: valor }
+                )
+            }
+        ));
+    };
+
+    const handleArchivos = (seccionIdx: number, preguntaIdx: number, archivos: EvidenciaPregunta[]) => {
+        setSecciones(prev => prev.map((s, si) =>
+            si !== seccionIdx ? s : {
+                ...s,
+                preguntas: s.preguntas.map((p, pi) =>
+                    pi !== preguntaIdx ? p : { ...p, archivos }
                 )
             }
         ));
@@ -145,6 +159,7 @@ export const CuestionarioDetalle: React.FC = () => {
             { width: 6 },  // E: N/A
             { width: 35 },  // F: Observaciones
             { width: 35 },  // G: Recomendaciones
+            { width: 40 },  // H: Evidencias (enlaces)
         ];
 
         // ── Colores ─────────────────────────────────────────────────────────
@@ -170,7 +185,7 @@ export const CuestionarioDetalle: React.FC = () => {
         });
 
         // ── Fila 1: Título (con el logo de Asconfit pegado a la izquierda) ───
-        ws.mergeCells('A1:G1');
+        ws.mergeCells('A1:H1');
         const r1 = ws.getRow(1);
         r1.height = 36;
         r1.getCell(1).value = data.cuestionario;
@@ -208,7 +223,7 @@ export const CuestionarioDetalle: React.FC = () => {
         });
 
         // ── Fila 3: Nombre cuestionario ──────────────────────────────────────
-        ws.mergeCells('A3:G3');
+        ws.mergeCells('A3:H3');
         ws.getRow(3).height = 18;
         ws.getCell('A3').value = data.cuestionario;
         ws.getCell('A3').font = { bold: true, size: 11 };
@@ -221,14 +236,14 @@ export const CuestionarioDetalle: React.FC = () => {
         ws.getRow(4).height = 16;
 
         // ── Fila 5: Objetivo ─────────────────────────────────────────────────
-        ws.mergeCells('A5:G5');
+        ws.mergeCells('A5:H5');
         ws.getRow(5).height = 32;
         ws.getCell('A5').value = `Objetivo: ${data.objetivo}`;
         ws.getCell('A5').alignment = { wrapText: true, vertical: 'middle' };
         ws.getCell('A5').fill = fill('FFFFF2CC');
 
         // ── Fila 6: Empresa ──────────────────────────────────────────────────
-        ws.mergeCells('A6:G6');
+        ws.mergeCells('A6:H6');
         ws.getRow(6).height = 18;
         ws.getCell('A6').value = `${data.empresa || ''} · NIT: ${data.nit || ''}`;
         ws.getCell('A6').font = { bold: true };
@@ -236,7 +251,7 @@ export const CuestionarioDetalle: React.FC = () => {
         ws.getCell('A6').alignment = centrado;
 
         // ── Fila 7: Cuestionario de control interno / Entrevistado ───────────
-        ws.mergeCells('A7:G7');
+        ws.mergeCells('A7:H7');
         ws.getRow(7).height = 16;
         ws.getCell('A7').value = 'Cuestionario de control interno';
         ws.getCell('A7').font = { bold: true };
@@ -248,7 +263,7 @@ export const CuestionarioDetalle: React.FC = () => {
         // ── Encabezados de tabla ─────────────────────────────────────────────
         const hdrRow = ws.getRow(9);
         hdrRow.height = 20;
-        const hdrs = ['Pregunta', '', 'Si', 'No', 'N/A', 'Observaciones', 'Recomendaciones'];
+        const hdrs = ['Pregunta', '', 'Si', 'No', 'N/A', 'Observaciones', 'Recomendaciones', 'Evidencias'];
         hdrs.forEach((h, i) => {
             const cell = hdrRow.getCell(i + 1);
             cell.value = h;
@@ -258,6 +273,53 @@ export const CuestionarioDetalle: React.FC = () => {
             cell.border = borde();
         });
 
+        // ── Hoja "Evidencias": una fila por archivo, cada una con su enlace ──
+        // Los enlaces van a la app (piden iniciar sesión) para que no caduquen.
+        const LINK = { color: { argb: 'FF0563C1' }, underline: true } as Partial<ExcelJS.Font>;
+        const filasConArchivos = (data.filas as any[]).filter((f) => (f.archivos ?? []).length > 0);
+        const wsEv = filasConArchivos.length ? workbook.addWorksheet('Evidencias') : null;
+        // Fila de la hoja Evidencias donde empiezan los archivos de cada pregunta
+        const inicioEvidencias = new Map<any, number>();
+        if (wsEv) {
+            wsEv.columns = [{ width: 8 }, { width: 28 }, { width: 60 }, { width: 45 }];
+            wsEv.mergeCells('A1:D1');
+            wsEv.getCell('A1').value = `Evidencias: ${data.cuestionario}`;
+            wsEv.getCell('A1').font = { bold: true, size: 13, color: { argb: BLANCO } };
+            wsEv.getCell('A1').fill = fill(NARANJA);
+            wsEv.getCell('A1').alignment = centrado;
+            wsEv.getRow(1).height = 26;
+            wsEv.mergeCells('A2:D2');
+            wsEv.getCell('A2').value = `${data.empresa || ''} · NIT: ${data.nit || ''}. Para abrir un archivo se pide iniciar sesión en ASCONFIT.`;
+            wsEv.getCell('A2').font = { italic: true, color: { argb: 'FF595959' } };
+            ['N.°', 'Sección', 'Pregunta', 'Archivo'].forEach((h, i) => {
+                const c = wsEv.getRow(4).getCell(i + 1);
+                c.value = h;
+                c.font = { bold: true, color: { argb: BLANCO } };
+                c.fill = fill(AZUL_HDR);
+                c.alignment = centrado;
+                c.border = borde();
+            });
+            let r = 5;
+            let n = 0;
+            for (const fila of filasConArchivos) {
+                n++;
+                inicioEvidencias.set(fila, r);
+                for (const a of fila.archivos) {
+                    const row = wsEv.getRow(r);
+                    row.getCell(1).value = n;
+                    row.getCell(2).value = fila.seccion;
+                    row.getCell(3).value = fila.pregunta;
+                    row.getCell(4).value = { text: a.nombre, hyperlink: evidenciaAppUrl(a.id) };
+                    row.getCell(4).font = LINK;
+                    [1, 2, 3, 4].forEach((col) => {
+                        row.getCell(col).border = borde();
+                        row.getCell(col).alignment = col === 1 ? centrado : { ...izquierda, wrapText: true };
+                    });
+                    r++;
+                }
+            }
+        }
+
         // ── Filas de preguntas ───────────────────────────────────────────────
         let rowNum = 10;
         let seccionActual = '';
@@ -266,7 +328,7 @@ export const CuestionarioDetalle: React.FC = () => {
             // Fila de sección
             if (fila.seccion !== seccionActual) {
                 seccionActual = fila.seccion;
-                ws.mergeCells(`A${rowNum}:G${rowNum}`);
+                ws.mergeCells(`A${rowNum}:H${rowNum}`);
                 const secRow = ws.getRow(rowNum);
                 secRow.height = 18;
                 secRow.getCell(1).value = seccionActual;
@@ -323,9 +385,27 @@ export const CuestionarioDetalle: React.FC = () => {
             pRow.getCell(7).alignment = { ...izquierda, wrapText: true };
             pRow.getCell(7).border = borde();
 
+            // H: Evidencias. Con un archivo, enlace directo; con varios, enlace a la hoja Evidencias
+            const archivos: { id: number; nombre: string }[] = fila.archivos ?? [];
+            const celdaEv = pRow.getCell(8);
+            if (archivos.length === 1) {
+                celdaEv.value = { text: archivos[0].nombre, hyperlink: evidenciaAppUrl(archivos[0].id) };
+                celdaEv.font = LINK;
+            } else if (archivos.length > 1) {
+                // Enlace interno con HYPERLINK(): ExcelJS no escribe bien los saltos a otra hoja
+                const texto = `${archivos.length} archivos (ver hoja Evidencias)`;
+                celdaEv.value = {
+                    formula: `HYPERLINK("#'Evidencias'!D${inicioEvidencias.get(fila)}","${texto}")`,
+                    result: texto,
+                } as ExcelJS.CellFormulaValue;
+                celdaEv.font = LINK;
+            }
+            celdaEv.alignment = { ...izquierda, wrapText: true };
+            celdaEv.border = borde();
+
             // Alternar fondo de filas
             if (rowNum % 2 === 0) {
-                [1, 2, 6, 7].forEach(col => {
+                [1, 2, 6, 7, 8].forEach(col => {
                     if (!pRow.getCell(col).fill || (pRow.getCell(col).fill as any).fgColor?.argb === BLANCO) {
                         pRow.getCell(col).fill = fill('FFF5F5F5');
                     }
@@ -495,6 +575,15 @@ export const CuestionarioDetalle: React.FC = () => {
                                                 />
                                             </div>
                                         </div>
+
+                                        <EvidenciasPregunta
+                                            cuestionarioId={Number(cuestionarioId)}
+                                            auditoriaId={auditoriaId!}
+                                            preguntaId={pregunta.id}
+                                            auditoriaCreadorId={auditoria?.user_id}
+                                            archivos={pregunta.archivos}
+                                            onChange={(lista) => handleArchivos(si, pi, lista)}
+                                        />
                                     </div>
                                 ))}
                             </div>

@@ -32,20 +32,17 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
     const empresaNombre =
         auditoria.empresa?.razon_social || auditoria.razon_social || `Auditoría #${auditoria.id}`;
 
-    // Rango de fechas de la actividad seleccionada (recortado a YYYY-MM-DD)
+    // La fecha límite es el plazo para corregir el hallazgo: puede ser cualquier
+    // fecha desde la solicitud de la actividad en adelante (antes se limitaba a la
+    // fecha de entrega y, con actividades ya vencidas, no dejaba elegir ningún día).
     const selectedAct = current.actividad_id
         ? allSubtareas.find((s) => s.id === current.actividad_id)
         : null;
     const minDate = selectedAct?.fecha_solicitud ? selectedAct.fecha_solicitud.slice(0, 10) : undefined;
-    const maxDate = selectedAct?.tiempo_entrega ? selectedAct.tiempo_entrega.slice(0, 10) : undefined;
     const fechaDisabled = !current.actividad_id;
 
     const handleDateChange = (val: string) => {
-        if (!val) { update(activeIndex, "fecha_limite", ""); return; }
-        const outOfRange =
-            (minDate && val < minDate) ||
-            (maxDate && val > maxDate);
-        if (outOfRange) return;
+        if (val && minDate && val < minDate) return;
         update(activeIndex, "fecha_limite", val);
     };
 
@@ -156,7 +153,6 @@ export const CrearFindingModal: React.FC<CrearFindingModalProps> = ({
                     <FechaLimiteField
                         value={current.fecha_limite}
                         minDate={minDate}
-                        maxDate={maxDate}
                         disabled={fechaDisabled}
                         onChange={handleDateChange}
                     />

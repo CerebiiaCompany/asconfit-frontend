@@ -162,10 +162,11 @@ export const auditoriaService = {
     return response.data;
   },
 
-  async generarInformePreliminarIA(auditoriaId: string) {
+  /** Con `regenerar` se vuelve a llamar a la IA aunque haya un informe guardado para los mismos datos. */
+  async generarInformePreliminarIA(auditoriaId: string, regenerar = false) {
     const response = await axios.post(
       `${API_URL}/auditorias/${auditoriaId}/informe-preliminar/generar-ia`,
-      {},
+      regenerar ? { regenerar: true } : {},
       { headers: getAuthHeader(), timeout: 120000 },
     );
     return response.data;

@@ -20,6 +20,7 @@ export const UserRoles: React.FC = () => {
     loading: usersLoading,
     error: usersError,
     updateUserRole,
+    loadUsers,
   } = useUsers();
   const { roles, loading: rolesLoading } = useRoles();
   const { isOpen, title, message, openConfirm, closeConfirm, handleConfirm } =
@@ -111,6 +112,7 @@ export const UserRoles: React.FC = () => {
                 roles={roles}
                 loading={usersLoading || rolesLoading}
                 onUpdateRole={handleUpdateRole}
+                onEmpresasChanged={loadUsers}
               />
             </div>
           </div>

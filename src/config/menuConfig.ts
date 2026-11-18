@@ -107,6 +107,7 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/auditorias/:id/matriz-riesgo": "auditorias",
   "/auditorias/:id/cuestionarios": "auditorias",
   "/auditorias/:id/cuestionarios/:cuestionarioId": "auditorias",
+  "/evidencias/cuestionario/:archivoId": "auditorias",
   "/ai-analysis": "ai-analysis",
   "/mis-tareas": "mis-tareas",
   "/mis-tareas/:id": "mis-tareas",
@@ -120,6 +121,17 @@ export const ROUTE_TO_MENU_ID: Record<string, string> = {
   "/perfil": "perfil",
   "/papelera": "papelera",
 };
+
+// Para el administrador el módulo "Mis Encargos" se llama "Clientes";
+// el resto de roles lo sigue viendo como "Mis Encargos".
+const LABELS_ADMIN: Record<string, string> = {
+  empresas: "Clientes",
+};
+
+export const withRoleLabels = (items: MenuItem[], role: UserRole): MenuItem[] =>
+  String(role ?? "").toLowerCase() === "admin"
+    ? items.map((item) => (LABELS_ADMIN[item.id] ? { ...item, label: LABELS_ADMIN[item.id] } : item))
+    : items;
 
 // Función para obtener items del menú según el rol
 export const getMenuItemsByRole = (role: UserRole): MenuItem[] => {

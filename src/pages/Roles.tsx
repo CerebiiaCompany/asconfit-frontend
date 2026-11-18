@@ -196,6 +196,7 @@ export const Roles: React.FC = () => {
                 roles={roles}
                 loading={usersLoading || loading}
                 onUpdateRole={handleUpdateUserRole}
+                onEmpresasChanged={loadUsers}
               />
             </div>
           )}

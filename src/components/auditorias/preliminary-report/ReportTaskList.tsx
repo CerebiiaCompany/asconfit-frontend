@@ -14,6 +14,12 @@ const formatDate = (d?: string) => {
     return `${parseInt(day)} de ${meses[parseInt(m) - 1]} de ${y}`;
 };
 
+const PRIORIDAD_CLASS: Record<string, string> = {
+    alta: "bg-red-100 text-red-700",
+    media: "bg-amber-100 text-amber-700",
+    baja: "bg-green-100 text-green-700",
+};
+
 interface ReportTaskListProps {
     auditoria: Auditoria;
     findings: Finding[];
@@ -54,12 +60,14 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
         return map;
     }, [iaInforme]);
 
-    const cargarInformeIA = useCallback(() => {
+    // Si los datos de la auditoría no cambiaron, el backend devuelve el informe guardado
+    // sin volver a llamar a la IA; "Regenerar" fuerza una versión nueva.
+    const cargarInformeIA = useCallback((regenerar = false) => {
         if (!auditoria?.id) return;
         setLoadingIA(true);
         setErrorIA(null);
         auditoriaService
-            .generarInformePreliminarIA(String(auditoria.id))
+            .generarInformePreliminarIA(String(auditoria.id), regenerar)
             .then(setIaInforme)
             .catch((err: any) => {
                 setErrorIA(err.response?.data?.error || "No se pudo generar el informe con IA.");
@@ -125,9 +133,23 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                     <h2 className="text-white font-semibold text-base">Informe Preliminar</h2>
                     <p className="text-orange-100 text-xs mt-0.5">
                         {aprobadas} de {totalSubtareas} aprobados · {pendientes} pendientes
-                        {loadingIA ? " · Generando con IA..." : " · Generado con IA"}
+                        {loadingIA
+                            ? " · Generando con IA..."
+                            : iaInforme?.generado_en
+                                ? ` · Generado con IA el ${new Date(iaInforme.generado_en).toLocaleString("es-CO", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
+                                : " · Generado con IA"}
                     </p>
                 </div>
+                <div className="shrink-0 flex items-center gap-2">
+                <button
+                    type="button"
+                    onClick={() => cargarInformeIA(true)}
+                    disabled={loadingIA}
+                    title="Vuelve a redactar el informe con la IA (consume tokens)"
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg border border-white/60 text-white text-xs font-semibold hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                >
+                    Regenerar
+                </button>
                 <button
                     type="button"
                     onClick={() => exportPreliminaryReportPdf({ auditoria, findings, informe: iaInforme, empresa: empresaNombre })}
@@ -140,13 +162,14 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                     </svg>
                     Exportar PDF
                 </button>
+                </div>
             </div>
 
             {errorIA && (
                 <div className="mx-5 mt-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center justify-between gap-3">
                     <p className="text-sm text-red-700">{errorIA}</p>
                     <button
-                        onClick={cargarInformeIA}
+                        onClick={() => cargarInformeIA()}
                         className="text-sm font-medium text-red-700 hover:text-red-900 whitespace-nowrap"
                     >
                         Reintentar
@@ -155,6 +178,13 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
             )}
 
             <div className="px-6 py-5 space-y-5 text-sm text-gray-700 leading-relaxed">
+                {iaInforme?.resumen_ejecutivo && (
+                    <div className="bg-orange-50 border border-orange-100 border-l-4 border-l-orange-500 rounded-lg px-4 py-3">
+                        <p className="text-xs font-semibold text-orange-700 mb-1">Resumen ejecutivo</p>
+                        <p className="text-gray-700 leading-relaxed">{iaInforme.resumen_ejecutivo}</p>
+                    </div>
+                )}
+
                 <div>
                     <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-2">
                         Introducción
@@ -238,6 +268,27 @@ export const ReportTaskList: React.FC<ReportTaskListProps> = ({ auditoria, findi
                                 </div>
                             );
                         })()}
+                    </div>
+                )}
+
+                {(iaInforme?.plan_accion?.length ?? 0) > 0 && (
+                    <div className="pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">
+                            Plan de acción sugerido
+                        </p>
+                        <ul className="space-y-2">
+                            {iaInforme!.plan_accion!.map((p, i) => (
+                                <li key={i} className="flex items-start justify-between gap-3">
+                                    <span className="text-gray-700">{p.accion}</span>
+                                    <span className="shrink-0 text-xs text-gray-500 whitespace-nowrap">
+                                        {p.plazo}
+                                        <span className={`ml-2 px-1.5 py-0.5 rounded font-medium ${PRIORIDAD_CLASS[p.prioridad] ?? "bg-gray-100 text-gray-600"}`}>
+                                            {p.prioridad.charAt(0).toUpperCase() + p.prioridad.slice(1)}
+                                        </span>
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 

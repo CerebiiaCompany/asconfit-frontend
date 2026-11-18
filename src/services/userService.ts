@@ -24,6 +24,8 @@ export interface User {
   cv_url?: string;
   profile_photo_path?: string;
   profile_photo_url?: string;
+  /** Solo viene cuando quien consulta es admin (GET /users). */
+  encargos?: Encargo[];
 }
 
 export interface UserProfile {

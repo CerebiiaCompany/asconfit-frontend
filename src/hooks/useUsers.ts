@@ -25,7 +25,8 @@ export const useUsers = () => {
         try {
             const updatedUser = await userService.updateUserRole(userId, roleId);
             console.log('Updated user:', updatedUser);
-            setUsers(prevUsers => prevUsers.map(u => u.id === userId ? updatedUser : u));
+            // La respuesta del cambio de rol no trae los encargos: se conservan los que ya había.
+            setUsers(prevUsers => prevUsers.map(u => u.id === userId ? { ...updatedUser, encargos: u.encargos } : u));
             return updatedUser;
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error al actualizar rol';

@@ -98,7 +98,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <div ref={ref} className="relative">
             <button
                 type="button"
-                onClick={() => !disabled && setOpen(o => !o)}
+                onClick={() => {
+                    if (disabled) return;
+                    if (!open && !value) {
+                        // Sin fecha elegida: abrir en hoy, o en el límite más cercano si hoy queda fuera del rango
+                        let base = today;
+                        if (minDate && base < minDate) base = minDate;
+                        if (maxDate && base > maxDate) base = maxDate;
+                        setViewYear(base.getFullYear());
+                        setViewMonth(base.getMonth());
+                    }
+                    setOpen(o => !o);
+                }}
                 disabled={disabled}
                 className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 bg-white ${disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""} ${hasError ? "border-red-500 focus:ring-red-500" : "focus:ring-orange-400"} ${className}`}
             >

@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { rutaTrasLogin } from "./utils/loginRedirect";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastProvider } from "./contexts/ToastContext";
@@ -19,6 +20,7 @@ import { PreliminaryReport } from "./pages/auditorias/PreliminaryReport";
 import { MatrizRiesgo } from "./pages/auditorias/MatrizRiesgo";
 import { CuestionariosPage } from "./pages/auditorias/CuestionariosPage";
 import { CuestionarioDetalle } from "./pages/auditorias/CuestionarioDetalle";
+import { EvidenciaCuestionario } from "./pages/auditorias/EvidenciaCuestionario";
 import { MisTareas } from "./pages/MisTareas";
 import { TareaDetalle } from "./pages/TareaDetalle";
 import { Perfil } from "./pages/Perfil";
@@ -36,13 +38,15 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user } = useAuth();
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
+  const location = useLocation();
+  return user ? <>{children}</> : <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
 };
 
 // Componente para redirigir usuarios autenticados
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
+  const location = useLocation();
+  return !user ? <>{children}</> : <Navigate to={rutaTrasLogin(location.state)} replace />;
 };
 
 function App() {
@@ -181,6 +185,14 @@ function App() {
                     element={
                       <RoleBasedRoute>
                         <CuestionariosPage />
+                      </RoleBasedRoute>
+                    }
+                  />
+                  <Route
+                    path="/evidencias/cuestionario/:archivoId"
+                    element={
+                      <RoleBasedRoute>
+                        <EvidenciaCuestionario />
                       </RoleBasedRoute>
                     }
                   />

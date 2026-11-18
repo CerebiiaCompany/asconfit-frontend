@@ -22,13 +22,11 @@ export const EditarFindingModal: React.FC<EditarFindingModalProps> = ({ finding,
 
     const empresaNombre = finding.auditoria?.empresa?.razon_social ?? `Auditoría #${finding.auditoria_id}`;
 
-    // Misma regla que al crear un hallazgo: la fecha límite debe estar dentro del
-    // rango de fechas de la actividad (pendiente de validación del negocio, punto 15).
+    // Misma regla que al crear un hallazgo: desde la fecha de solicitud de la actividad en adelante.
     const minDate = toDateStr(finding.actividad?.fecha_solicitud) || undefined;
-    const maxDate = toDateStr(finding.actividad?.tiempo_entrega) || undefined;
 
     const handleDateChange = (val: string) => {
-        if (val && ((minDate && val < minDate) || (maxDate && val > maxDate))) return;
+        if (val && minDate && val < minDate) return;
         setFechaLimite(val);
     };
 
@@ -139,7 +137,6 @@ export const EditarFindingModal: React.FC<EditarFindingModalProps> = ({ finding,
                     <FechaLimiteField
                         value={fechaLimite}
                         minDate={minDate}
-                        maxDate={maxDate}
                         disabled={!finding.actividad_id}
                         onChange={handleDateChange}
                     />

@@ -8,6 +8,7 @@ import { UserAvatar } from "../common/UserAvatar";
 import { UserProfileModal } from "./UserProfileModal";
 import { EmpresaAssignmentModal } from "./EmpresaAssignmentModal";
 import { ChangePasswordModal } from "./ChangePasswordModal";
+import { EncargosCell } from "./EncargosCell";
 import { storageUrl } from "../../utils/storageUrl";
 
 interface UserRoleAssignmentProps {
@@ -15,6 +16,8 @@ interface UserRoleAssignmentProps {
   roles: Role[];
   loading: boolean;
   onUpdateRole: (userId: number, roleId: string) => Promise<void>;
+  /** Se llama al cerrar la asignación de empresas, para refrescar los encargos de la tabla. */
+  onEmpresasChanged?: () => void;
 }
 
 export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
@@ -22,6 +25,7 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   roles,
   loading,
   onUpdateRole,
+  onEmpresasChanged,
 }) => {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,6 +114,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                   Asignar Rol
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Encargos asignados
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Empresas y Encargos
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -184,6 +191,13 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                       placeholder="Seleccionar rol..."
                     />
                   </td>
+                  <td className="px-6 py-4 align-top">
+                    {user.role?.nombre === "admin" ? (
+                      <span className="text-xs text-gray-400">—</span>
+                    ) : (
+                      <EncargosCell encargos={user.encargos} />
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {user.role?.nombre === "admin" ? (
                       <span className="text-xs text-gray-400 italic">
@@ -249,7 +263,10 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
       {empresaAssignmentUser && (
         <EmpresaAssignmentModal
           isOpen={true}
-          onClose={() => setEmpresaAssignmentUser(null)}
+          onClose={() => {
+            setEmpresaAssignmentUser(null);
+            onEmpresasChanged?.();
+          }}
           userId={empresaAssignmentUser.id}
           userName={empresaAssignmentUser.name}
         />
